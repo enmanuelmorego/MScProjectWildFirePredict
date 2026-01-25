@@ -1,5 +1,6 @@
 from pathlib import Path
 import os 
+import pandas as pd
 
 def get_filepaths(dir_name: str) -> list[Path]: 
   """
@@ -14,7 +15,7 @@ def get_filepaths(dir_name: str) -> list[Path]:
   files = list(dir_path.iterdir())
   return files
   
-def to_load_viirs(files: list[str], year_load: list[int] | None = None):
+def to_load_viirs(files: list[str], year_load: list[int] | None = None) -> list[Path]:
   """
   Function to select the VIIRS files to load from GoogleDrive storage
   - It filters the list of files to a given year (if specified)
@@ -22,6 +23,9 @@ def to_load_viirs(files: list[str], year_load: list[int] | None = None):
   Args:
     files (list): List of strings containing a full file path for each of the files to load
     year_load (int): An integer representing a year to load the data - If not provided, the default with load all data
+
+  Returns:
+    A list of paths
   """
   if len(year_load) > 0:
     files_out = []
@@ -33,3 +37,16 @@ def to_load_viirs(files: list[str], year_load: list[int] | None = None):
     return files_out
   
   return files
+
+def load_viirs(paths_to_load: list[Path]) -> pd.Dataframe:
+  """
+  Function to load the VIIRS data
+  It loads NOAA-20 and SNPP separately, and then takes the difference of SNPP - NOAA-20 
+  This means lon-lat-date values from SNPP take priority and values not in SNPP but in NOAA-20 are added to the 
+  final data frame
+
+  Args:
+    paths_to_load: List of Path objects to load 
+
+  """
+  pass
