@@ -38,7 +38,7 @@ def to_load_viirs(files: list[str], year_load: list[int] | None = None) -> list[
   
   return files
 
-def load_viirs(paths_to_load: list[Path]) -> pd.Dataframe:
+def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   """
   Function to load the VIIRS data
   It loads NOAA-20 and SNPP separately, and then takes the difference of SNPP - NOAA-20 
@@ -48,5 +48,21 @@ def load_viirs(paths_to_load: list[Path]) -> pd.Dataframe:
   Args:
     paths_to_load: List of Path objects to load 
 
+  Returns:
+    dictionary containing both data frames from both used products 
+
   """
-  pass
+  viirs_noaa = []
+  viirs_snpp = []
+
+  for p in paths_to_load:
+    if "snpp" in p.name:
+      df_in_v = pd.read_csv(p)
+      viirs_snpp.append(df_in_v)
+    else:
+      df_in_n = pd.read_csv(p)
+      viirs_noaa.append(df_in_n)
+
+  df_viirs = pd.concat(viirs_snpp, ignore_index=True)
+  df_noaa = pd.concat(viirs_noaa,ignore_index=True)
+  return {'snpp': df_viirs, 'noaa': df_noaa}

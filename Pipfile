@@ -6,9 +6,12 @@ name = "pypi"
 [packages]
 requests = "*"
 google = "*"
+pandas = "*"
+mypy = "*"
 
 [dev-packages]
 ipykernel = "*"
+pandas-stubs = "*"
 
 [requires]
 python_version = "3.12"
