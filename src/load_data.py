@@ -1,16 +1,16 @@
 from pathlib import Path
+import os 
 
-def get_filepaths(working_dir: str, dir_name: str) -> list[str]: 
+def get_filepaths(dir_name: str) -> list[Path]: 
   """
   Function to get all the files in a directory inside the data folder
 
   Args: 
-    working_dir (str): String containing the current working directory for the project
     dir_name (str): Name of the directory inside of data folder to get all the files names from 
 
   Returns: List containing all the files inside the given folder
   """
-  dir_path = Path(working_dir)/'data'/dir_name
+  dir_path = Path(os.environ['DATA_DIR'])/dir_name
   files = list(dir_path.iterdir())
   return files
   
