@@ -1,7 +1,20 @@
+# Python
 __pycache__/
+*.py[cod]
+
+# Jupyter
 .ipynb_checkpoints/
+
+# Virtual Envs
 .env
+.venv/
+
+# Objects
 data/
 models/
 outputs/
 *.csv
+
+# MacOS
+.DS_Store
+**.DS_Store
