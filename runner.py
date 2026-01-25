@@ -14,6 +14,6 @@ print(f"\t{os.environ.get('DATA_DIR')}")
 
 import src.load_data as ld
 viirs_files = ld.get_filepaths('VIIRS')
-viirs_to_load = ld.to_load_viirs(viirs_files,[2018])
+viirs_to_load = ld.to_load_viirs(viirs_files,[])
 print(f"🧪 Testing file selection: ")
 print(f"\t{viirs_to_load}")
