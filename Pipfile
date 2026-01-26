@@ -8,6 +8,7 @@ requests = "*"
 google = "*"
 pandas = "*"
 mypy = "*"
+pytest = "*"
 
 [dev-packages]
 ipykernel = "*"
