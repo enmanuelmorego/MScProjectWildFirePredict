@@ -86,4 +86,24 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
     It also prints in the console basic information of the merge for the user to report if required
   """
   cols_merge = ['longitude','latitude','acq_date']
-  df_snpp
+  df_snpp = viirs_dict.get('snpp', 'SNPP: No data available')
+  df_noaa = viirs_dict.get('noaa', 'NOAA: No data available')
+
+  if df_snpp is None:
+    raise ValueError("SNPP data is required")
+
+  if append_noaa:
+    # Find values in NOAA not in SNPP 
+    df_diff = df_noaa.loc[~df_noaa.set_index(cols_merge).index.isin(df_snpp.set_index(cols_merge).index)]
+    df_out = pd.concat([df_snpp, df_diff], ignore_index = True)
+    data_report = {'total_rows_snpp': df_snpp.shape[0],
+                   'total_rows_noaa': df_diff.shape[0]}
+    return {'df': df_out,
+            'data_report': data_report}
+  else:
+      return {'df': df_snpp,
+              'data_report': None}
+
+'''
+df_merged.shape[0]
+'''
