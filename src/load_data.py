@@ -49,6 +49,8 @@ def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   Returns:
     dictionary containing both data frames from both used products 
 
+    `{'snpp': df_viirs, 'noaa': df_noaa}`
+
   """
   viirs_noaa = []
   viirs_snpp = []
@@ -79,18 +81,17 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
       df: Data frame merged
       data_report: a dictionary containing information on the rows and data origin
 
+      `{'df': df_out, 'data_report': data_report}`
+
   Raises:
     ValueError if SNPP data is not provided 
-
-  Notes:
-    It also prints in the console basic information of the merge for the user to report if required
   """
   cols_merge = ['longitude','latitude','acq_date']
   df_snpp = viirs_dict.get('snpp', 'SNPP: No data available')
   df_noaa = viirs_dict.get('noaa', 'NOAA: No data available')
 
   if df_snpp is None:
-    raise ValueError("SNPP data is required")
+    raise ValueError("❌ SNPP data is required")
 
   if append_noaa:
     # Find values in NOAA not in SNPP 
@@ -104,6 +105,16 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
       return {'df': df_snpp,
               'data_report': None}
 
-'''
-df_merged.shape[0]
-'''
+def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
+  """
+  Filters the VIIRS data to only the desired rows to ensure data quality
+  - Filter only Vegetation Fires:                     `type == 0`
+  - Filter to keep Nominal and high Confidence class: `confidence == 'N' or confidence == 'H'`
+
+  Returns
+    DataFrame
+  """
+  df_viirs = viirs_data.copy()
+  df_out = df_viirs[df_viirs['type'] == 0]
+  df_out = df_viirs[df_viirs['confidence'].isin(['h','n'])]
+  return df_out

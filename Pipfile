@@ -12,8 +12,3 @@ pytest = "*"
 mscprojectwildfirepredict = {file = ".", editable = true}
 
 [dev-packages]
-ipykernel = "*"
-pandas-stubs = "*"
-
-[requires]
-python_version = "3.12"
