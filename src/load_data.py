@@ -116,6 +116,7 @@ def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
     DataFrame
   """
   df_viirs = viirs_data.copy()
+  df_viirs['confidence'] = df_viirs['confidence'].str.lower().str.strip()
   df_out = df_viirs[(df_viirs['type'] == 0) & 
                     (df_viirs['confidence'].isin(['h','n']))
                    ]
