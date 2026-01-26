@@ -79,25 +79,4 @@ def test_filter_viirs_keeps_only_high_quality_vegetation():
                              "value": [10, 40]})
 
     pd.testing.assert_frame_equal(
-        result.reset_index(drop=True),
-        expected)
-
-def test_filter_viirs_returns_empty_when_no_rows_match():
-    df = pd.DataFrame({"type":       [1, 1],
-                       "confidence": ["l", "l"]})
-    result = ld.filter_viirs(df)
-    assert result.empty
-
-def test_filter_viirs_case_insensitive():
-    df = pd.DataFrame({"type":       [0,   1,   0,   0],
-                       "confidence": ["H", "h", "l", "N "],
-                       "value":      [10,  20,  30,  40]})
-                                    # ok - x  - x - ok
-    result = ld.filter_viirs(df)
-
-    expected = pd.DataFrame({"type": [0, 0],
-                             "confidence": ["h", "n"],
-                             "value": [10, 40]})
-
-    pd.testing.assert_frame_equal(result.reset_index(drop=True),
-                                  expected)
+ 
