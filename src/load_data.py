@@ -65,9 +65,45 @@ def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   df_noaa = pd.concat(viirs_noaa,ignore_index=True)
   return {'snpp': df_viirs, 'noaa': df_noaa}
 
-def merge_viirs(viirs_dict: dict[pd.DataFrame]):
+def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dict[pd.DataFrame, dict]:
   """
   Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged
   them into a single data frame
-  Data from SNPP takes precedence over NOAA as SNPP data is more robust
+  Data from SNPP takes precedence over NOAA as SNPP data is more robust and undergoes more strict QA
+  
+  Args:
+    viirs_dict (dict): Dictionary containing NOAA and SNPP data frames
+  
+  Returns:
+    dict containing two objects: 
+      df: Data frame merged
+      data_report: a dictionary containing information on the rows and data origin
+
+  Raises:
+    ValueError if SNPP data is not provided 
+
+  Notes:
+    It also prints in the console basic information of the merge for the user to report if required
   """
+  cols_merge = ['longitude','latitude','acq_date']
+  df_snpp = viirs_dict.get('snpp', 'SNPP: No data available')
+  df_noaa = viirs_dict.get('noaa', 'NOAA: No data available')
+
+  if df_snpp is None:
+    raise ValueError("SNPP data is required")
+
+  if append_noaa:
+    # Find values in NOAA not in SNPP 
+    df_diff = df_noaa.loc[~df_noaa.set_index(cols_merge).index.isin(df_snpp.set_index(cols_merge).index)]
+    df_out = pd.concat([df_snpp, df_diff], ignore_index = True)
+    data_report = {'total_rows_snpp': df_snpp.shape[0],
+                   'total_rows_noaa': df_diff.shape[0]}
+    return {'df': df_out,
+            'data_report': data_report}
+  else:
+      return {'df': df_snpp,
+              'data_report': None}
+
+'''
+df_merged.shape[0]
+'''

@@ -13,12 +13,10 @@ print("🔎 DATA DIRECTORY:")
 print(f"\t{os.environ.get('DATA_DIR')}")
 
 import src.load_data as ld
-viirs_files = ld.get_filepaths('VIIRS')
+
+viirs_files =   ld.get_filepaths('VIIRS')
 viirs_to_load = ld.to_load_viirs(viirs_files,[2019,2020])
-# print(f"🧪 Testing file selection: ")
-# print(f"\t{viirs_to_load}")
+viirs_data =    ld.load_viirs(viirs_to_load)
+df_viirs =      ld.merge_viirs(viirs_data)
 
-print("Testing Load VIIRS")
-viirs_data = ld.load_viirs(viirs_to_load)
-
-
+print(df_viirs.get('data_report'))
