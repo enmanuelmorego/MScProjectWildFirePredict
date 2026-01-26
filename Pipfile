@@ -9,6 +9,7 @@ google = "*"
 pandas = "*"
 mypy = "*"
 pytest = "*"
+mscprojectwildfirepredict = {file = ".", editable = true}
 
 [dev-packages]
 ipykernel = "*"

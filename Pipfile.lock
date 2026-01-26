@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ad1d295a4ee3786cbdeccdcc74bd35773ef710760c507fcbe871a0c2be034de3"
+            "sha256": "b32ef429396892b891a24e46125250cd50d0e61faa90a79a4c1be52b44aaccb9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -105,6 +105,10 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==0.7.8"
+        },
+        "mscprojectwildfirepredict": {
+            "editable": true,
+            "file": "."
         },
         "mypy": {
             "hashes": [

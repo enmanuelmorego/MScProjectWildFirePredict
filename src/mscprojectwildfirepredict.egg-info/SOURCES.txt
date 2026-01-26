@@ -1,0 +1,6 @@
+pyproject.toml
+src/mscprojectwildfirepredict.egg-info/PKG-INFO
+src/mscprojectwildfirepredict.egg-info/SOURCES.txt
+src/mscprojectwildfirepredict.egg-info/dependency_links.txt
+src/mscprojectwildfirepredict.egg-info/top_level.txt
+tests/test_load_data.py
