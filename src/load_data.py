@@ -40,10 +40,8 @@ def to_load_viirs(files: list[str], year_load: list[int] | None = None) -> list[
 
 def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   """
-  Function to load the VIIRS data
-  It loads NOAA-20 and SNPP separately, and then takes the difference of SNPP - NOAA-20 
-  This means lon-lat-date values from SNPP take priority and values not in SNPP but in NOAA-20 are added to the 
-  final data frame
+  Function to load the VIIRS data and store them in a dictionary
+  It loads NOAA-20 and SNPP separately
 
   Args:
     paths_to_load: List of Path objects to load 
@@ -66,3 +64,10 @@ def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   df_viirs = pd.concat(viirs_snpp, ignore_index=True)
   df_noaa = pd.concat(viirs_noaa,ignore_index=True)
   return {'snpp': df_viirs, 'noaa': df_noaa}
+
+def merge_viirs(viirs_dict: dict[pd.DataFrame]):
+  """
+  Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged
+  them into a single data frame
+  Data from SNPP takes precedence over NOAA as SNPP data is more robust
+  """
