@@ -2,6 +2,9 @@ from pathlib import Path
 import os 
 import pandas as pd
 
+# -------------------------
+# GENERAL FUNCTIONS
+# -------------------------  
 def get_filepaths(dir_name: str) -> list[Path]: 
   """
   Function to get all the files in a directory inside the data folder
@@ -14,7 +17,10 @@ def get_filepaths(dir_name: str) -> list[Path]:
   dir_path = Path(os.environ['DATA_DIR'])/dir_name
   files = list(dir_path.iterdir())
   return files
-  
+
+# -------------------------
+# VIIRS DATA
+# -------------------------  
 def to_load_viirs(files: list[Path], year_load: list[int] | None = None) -> list[Path]:
   """
   Function to select the VIIRS files to load from GoogleDrive storage
@@ -37,7 +43,6 @@ def to_load_viirs(files: list[Path], year_load: list[int] | None = None) -> list
   if not files_out:
     print(f"⚠️ WARNING:\nNo files found for years {year_load}")
   return files_out
-
 
 def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   """
