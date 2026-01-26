@@ -14,11 +14,8 @@ print(f"\t{os.environ.get('DATA_DIR')}")
 
 import src.load_data as ld
 
-viirs_files =     ld.get_filepaths('VIIRS')
-viirs_to_load =   ld.to_load_viirs(viirs_files,[2019,2020])
-viirs_data =      ld.load_viirs(viirs_to_load)
-df_viirs_raw =    ld.merge_viirs(viirs_data)
-df_viirs_report = df_viirs_raw.get('data_report')
-df_viirs_temp =   df_viirs_raw.get('df')
-df_viirs =        ld.filter_viirs(df_viirs_temp)
+viirs_dict = ld.viirs_load_pipeline(dir_name = 'VIIRS',
+                                    date_range = [2019,2020])
+
+df_viirs = viirs_dict.get('df_viirs')
 print(df_viirs.head())

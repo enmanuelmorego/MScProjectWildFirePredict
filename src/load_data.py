@@ -15,7 +15,7 @@ def get_filepaths(dir_name: str) -> list[Path]:
   files = list(dir_path.iterdir())
   return files
   
-def to_load_viirs(files: list[str], year_load: list[int] | None = None) -> list[Path]:
+def to_load_viirs(files: list[Path], year_load: list[int] | None = None) -> list[Path]:
   """
   Function to select the VIIRS files to load from GoogleDrive storage
   - It filters the list of files to a given year (if specified)
@@ -27,16 +27,17 @@ def to_load_viirs(files: list[str], year_load: list[int] | None = None) -> list[
   Returns:
     A list of paths
   """
-  if len(year_load) > 0:
-    files_out = []
-    for year in year_load:
-      str_search = str(year)
-      files_out.extend([f for f in files if str_search in f.name])
-    if not files_out:
-      print(f"⚠️ WARNING:\nNo files found for year {str_search}")
-    return files_out
+  if not year_load:
+    return files
   
-  return files
+  files_out = []
+  for year in year_load:
+    str_search = str(year)
+    files_out.extend([f for f in files if str_search in f.name])
+  if not files_out:
+    print(f"⚠️ WARNING:\nNo files found for years {year_load}")
+  return files_out
+
 
 def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   """
@@ -67,7 +68,7 @@ def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   df_noaa = pd.concat(viirs_noaa,ignore_index=True)
   return {'snpp': df_viirs, 'noaa': df_noaa}
 
-def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dict[pd.DataFrame, dict]:
+def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dict[str, object]:
   """
   Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged
   them into a single data frame
@@ -115,6 +116,33 @@ def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
     DataFrame
   """
   df_viirs = viirs_data.copy()
-  df_out = df_viirs[df_viirs['type'] == 0]
-  df_out = df_viirs[df_viirs['confidence'].isin(['h','n'])]
+  df_out = df_viirs[(df_viirs['type'] == 0) & 
+                    (df_viirs['confidence'].isin(['h','n']))
+                   ]
   return df_out
+
+def viirs_load_pipeline(dir_name: str,
+                        date_range: list[int] = [] ):
+  """
+  Pipeline to load VIIRS data
+  Cleaning and data transformation steps included in each of the individual functions
+
+  Args:
+    dir_name (str): The directory to load the data. Required for `get_filepaths()`
+    date_range (list): List of integers representing the year of data to load.
+                       
+                       Default to an empty list (load everything) if not provided
+
+  Returns:
+    Dictionary containing the final data frame and the data report 
+    `{'df_viirs': df_viirs, 'data_report': df_viirs_report}`
+  """
+  viirs_files =     get_filepaths(dir_name)
+  viirs_to_load =   to_load_viirs(viirs_files,date_range)
+  viirs_data =      load_viirs(viirs_to_load)
+  df_viirs_raw =    merge_viirs(viirs_data)
+  df_viirs_report = df_viirs_raw.get('data_report')
+  df_viirs_temp =   df_viirs_raw.get('df')
+  df_viirs =        filter_viirs(df_viirs_temp)
+  return {'df_viirs': df_viirs,
+          'data_report': df_viirs_report}
