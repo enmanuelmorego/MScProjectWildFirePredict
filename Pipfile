@@ -10,6 +10,8 @@ pandas = "*"
 mypy = "*"
 pytest = "*"
 mscprojectwildfirepredict = {file = ".", editable = true}
+geopandas = "*"
+matplotlib = "*"
 
 [dev-packages]
 ipykernel = "*"
