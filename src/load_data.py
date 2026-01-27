@@ -65,7 +65,7 @@ def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
     if "snpp" in p.name:
       df_in_v = pd.read_csv(p)
       viirs_snpp.append(df_in_v)
-    else:
+    elif 'jpss' in p.name:
       df_in_n = pd.read_csv(p)
       viirs_noaa.append(df_in_n)
 
@@ -152,3 +152,13 @@ def viirs_load_pipeline(dir_name: str,
   df_viirs =        filter_viirs(df_viirs_temp)
   return {'df_viirs': df_viirs,
           'data_report': df_viirs_report}
+
+if __name__ == "__main__":
+  os.environ.setdefault("RUN_DEMO", "ON")
+  import config as c
+  YEAR_LIST = []
+  dir_name = 'VIIRS'
+  files = get_filepaths(dir_name)
+  to_load = to_load_viirs(files)
+  data = load_viirs(to_load)
+  print(data)
