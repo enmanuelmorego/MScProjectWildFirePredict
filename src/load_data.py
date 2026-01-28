@@ -1,22 +1,9 @@
 from pathlib import Path
 import os 
 import pandas as pd
-
-# -------------------------
-# GENERAL FUNCTIONS
-# -------------------------  
-def get_filepaths(dir_name: str) -> list[Path]: 
-  """
-  Function to get all the files in a directory inside the data folder
-
-  Args: 
-    dir_name (str): Name of the directory inside of data folder to get all the files names from 
-
-  Returns: List containing all the files inside the given folder
-  """
-  dir_path = Path(os.environ['DATA_DIR'])/dir_name
-  files = list(dir_path.iterdir())
-  return files
+import geopandas as gpd
+from config import CRS
+import utils as u
 
 # -------------------------
 # VIIRS DATA
@@ -127,6 +114,20 @@ def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
                    ]
   return df_out
 
+def geo_viirs(viirs_data: pd.DataFrame, crs: str) -> gpd.GeoDataFrame:
+  """
+  Function to transform the VIIRS input data to a GeoPandasDataFrame
+
+  Args:
+    viirs_data (pd.DataFrame): Dataframe with VIIRS data, filtered and cleaned
+    crs (str): A string containing the EPSG value to set the CRS
+
+  Returns:
+    pd.GeoDataFrame 
+  """
+  viirs_geo = gpd.GeoDataFrame(viirs_data, geometry=gpd.points_from_xy(viirs_data.longitude, viirs_data.latitude), crs=crs)
+  return viirs_geo
+
 def viirs_load_pipeline(dir_name: str,
                         date_range: list[int] = [] ):
   """
@@ -140,25 +141,31 @@ def viirs_load_pipeline(dir_name: str,
                        Default to an empty list (load everything) if not provided
 
   Returns:
-    Dictionary containing the final data frame and the data report 
+    Dictionary containing the final data frame and the data report (the dataframe returned is a GeoPandas df)
     `{'df_viirs': df_viirs, 'data_report': df_viirs_report}`
   """
-  viirs_files =     get_filepaths(dir_name)
+  viirs_files =     u.get_filepaths(dir_name)
   viirs_to_load =   to_load_viirs(viirs_files,date_range)
   viirs_data =      load_viirs(viirs_to_load)
   df_viirs_raw =    merge_viirs(viirs_data)
   df_viirs_report = df_viirs_raw.get('data_report')
   df_viirs_temp =   df_viirs_raw.get('df')
   df_viirs =        filter_viirs(df_viirs_temp)
-  return {'df_viirs': df_viirs,
+  df_viirs_geo =    geo_viirs(df_viirs, CRS)
+  return {'df_viirs': df_viirs_geo,
           'data_report': df_viirs_report}
 
+# -------------------------
+# UK GRID DATA
+# -------------------------  
+def load_uk_grid(file: str) -> gpd.GeoDataFrame:
+  pass
 if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
   import config as c
   YEAR_LIST = []
-  dir_name = 'VIIRS'
-  files = get_filepaths(dir_name)
-  to_load = to_load_viirs(files)
-  data = load_viirs(to_load)
-  print(data)
+  # dir_name = 'VIIRS'
+  # files = u.get_filepaths(dir_name)
+  # to_load = to_load_viirs(files)
+  # data = load_viirs(to_load)
+  # print(data)
