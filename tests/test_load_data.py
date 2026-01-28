@@ -1,8 +1,7 @@
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import load_data as ld
-import os
-os.environ.setdefault("RUN_DEMO", "ON")
+
 
 '''
 pipenv run pytest

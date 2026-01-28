@@ -15,6 +15,4 @@ os.environ['DATA_DIR'] =    str(PROJECT_ROOT / "data")
 os.environ['MODELS_DIR'] =  str(PROJECT_ROOT / "models")
 os.environ['OUTPUTS_DIR'] = str(PROJECT_ROOT / "outputs")
 
-# Set Coordinate Reference System (CRS) so it is uniform across all data inputs
-CRS = "EPSG: 4326"
 

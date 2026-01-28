@@ -13,11 +13,13 @@ import matplotlib.pyplot as plt
 # VARIABLES
 # --------------------------
 YEAR_FILTER = [2020,2021]
-
+CRS = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
+         
 # --------------------------
 # VIIRS DATA
 # --------------------------
 viirs_dict = ld.viirs_load_pipeline(dir_name = 'VIIRS',
+                                    crs = CRS,
                                     date_range = YEAR_FILTER)
 df_viirs = viirs_dict.get('df_viirs')
 print(f"{'='*80}")

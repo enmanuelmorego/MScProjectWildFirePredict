@@ -2,7 +2,7 @@ from pathlib import Path
 import os 
 import pandas as pd
 import geopandas as gpd
-from config import CRS
+#from config import CRS
 import utils as u
 
 # -------------------------
@@ -129,6 +129,7 @@ def geo_viirs(viirs_data: pd.DataFrame, crs: str) -> gpd.GeoDataFrame:
   return viirs_geo
 
 def viirs_load_pipeline(dir_name: str,
+                        crs: str,
                         date_range: list[int] = [] ):
   """
   Pipeline to load VIIRS data
@@ -151,7 +152,7 @@ def viirs_load_pipeline(dir_name: str,
   df_viirs_report = df_viirs_raw.get('data_report')
   df_viirs_temp =   df_viirs_raw.get('df')
   df_viirs =        filter_viirs(df_viirs_temp)
-  df_viirs_geo =    geo_viirs(df_viirs, CRS)
+  df_viirs_geo =    geo_viirs(df_viirs, crs)
   return {'df_viirs': df_viirs_geo,
           'data_report': df_viirs_report}
 
