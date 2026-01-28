@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # --------------------------
 # VARIABLES
 # --------------------------
-YEAR_FILTER = []
+YEAR_FILTER = [2020,2021]
 
 # --------------------------
 # VIIRS DATA
@@ -21,10 +21,9 @@ viirs_dict = ld.viirs_load_pipeline(dir_name = 'VIIRS',
                                     date_range = YEAR_FILTER)
 df_viirs = viirs_dict.get('df_viirs')
 print(f"{'='*80}")
-print(f"VIIRS Sample")
+print(f"VIIRS Data")
 print(f"\tData Type: {type(df_viirs)}")
-print(df_viirs.head())
-print(f"\tData Description: {df_viirs.info}")
+print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
 
 
 # --------------------------
