@@ -159,8 +159,20 @@ def viirs_load_pipeline(dir_name: str,
 # -------------------------
 # UK GRID DATA
 # -------------------------  
-def load_uk_grid(file: str) -> gpd.GeoDataFrame:
-  pass
+def load_uk_grid(file_name: str) -> gpd.GeoDataFrame:
+  """
+  Function to load the shapefile containing the UK grid to use as base
+
+  Args:
+    file_name (str): Name of the file to load
+
+  Returns:
+    df (GeoPandasDataFrame)
+  """
+  grid_path = Path(os.environ.get('DATA_DIR'))/'UKGrid'/file_name
+  uk_grid = gpd.read_file(grid_path)
+  return uk_grid
+
 if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
   import config as c

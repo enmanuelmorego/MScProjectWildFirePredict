@@ -22,20 +22,21 @@ viirs_dict = ld.viirs_load_pipeline(dir_name = 'VIIRS',
                                     crs = CRS,
                                     date_range = YEAR_FILTER)
 df_viirs = viirs_dict.get('df_viirs')
-print(f"{'='*80}")
-print(f"VIIRS Data")
-print(f"\tData Type: {type(df_viirs)}")
-print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
+# print(f"{'='*80}")
+# print(f"VIIRS Data")
+# print(f"\tData Type: {type(df_viirs)}")
+# print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
 
 
 # --------------------------
 # UK GRID 
 # --------------------------
-grid_path = Path(os.environ.get('DATA_DIR'))/'UKGrid'/'ukcp18-uk-land-12km.shp'
-uk_grid = gpd.read_file(grid_path)
+df_uk_grid = ld.load_uk_grid('ukcp18-uk-land-12km.shp')
+
 print(f"{'='*80}")
 print(f"UK Sample")
-print(f"\tData Type: {type(uk_grid)}")
+print(f"\tData Type: {type(df_uk_grid)}")
+print(df_uk_grid.head())
 #uk_grid_norm = uk_grid.to_crs(epsg=4326)
 #uk_grid_norm.explore()
 
