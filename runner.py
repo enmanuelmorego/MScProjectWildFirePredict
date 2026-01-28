@@ -8,11 +8,12 @@ import src.load_data as ld
 import geopandas as gpd
 from pathlib import Path
 import matplotlib.pyplot as plt
+import utils as u
 
 # --------------------------
 # VARIABLES
 # --------------------------
-YEAR_FILTER = [2020,2021]
+YEAR_FILTER = [2019]
 CRS = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
          
 # --------------------------
@@ -22,26 +23,26 @@ viirs_dict = ld.viirs_load_pipeline(dir_name = 'VIIRS',
                                     crs = CRS,
                                     date_range = YEAR_FILTER)
 df_viirs = viirs_dict.get('df_viirs')
-# print(f"{'='*80}")
-# print(f"VIIRS Data")
-# print(f"\tData Type: {type(df_viirs)}")
-# print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
+print(f"{'='*80}")
+print(f"VIIRS Data")
+print(f"\tData Type: {type(df_viirs)}")
+print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
 
 
 # --------------------------
 # UK GRID 
 # --------------------------
-df_uk_grid = ld.load_uk_grid('ukcp18-uk-land-12km.shp')
-
+df_uk_grid = ld.load_uk_grid(file_name='ukcp18-uk-land-12km.shp', 
+                             crs=CRS)
 print(f"{'='*80}")
-print(f"UK Sample")
-print(f"\tData Type: {type(df_uk_grid)}")
-print(df_uk_grid.head())
-#uk_grid_norm = uk_grid.to_crs(epsg=4326)
-#uk_grid_norm.explore()
+print(f"UK Grid")
+print(f"Shape: {df_uk_grid.shape}")
 
-# uk_grid_norm.plot(figsize=(6,8),
-#                   edgecolor='white',
-#                   linewidth=0.2)
-# plt.title("United Kingdom split on 12km x 12km grids")
-# plt.show()
+# Grids by Day
+print(f"{'='*80}")
+print(f"UK Grid Daily")
+dates = u.extract_year_range(df_viirs)
+df_daily_grid = df_uk_grid.copy()
+df_daily_grid['join_key'] = 1
+df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
+print(f"Shape: {df_daily_grid.shape}")

@@ -159,18 +159,20 @@ def viirs_load_pipeline(dir_name: str,
 # -------------------------
 # UK GRID DATA
 # -------------------------  
-def load_uk_grid(file_name: str) -> gpd.GeoDataFrame:
+def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   """
   Function to load the shapefile containing the UK grid to use as base
 
   Args:
     file_name (str): Name of the file to load
+    crs (str): Coordinate Reference System, ensure all data is consistent across the project
 
   Returns:
     df (GeoPandasDataFrame)
   """
   grid_path = Path(os.environ.get('DATA_DIR'))/'UKGrid'/file_name
   uk_grid = gpd.read_file(grid_path)
+  uk_grid = uk_grid.set_crs(crs, allow_override = True)
   return uk_grid
 
 if __name__ == "__main__":
