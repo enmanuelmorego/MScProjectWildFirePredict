@@ -16,6 +16,7 @@ mapclassify = "*"
 folium = "*"
 leafmap = "*"
 ee = "*"
+geemap = "*"
 
 [dev-packages]
 ipykernel = "*"
