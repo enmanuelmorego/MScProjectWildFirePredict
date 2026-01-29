@@ -15,6 +15,7 @@ matplotlib = "*"
 mapclassify = "*"
 folium = "*"
 leafmap = "*"
+ee = "*"
 
 [dev-packages]
 ipykernel = "*"

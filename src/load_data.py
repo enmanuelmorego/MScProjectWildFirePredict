@@ -172,7 +172,7 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   """
   grid_path = Path(os.environ.get('DATA_DIR'))/'UKGrid'/file_name
   uk_grid = gpd.read_file(grid_path)
-  uk_grid = uk_grid.set_crs(crs, allow_override = True)
+  uk_grid = uk_grid.to_crs(crs)
   return uk_grid
 
 if __name__ == "__main__":

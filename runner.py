@@ -15,7 +15,7 @@ import utils as u
 # --------------------------
 YEAR_FILTER = [2019]
 CRS = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
-         
+SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"         
 # --------------------------
 # VIIRS DATA
 # --------------------------
