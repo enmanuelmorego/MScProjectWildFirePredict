@@ -44,5 +44,4 @@ print(f"UK Grid Daily")
 dates = u.extract_year_range(df_viirs)
 df_daily_grid = df_uk_grid.copy()
 df_daily_grid['join_key'] = 1
-df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
-print(f"Shape: {df_daily_grid.shape}")
+df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='joi
