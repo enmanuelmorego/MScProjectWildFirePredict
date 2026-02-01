@@ -114,7 +114,7 @@ def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
   df_viirs['confidence'] = df_viirs['confidence'].str.lower().str.strip()
   df_out = df_viirs[(df_viirs['type'] == 0) & 
                     (df_viirs['confidence'].isin(['h','n']))
-                   ]
+                   ].copy()
   return df_out
 
 def geo_viirs(viirs_data: pd.DataFrame, crs: str) -> gpd.GeoDataFrame:
@@ -302,7 +302,7 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
   dur = timedelta(minutes=total_minutes)
   hrs, rmdr = divmod(dur.total_seconds(), 3600)
   mins = rmdr // 60
-  print(f"⏱️  Google Earth engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
+  print(f"\t⏱️  Google Earth engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
   return dict_out
 
 
