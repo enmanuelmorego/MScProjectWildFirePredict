@@ -13,14 +13,14 @@ import utils as u
 # --------------------------
 # VARIABLES
 # --------------------------
-YEAR_FILTER = [2019]
-CRS = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
+YEAR_FILTER     = [2019]
+CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"         
 # --------------------------
 # VIIRS DATA
 # --------------------------
-viirs_dict = ld.viirs_load_pipeline(dir_name = 'VIIRS',
-                                    crs = CRS,
+viirs_dict = ld.viirs_load_pipeline(dir_name   = 'VIIRS',
+                                    crs        = CRS,
                                     date_range = YEAR_FILTER)
 df_viirs = viirs_dict.get('df_viirs')
 print(f"{'='*80}")
@@ -32,8 +32,8 @@ print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date']
 # --------------------------
 # UK GRID 
 # --------------------------
-df_uk_grid = ld.load_uk_grid(file_name='ukcp18-uk-land-12km.shp', 
-                             crs=CRS)
+df_uk_grid = ld.load_uk_grid(file_name ='ukcp18-uk-land-12km.shp', 
+                             crs       = CRS)
 print(f"{'='*80}")
 print(f"UK Grid")
 print(f"Shape: {df_uk_grid.shape}")
