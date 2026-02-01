@@ -2,6 +2,8 @@ from pathlib import Path
 import os 
 import pandas as pd
 import geopandas as gpd
+from datetime import date
+from typing import Dict, List, Tuple
 #from config import CRS
 import utils as u
 
@@ -174,6 +176,36 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   uk_grid = gpd.read_file(grid_path)
   uk_grid = uk_grid.to_crs(crs)
   return uk_grid
+
+
+# -------------------------
+# GOOGLE EE SENTINEL-2
+# -------------------------  
+def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
+                         available_files: List[Path]) -> dict[str, List[Tuple[date,date]]]:
+  """"
+  Checks whether Sentinel-2 .csv files already exist in GoogleDrive ready to use for a given date range
+
+  The required date range is inferred from the input GeoDataFrame, which represents the UK grid expanded across daily timestamps. 
+  The function compares this required knowing date range against Sentinel-2 metadata files already available in persistent storage (Google Drive).
+  
+  Args:
+    df (GeoDataFrame): Geo data frame containing the whole UK Map split by grids, with grid_id, and for each day in the given range
+    available_file (List): A list contaning all the available files in GoogleDrive
+
+  Returns
+    dict: Containing the date ranges found found in GoogleDrive and the date range required to download from Google EE
+
+  Example:
+    `df_geo <Date range 2025-01-01 - 2025-10-01>`
+
+    Assume that in Google Drive there are Sentinel files for: 2025-01-01 to 2025-03-01 AND 2025-04-01 to 2025-04-28
+
+    `out_dict = {'available' : [(2025-01-01, 2025-03-01), 
+                                (2025-04-01 2025-04-28)],
+                 'required'  : [(2025-03-02, 2025-03-31),
+                                (2025-04-29, 2025-10-01)]}`
+  """
 
 if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
