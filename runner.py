@@ -5,6 +5,7 @@ import os
 os.environ.setdefault("RUN_DEMO", "ON")
 import src.config as c
 import src.load_data as ld
+import src.google_ee as gee
 import geopandas as gpd
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -54,7 +55,10 @@ print(f"Shape: {df_daily_grid.shape}")
 from datetime import datetime 
 print(f"{'='*80}")
 print(f"🛰️ GOOGLE EE SENTINEL-2")  
-sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
-req_files = ld.sentinel_check_drive(df_daily_grid, sentinel_files)
-if req_files['required_days']:
-    test = ld.sentinel_batch_create(df_daily_grid, req_files['required_days'])
+test = gee.google_ee_request_runner(satelite     = SATELITE_IMAGES,
+                                    df_grid_date = df_daily_grid[df_daily_grid['date'] < '2019-01-18'],
+                                    data_dir     = DATA_DIR)
+# sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
+# req_files = ld.sentinel_check_drive(df_daily_grid, sentinel_files)
+# if req_files['required_days']:
+#     test = ld.sentinel_batch_create(df_daily_grid, req_files['required_days'])

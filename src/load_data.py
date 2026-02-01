@@ -232,8 +232,11 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
 
    # Find files relevant to current date range 
   for f in available_files:
-    avail_min = datetime.strptime(f[:8],   "%Y%m%d").date() 
-    avail_max = datetime.strptime(f[9:17], "%Y%m%d").date()
+    try:
+      avail_min = datetime.strptime(f[:8],   "%Y%m%d").date() 
+      avail_max = datetime.strptime(f[9:17], "%Y%m%d").date()
+    except ValueError:
+      continue
 
     if avail_max < min_d or avail_min > max_d:
       continue
@@ -249,7 +252,7 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
   return {"available_files": used_files,
           "required_days": sorted(required_days)}
 
-def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int = 10):
+def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int = 10) -> dict:
   """
   Takes the UK Grid by day, along with the computed required_days list from `sentinel_check_drive` and
   splits the data frame into batches of 14 days max. This allows for each data frame to be approximately 
@@ -265,7 +268,7 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
                       defaults to 10 days
 
   Returns:
-    dict_out (dict): A dictionary of data frames, each containing 14 days worth of data
+    dict_out (dict): A dictionary of data frames, each containing `batch_size` days worth of data
   """
   min_i       = 0
   max_i       = batch_size - 1
@@ -277,6 +280,7 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
   # Get total batches required
   total_batches = math.ceil(total_dates / batch_size)
   dict_out = {}
+  total_rows = 0
 
   for _ in range(1, total_batches + 1):
     if max_i >= total_dates:
@@ -292,9 +296,13 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
     min_i += batch_size
     max_i += batch_size
     batch += 1
+    total_rows += df_batch.shape[0]
 
-  g_ee_duration = timedelta(minutes=batch*40)
-  print(f"⏱️  Google Earth engine will take approximately {g_ee_duration} to process the data")
+  total_minutes = 0.12 * total_rows
+  dur = timedelta(minutes=total_minutes)
+  hrs, rmdr = divmod(dur.total_seconds(), 3600)
+  mins = rmdr // 60
+  print(f"⏱️  Google Earth engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
   return dict_out
 
 

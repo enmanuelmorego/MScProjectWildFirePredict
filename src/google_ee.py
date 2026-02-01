@@ -2,6 +2,9 @@
 import ee
 import geopandas as gpd
 import pandas as pd
+import os
+import load_data as ld
+from pathlib import Path
 
 def geodf_to_ee(geo_df: gpd.GeoDataFrame) -> ee.FeatureCollection:
     """
@@ -55,7 +58,7 @@ def attach_s2_metadata(feature: ee.Feature, s2: ee.imagecollection) -> ee.Featur
                         "has_image":   ee.Algorithms.If(img,1,0)})
 
 
-def google_ee_request_runner(sat: str, uk_grid_date: pd.DataFrame, required_days: dict):
+def google_ee_request_runner(satelite: str, df_grid_date: pd.DataFrame, data_dir: str):
     """
     Runs the Google EarthEngine functions to request Sentinel Images from Google EarthEngine
     Runner splits the requests to max of 15 days at the time, given that more days causes a request limit error
@@ -67,4 +70,32 @@ def google_ee_request_runner(sat: str, uk_grid_date: pd.DataFrame, required_days
         ee.Authenticate()
         ee.Initialize(project = "ee-enmanuelmorego")
     # Get image collection     
-    sat_img_col = ee.ImageCollection(sat)
+    sat_img_col = ee.ImageCollection(satelite)
+    # Get stored files 
+    sentinel_files = os.listdir(Path(data_dir)/"sentinel2")
+    # Get required dates to fetch from Google EE
+    req_files = ld.sentinel_check_drive(df_grid_date, sentinel_files)
+
+    if req_files['required_days']:
+        # Split the data into manageable batches for Google EE
+        data_batch = ld.sentinel_batch_create(df_grid_date, req_files['required_days'])
+        # Iterate thru each batch
+        for key in data_batch:
+            df_request = data_batch.get(key)
+            start, end = (df_request['date'].min()).strftime('%Y%m%d'), (df_request['date'].max()).strftime('%Y%m%d')
+            fname = f"{start}-{end}_sentinel_images_layer1"
+
+            fc_request = geodf_to_ee(df_request)
+            fc_s2 = fc_request.map(lambda f: attach_s2_metadata(f, sat_img_col))
+            fc_export = (fc_s2
+                         .filter(ee.Filter.eq("has_image",1))
+                         .select(['date','grid_id','sentinel_id','cloud_pct'])
+                         .map(lambda f: f.setGeometry(None)))
+            task = ee.batch.Export.table.toDrive(collection=fc_export,
+                                                 description=fname,
+                                                 folder = "Sentinel2",
+                                                 fileFormat="CSV")
+            task.start()
+
+
+
