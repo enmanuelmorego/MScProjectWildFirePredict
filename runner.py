@@ -45,14 +45,4 @@ print(f"🇬🇧 UK Grid Daily")
 dates = u.extract_year_range(df_viirs)
 df_daily_grid = df_uk_grid.copy()
 df_daily_grid['join_key'] = 1
-df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
-print(f"Shape: {df_daily_grid.shape}")
-
-# -------------------------
-# GOOGLE EE SENTINEL-2
-# -------------------------
-from datetime import datetime 
-print(f"{'='*80}")
-print(f"🛰️ GOOGLE EE SENTINEL-2")  
-sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
-print(ld.sentinel_check_drive(df_daily_grid, sentinel_files))
+df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(column

@@ -2,8 +2,9 @@ from pathlib import Path
 import os 
 import pandas as pd
 import geopandas as gpd
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Tuple
+import math
 #from config import CRS
 import utils as u
 
@@ -246,12 +247,13 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
   required_days = sorted(requested_days - available_days)
 
   return {"available_files": used_files,
-          "required_days": required_days}
+          "required_days": sorted(required_days)}
 
-def sentinel_batch_create(df: pd.DataFrame, required_days: list):
+def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int = 10):
   """
   Takes the UK Grid by day, along with the computed required_days list from `sentinel_check_drive` and
-  splits the data frame into batches of 14 days max. 
+  splits the data frame into batches of 14 days max. This allows for each data frame to be approximately 
+  20k-25k rows max
   This is to ensure that the request is under the max size set by Google EE engine
 
   Args:
@@ -259,11 +261,42 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list):
 
     required_days (list): List of dates to request from google earth
 
+    batch_size (int): Number of days allowed in each batch. this controls the size of the data to be processed
+                      defaults to 10 days
+
   Returns:
-    df_out (dict): A dictionary of data frames, each containing 14 days worth of data
+    dict_out (dict): A dictionary of data frames, each containing 14 days worth of data
   """
-  # Sort list of dates
-  sorted_dates = sort(required_days)
+  min_i       = 0
+  max_i       = batch_size - 1
+  batch       = 1
+  total_dates = len(required_days)
+  df['date'] = pd.to_datetime(df['date']).dt.date
+  required_days = sorted(required_days)
+
+  # Get total batches required
+  total_batches = math.ceil(total_dates / batch_size)
+  dict_out = {}
+
+  for _ in range(1, total_batches + 1):
+    if max_i >= total_dates:
+      max_d = required_days[total_dates - 1]
+    else:
+      max_d = required_days[max_i]
+    min_d = required_days[min_i]
+
+    df_batch = df[(df['date'] >= min_d) &
+                  (df['date'] <= max_d)].copy()
+    dict_out[f"batch_{batch}"] = df_batch
+    # Update values
+    min_i += batch_size
+    max_i += batch_size
+    batch += 1
+
+  g_ee_duration = timedelta(minutes=batch*40)
+  print(f"⏱️  Google Earth engine will take approximately {g_ee_duration} to process the data")
+  return dict_out
+
 
 
 if __name__ == "__main__":
@@ -273,7 +306,8 @@ if __name__ == "__main__":
   files_list = ['20250101-20250120_.csv', '20250121-20250130_.csv']
   df = pd.DataFrame({"date": ["2025-01-01", "2025-01-30"]})
 
-  print(sentinel_check_drive(df, files_list ))
+  req = sentinel_check_drive(df, files_list)
+  sent
   # dir_name = 'VIIRS'
   # files = u.get_filepaths(dir_name)
   # to_load = to_load_viirs(files)
