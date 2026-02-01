@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import load_data as ld
+from datetime import datetime, date
 
 
 '''
@@ -109,14 +110,24 @@ def test_filter_viirs_case_insensitive():
 # -------------------------  
 def test_sentinel_check_drive_empty_list():
     files_list = []
-    df = pd.DataFrame({'date': ['2025-01-01', '2025-02-01', '2025-06-30']})
-    out_expect = {'available_files': [],
-                  'required_ranges' : [('2025-01-01', '2025-06-30')]}
-    assert ld.sentinel_check_drive(df, files_list) == out_expect
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-05"]})
 
-def test_sentinel_check_drive_all_required_list():
-    files_list = []
-    df = pd.DataFrame({'date': ['2025-01-01', '2025-02-01', '2025-06-30']})
-    out_expect = {'available_files': [],
-                  'required_ranges' : [('2025-01-01', '2025-06-30')]}
-    assert ld.sentinel_check_drive(df, files_list) == out_expect
+    out_expect = {"available_files": [],
+                  "required_days": [date(2025, 1, 1), date(2025, 1, 2),
+                                    date(2025, 1, 3),date(2025, 1, 4),
+                                    date(2025, 1, 5),],}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+def test_sentinel_check_drive_all_non_overlapping_files():
+    files_list = ['20190101-20190115_.csv', '20190101-20190115_.csv','20190101-20190115_.csv' ]
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-05"]})
+
+    out_expect = {"available_files": [],
+                  "required_days": [date(2025, 1, 1), date(2025, 1, 2),
+                                    date(2025, 1, 3),date(2025, 1, 4),
+                                    date(2025, 1, 5),],}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect

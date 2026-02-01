@@ -202,47 +202,51 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
       A list of filenames corresponding to Sentinel-2 metadata CSVs that can be reused directly for the requested date range.
 
       "required_ranges":
-      A list of (start_date, end_date) tuples defining temporal segments for which Sentinel-2 metadata are missing and must be retrieved from Google Earth Engine.
+      A list of date objects representing each of the days that need to be retrieved from Google Earth Engine 
 
   Example:
-    `df_geo <Date range 2019-01-01 - 2019-10-01>`
+    `df_geo <Date range 2019-01-01 - 2019-01-20>`
 
-    Assume that in Google Drive there are Sentinel files for:`2019-01-01` to `2019-01-15` AND `2019-03-01` to `2019-07-15`::
+    Assume that in Google Drive there are Sentinel files for:`2019-01-01` to `2019-01-05` AND `2019-01-10` to `2019-01-20`::
 
-      out_dict = {'available_files' : ['20190101-20190115_sentinel_images_layer1.csv', 
-                                       '20190301-20190715_sentinel_images_layer1.csv'],
-                  'required_ranges'  : [dates]}
+      out_dict = {'available_files' : ['20190101-20190105_sentinel_images_layer1.csv', 
+                                       '20190110-20190120_sentinel_images_layer1.csv'],
+                  'required_ranges'  : [datetime.date(2019, 1, 6), datetime.date(2019, 1, 7)
+                                        datetime.date(2019, 1, 8), datetime.date(2019, 1, 9)]}
   """
   # Extract date range
-  geo_dates = pd.to_datetime(geo_df['dates']).dt.date
+  geo_dates = pd.to_datetime(geo_df['date']).dt.date
   min_d, max_d = geo_dates.min(), geo_dates.max()
 
-  requested_days = set(pd.date_range(start =min, 
-                                     end   = max,
+  requested_days = set(pd.date_range(start = min_d, 
+                                     end   = max_d,
                                      freq  = "D").date)
-  out_dict = {'available_files' : [],
-              'required_ranges' : []}
   # If no files exists, all are required
   if not available_files:
     return {"available_files": [],
             "required_days": sorted(requested_days)}
 
-  available_total_range = []
-  # Find files relevant to current date range 
+  available_days: set[date] = set()
+  used_files: List[Path] = []
+
+   # Find files relevant to current date range 
   for f in available_files:
-    avail_min, avail_max = f[:8], f[9:17]
-    avail_min, avail_max = datetime.strptime(avail_min, "%Y%m%d").date(), datetime.strptime(avail_max, "%Y%m%d").date()
-    if avail_min >= min_d and avail_min <= max_d:
-      out_dict['available_files'].append(f)
-      available_total_range.append(pd.date_range(start = avail_min,
-                                                 end   = avail_max,
-                                                 freq  = "D"))
+    avail_min = datetime.strptime(f[:8],   "%Y%m%d").date() 
+    avail_max = datetime.strptime(f[9:17], "%Y%m%d").date()
+
+    if avail_max < min_d or avail_min > max_d:
+      continue
+
+    used_files.append(f)
+    available_days.update(pd.date_range(start = avail_min,
+                                        end   = avail_max,
+                                        freq  = "D")
+                                        .date)
   # Find missing dates
-  r_t = requested_total_range.date().tolist()
-  a_t = available_total_range.date().tolist()
-  required_days = set(r_t) - set(a_t)
-  out_dict['required_ranges'] = list(required_days)
-  return out_dict
+  required_days = sorted(requested_days - available_days)
+
+  return {"available_files": used_files,
+          "required_days": required_days}
 
 
 
@@ -250,10 +254,9 @@ if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
   import config as c
   YEAR_LIST = []
-  files = ['20190101-20190115_sentinel_images_layer1', '20190301-20190715_sentinel_images_layer1','20200301-20200715_sentinel_images_layer1' ]
-  #files = []
-  df = pd.DataFrame({'date': ['2019-01-01', '2019-02-01', '2019-06-30']})
-  print(sentinel_check_drive(df, files ))
+  files_list = ['20190101-20190115_.csv', '20190101-20190115_.csv','20190101-20190115_.csv' ]
+  df = pd.DataFrame({"date": ["2025-01-01", "2025-01-05"]})
+  print(sentinel_check_drive(df, files_list ))
   # dir_name = 'VIIRS'
   # files = u.get_filepaths(dir_name)
   # to_load = to_load_viirs(files)
