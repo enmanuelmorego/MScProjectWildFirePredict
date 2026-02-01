@@ -11,6 +11,7 @@ pipenv run pytest
 # -------------------------
 # VIIRS DATA LOAD PROCESS
 # -------------------------
+# -----
 def test_merge_viirs_merges_df_correctly():
     d1 = pd.DataFrame(
         {'longitude':   [1,            2,             3,           4,            5],
@@ -69,6 +70,7 @@ def test_merge_viirs_data_report():
     assert dict_data_report.get('total_rows_snpp') == 5
     assert dict_data_report.get('total_rows_noaa') == 3
 
+# -----
 def test_filter_viirs_keeps_only_high_quality_vegetation():
     df = pd.DataFrame({"type":       [0,   1,   0,   0],
                        "confidence": ["h", "h", "l", "n"],
@@ -108,6 +110,7 @@ def test_filter_viirs_case_insensitive():
 # -------------------------
 # GOOGLE EE SENTINEL-2
 # -------------------------  
+# -----
 def test_sentinel_check_drive_empty_list():
     files_list = []
     df = pd.DataFrame({"date": ["2025-01-01", "2025-01-05"]})
@@ -172,6 +175,7 @@ def test_sentinel_check_drive_early_overlap_start():
     out = ld.sentinel_check_drive(df, files_list)
     assert out == out_expect
 
+# -----
 def test_sentinel_batch_create():
     df = pd.DataFrame({"date": ["2025-01-01", "2025-01-04", "2025-01-02", "2025-01-03",
                                 "2025-01-01", "2025-01-05", "2025-01-06", "2025-01-07",
