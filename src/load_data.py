@@ -206,6 +206,12 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
                  'required'  : [(2025-03-02, 2025-03-31),
                                 (2025-04-29, 2025-10-01)]}`
   """
+  # Extract date range
+  min, max = geo_df['date'].min(), geo_df['date'].max()
+  if available_files is None or len(available_files) == 0:
+    return {'available': [],
+            'required' : [(min, max)]}
+
 
 if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")

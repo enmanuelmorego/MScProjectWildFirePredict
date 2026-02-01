@@ -102,3 +102,10 @@ def test_filter_viirs_case_insensitive():
 
     pd.testing.assert_frame_equal(result.reset_index(drop=True),
                                   expected)
+
+
+# -------------------------
+# GOOGLE EE SENTINEL-2
+# -------------------------  
+def test_sentinel_check_drive_empty_list():
+    pass
