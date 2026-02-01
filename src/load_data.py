@@ -262,6 +262,8 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list):
   Returns:
     df_out (dict): A dictionary of data frames, each containing 14 days worth of data
   """
+  # Sort list of dates
+  sorted_dates = sort(required_days)
 
 
 if __name__ == "__main__":
