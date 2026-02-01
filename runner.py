@@ -55,4 +55,4 @@ from datetime import datetime
 print(f"{'='*80}")
 print(f"🛰️ GOOGLE EE SENTINEL-2")  
 sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
-print(ld.sentinel_check_drive(df_viirs, sentinel_files))
+print(ld.sentinel_check_drive(df_daily_grid, sentinel_files))
