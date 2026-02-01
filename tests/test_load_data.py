@@ -171,3 +171,33 @@ def test_sentinel_check_drive_early_overlap_start():
 
     out = ld.sentinel_check_drive(df, files_list)
     assert out == out_expect
+
+def test_sentinel_batch_create():
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-04", "2025-01-02", "2025-01-03",
+                                "2025-01-01", "2025-01-05", "2025-01-06", "2025-01-07",
+                                "2025-01-08", "2025-01-09", "2025-01-09"],
+                       "name": ["a", "a.1", "b", "c", "d",
+                                "e", "f", "g", "h", "i", "i.1"]})
+
+    required = pd.date_range(start="2025-01-01",
+                             end="2025-01-09",
+                             freq="D").date.tolist()
+
+    out = ld.sentinel_batch_create(df, required, batch_size=2)
+
+    # Correct number of batches
+    assert len(out) == 5 
+
+    # Check batch-by-batch dates
+    expected_batches = {"batch_1": {date(2025, 1, 1), date(2025, 1, 2)},
+                        "batch_2": {date(2025, 1, 3), date(2025, 1, 4)},
+                        "batch_3": {date(2025, 1, 5), date(2025, 1, 6)},
+                        "batch_4": {date(2025, 1, 7), date(2025, 1, 8)},
+                        "batch_5": {date(2025, 1, 9)}}
+
+    for batch_name, expected_dates in expected_batches.items():
+        batch_df = out[batch_name]
+
+        # ensure only expected dates are present
+        assert set(batch_df["date"]) == expected_dates
+
