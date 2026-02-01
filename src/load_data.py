@@ -298,7 +298,7 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
     batch += 1
     total_rows += df_batch.shape[0]
 
-  total_minutes = 0.12 * total_rows
+  total_minutes = 0.012 * total_rows
   dur = timedelta(minutes=total_minutes)
   hrs, rmdr = divmod(dur.total_seconds(), 3600)
   mins = rmdr // 60

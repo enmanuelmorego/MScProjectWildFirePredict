@@ -124,4 +124,84 @@ def test_sentinel_check_drive_empty_list():
     assert out == out_expect
 
 def test_sentinel_check_drive_all_non_overlapping_files():
-    files_list = ['20190101-20190115_.csv', '20190101-20190115_.csv','2
+    files_list = ['20190101-20190115_.csv', '20190101-20190115_.csv','20190101-20190115_.csv' ]
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-05"]})
+
+    out_expect = {"available_files": [],
+                  "required_days": [date(2025, 1, 1), date(2025, 1, 2),
+                                    date(2025, 1, 3),date(2025, 1, 4),
+                                    date(2025, 1, 5),],}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+def test_sentinel_check_drive_partial_overlapping_files():
+    files_list = ['20250101-20250115_.csv', '20250120-20250125_.csv']
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-02-01"]})
+
+    out_expect = {"available_files": ['20250101-20250115_.csv', '20250120-20250125_.csv'],
+                  "required_days":   [date(2025, 1, 16), date(2025, 1, 17),
+                                      date(2025, 1, 18), date(2025, 1, 19),
+                                      date(2025, 1, 26), date(2025, 1, 27),
+                                      date(2025, 1, 28), date(2025, 1, 29),
+                                      date(2025, 1, 30), date(2025, 1, 31),
+                                      date(2025, 2, 1)],}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+def test_sentinel_check_drive_all_overlapping_files():
+    files_list = ['20250101-20250120_.csv', '20250121-20250130_.csv']
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-30"]})
+
+    out_expect = {"available_files": files_list,
+                  "required_days":   []}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+def test_sentinel_check_drive_early_overlap_start():
+    files_list = ['20250101-20250115_.csv', '20250120-20250125_.csv']
+    df = pd.DataFrame({"date": ["2025-01-10", "2025-02-01"]})
+
+    out_expect = {"available_files": ['20250101-20250115_.csv', '20250120-20250125_.csv'],
+                  "required_days":   [date(2025, 1, 16), date(2025, 1, 17),
+                                      date(2025, 1, 18), date(2025, 1, 19),
+                                      date(2025, 1, 26), date(2025, 1, 27),
+                                      date(2025, 1, 28), date(2025, 1, 29),
+                                      date(2025, 1, 30), date(2025, 1, 31),
+                                      date(2025, 2, 1)],}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+# -----
+def test_sentinel_batch_create():
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-04", "2025-01-02", "2025-01-03",
+                                "2025-01-01", "2025-01-05", "2025-01-06", "2025-01-07",
+                                "2025-01-08", "2025-01-09", "2025-01-09"],
+                       "name": ["a", "a.1", "b", "c", "d",
+                                "e", "f", "g", "h", "i", "i.1"]})
+
+    required = pd.date_range(start="2025-01-01",
+                             end="2025-01-09",
+                             freq="D").date.tolist()
+
+    out = ld.sentinel_batch_create(df, required, batch_size=2)
+
+    # Correct number of batches
+    assert len(out) == 5 
+
+    # Check batch-by-batch dates
+    expected_batches = {"batch_1": {date(2025, 1, 1), date(2025, 1, 2)},
+                        "batch_2": {date(2025, 1, 3), date(2025, 1, 4)},
+                        "batch_3": {date(2025, 1, 5), date(2025, 1, 6)},
+                        "batch_4": {date(2025, 1, 7), date(2025, 1, 8)},
+                        "batch_5": {date(2025, 1, 9)}}
+
+    for batch_name, expected_dates in expected_batches.items():
+        batch_df = out[batch_name]
+
+        # ensure only expected dates are present
+        assert set(batch_df["date"]) == expected_dates
+
