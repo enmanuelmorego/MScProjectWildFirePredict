@@ -1,0 +1,1 @@
+# Functions specific to Google Earth Engine connection and satelite images processing 

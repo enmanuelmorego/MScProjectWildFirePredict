@@ -215,7 +215,7 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
                                         datetime.date(2019, 1, 8), datetime.date(2019, 1, 9)]}
   """
   # Extract date range
-  geo_dates = pd.to_datetime(geo_df['date']).dt.date
+  geo_dates = pd.to_datetime(geo_df['acq_date']).dt.date
   min_d, max_d = geo_dates.min(), geo_dates.max()
 
   requested_days = set(pd.date_range(start = min_d, 
