@@ -131,17 +131,43 @@ def test_sentinel_check_drive_all_non_overlapping_files():
 
     out = ld.sentinel_check_drive(df, files_list)
     assert out == out_expect
+
 def test_sentinel_check_drive_partial_overlapping_files():
-    files_list = ['20250101-20250115_.csv', '20190120-20250125_.csv']
+    files_list = ['20250101-20250115_.csv', '20250120-20250125_.csv']
     df = pd.DataFrame({"date": ["2025-01-01", "2025-02-01"]})
 
-    out_expect = {"available_files": ['20250101-20250115_.csv', '20190120-20250125_.csv'],
-                  "required_days": [date(2025, 1, 16), date(2025, 1, 17),
-                                    date(2025, 1, 18), date(2025, 1, 19),
-                                    date(2025, 1, 26), date(2025, 1, 27),
-                                    date(2025, 1, 28), date(2025, 1, 29),
-                                    date(2025, 1, 30), date(2025, 1, 31),
-                                    date(2025, 2, 1)],}
+    out_expect = {"available_files": ['20250101-20250115_.csv', '20250120-20250125_.csv'],
+                  "required_days":   [date(2025, 1, 16), date(2025, 1, 17),
+                                      date(2025, 1, 18), date(2025, 1, 19),
+                                      date(2025, 1, 26), date(2025, 1, 27),
+                                      date(2025, 1, 28), date(2025, 1, 29),
+                                      date(2025, 1, 30), date(2025, 1, 31),
+                                      date(2025, 2, 1)],}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+def test_sentinel_check_drive_all_overlapping_files():
+    files_list = ['20250101-20250120_.csv', '20250121-20250130_.csv']
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-30"]})
+
+    out_expect = {"available_files": files_list,
+                  "required_days":   []}
+
+    out = ld.sentinel_check_drive(df, files_list)
+    assert out == out_expect
+
+def test_sentinel_check_drive_early_overlap_start():
+    files_list = ['20250101-20250115_.csv', '20250120-20250125_.csv']
+    df = pd.DataFrame({"date": ["2025-01-10", "2025-02-01"]})
+
+    out_expect = {"available_files": ['20250101-20250115_.csv', '20250120-20250125_.csv'],
+                  "required_days":   [date(2025, 1, 16), date(2025, 1, 17),
+                                      date(2025, 1, 18), date(2025, 1, 19),
+                                      date(2025, 1, 26), date(2025, 1, 27),
+                                      date(2025, 1, 28), date(2025, 1, 29),
+                                      date(2025, 1, 30), date(2025, 1, 31),
+                                      date(2025, 2, 1)],}
 
     out = ld.sentinel_check_drive(df, files_list)
     assert out == out_expect

@@ -254,8 +254,9 @@ if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
   import config as c
   YEAR_LIST = []
-  files_list = ['20250101-20250115_.csv', '20190120-20250125_.csv']
-  df = pd.DataFrame({"date": ["2025-01-01", "2025-02-01"]})
+  files_list = ['20250101-20250120_.csv', '20250121-20250130_.csv']
+  df = pd.DataFrame({"date": ["2025-01-01", "2025-01-30"]})
+
   print(sentinel_check_drive(df, files_list ))
   # dir_name = 'VIIRS'
   # files = u.get_filepaths(dir_name)
