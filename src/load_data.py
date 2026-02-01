@@ -248,6 +248,20 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
   return {"available_files": used_files,
           "required_days": required_days}
 
+def sentinel_batch_create(df: pd.DataFrame, required_days: list):
+  """
+  Takes the UK Grid by day, along with the computed required_days list from `sentinel_check_drive` and
+  splits the data frame into batches of 14 days max. 
+  This is to ensure that the request is under the max size set by Google EE engine
+
+  Args:
+    df (DataFrame): UK grid data frame by day
+
+    required_days (list): List of dates to request from google earth
+
+  Returns:
+    df_out (dict): A dictionary of data frames, each containing 14 days worth of data
+  """
 
 
 if __name__ == "__main__":
