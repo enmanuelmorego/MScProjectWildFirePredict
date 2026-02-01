@@ -108,4 +108,15 @@ def test_filter_viirs_case_insensitive():
 # GOOGLE EE SENTINEL-2
 # -------------------------  
 def test_sentinel_check_drive_empty_list():
-    pass
+    files_list = []
+    df = pd.DataFrame({'date': ['2025-01-01', '2025-02-01', '2025-06-30']})
+    out_expect = {'available_files': [],
+                  'required_ranges' : [('2025-01-01', '2025-06-30')]}
+    assert ld.sentinel_check_drive(df, files_list) == out_expect
+
+def test_sentinel_check_drive_all_required_list():
+    files_list = []
+    df = pd.DataFrame({'date': ['2025-01-01', '2025-02-01', '2025-06-30']})
+    out_expect = {'available_files': [],
+                  'required_ranges' : [('2025-01-01', '2025-06-30')]}
+    assert ld.sentinel_check_drive(df, files_list) == out_expect
