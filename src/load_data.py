@@ -305,7 +305,23 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
   print(f"\t⏱️  Google Earth Engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
   return dict_out
 
+def sentinel_load_from_drive(sentinel_2_path: Path, relevant_files: list) -> pd.DataFrame:
+  """
+  Loads previously downloaded Sentinel-2 files from GoogleDrive 
+  It combines all the files into a single data frame
 
+  Please note, this function loads only the relevant files, not all available files. 
+  This is to allow users to run small batch tests, and flexibility
+
+  Args:
+    sentinel_2_path (Path): A Path object contaning the parent location of where all the Sentinel-2 files are stored 
+
+    relevant_files (List): A list of strings containing the files names of the relevant files for the current processing pipeline
+
+  Returns:
+    Dataframe: A data frame containing all the data from all relevant files 
+  """
+  pass
 
 if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
