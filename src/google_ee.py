@@ -78,23 +78,44 @@ def attach_s2_metadata(feature: ee.Feature, s2: ee.imagecollection) -> ee.Featur
                         "cloud_pct":   ee.Algorithms.If(img, img.get("CLOUDY_PIXEL_PERCENTAGE"), None),
                         "has_image":   ee.Algorithms.If(img,1,0)})
 
-def google_ee_request(batch_dict: dict, sat_img_collection: ee.featurecollection) -> None:
+def google_ee_request(batch_dict: dict, sat_img_collection: ee.ImageCollection) -> None:
+    """
+    Submit Google Earth export tasks for each of the batches in the `batch_dict` input dictionary
+
+    For each set batch
+    - The data is transformed to ee.FeatureCollection
+    - Sentinel-2 Metadata is attached (and Sentinel-2 identifying id)
+    - Feature without images are excluded
+    - Results are exported directly to GoogleDrive as a csv file
+
+    Args:
+        batch_dict (dict):
+            A dictionary containing the batch name, and a data frame for each batch
+
+        sat_img_collection (ee.ImageCollection):
+            Sentinel-2 image collection used to retrieve metadata
+
+    Returns:
+        None - Function submits EE export request 
+    """
     # Iterate thru each batch
     for key in batch_dict:
         df_request = batch_dict.get(key)
-        start, end = (df_request['date'].min()).strftime('%Y%m%d'), (df_request['date'].max()).strftime('%Y%m%d')
+        start = (df_request['date'].min()).strftime('%Y%m%d')
+        end   = (df_request['date'].max()).strftime('%Y%m%d')
         fname = f"{start}-{end}_sentinel_images_layer1"
 
         fc_request = geodf_to_ee(df_request)
-        fc_s2 = fc_request.map(lambda f: attach_s2_metadata(f, sat_img_collection))
-        fc_export = (fc_s2
-                        .filter(ee.Filter.eq("has_image",1))
-                        .select(['date','grid_id','sentinel_id','cloud_pct'])
-                        .map(lambda f: f.setGeometry(None)))
-        task = ee.batch.Export.table.toDrive(collection=fc_export,
-                                                description=fname,
-                                                folder = "Sentinel2",
-                                                fileFormat="CSV")
+        fc_s2      = fc_request.map(lambda f: attach_s2_metadata(f, sat_img_collection))
+        fc_export  = (fc_s2
+                      .filter(ee.Filter.eq("has_image",1))
+                      .select(['date','grid_id','sentinel_id','cloud_pct'])
+                      .map(lambda f: f.setGeometry(None)))
+        
+        task = ee.batch.Export.table.toDrive(collection  = fc_export,
+                                             description = fname,
+                                             folder      = "Sentinel2",
+                                             fileFormat  = "CSV")
         task.start()
 
 def google_ee_request_runner(satelite: str, df_grid_date: pd.DataFrame, data_dir: str):
