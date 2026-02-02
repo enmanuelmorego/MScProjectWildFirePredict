@@ -178,11 +178,11 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   uk_grid = uk_grid.to_crs(crs)
   return uk_grid
 
-
+#sentinel_batch_create
 # -------------------------
 # GOOGLE EE SENTINEL-2
 # -------------------------  
-def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
+def check_drive_sentinel(geo_df: gpd.GeoDataFrame,
                          available_files: List[Path]) -> dict[str, List]:
   """"
   Checks whether Sentinel-2 .csv files already exist in GoogleDrive ready to use for a given date range
@@ -252,9 +252,9 @@ def sentinel_check_drive(geo_df: gpd.GeoDataFrame,
   return {"available_files": used_files,
           "required_days": sorted(required_days)}
 
-def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int = 10) -> dict:
+def batch_create_sentinel(df: pd.DataFrame, required_days: list, batch_size: int = 10) -> dict:
   """
-  Takes the UK Grid by day, along with the computed required_days list from `sentinel_check_drive` and
+  Takes the UK Grid by day, along with the computed required_days list from `check_drive_sentinel` and
   splits the data frame into batches of 14 days max. This allows for each data frame to be approximately 
   20k-25k rows max
   This is to ensure that the request is under the max size set by Google EE engine
@@ -305,7 +305,7 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
   print(f"\t⏱️  Google Earth Engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
   return dict_out
 
-def sentinel_load_from_drive(sentinel_2_path: Path, relevant_files: list) -> pd.DataFrame:
+def load_from_drive_sentinel(sentinel_2_path: Path, relevant_files: list) -> pd.DataFrame:
   """
   Loads previously downloaded Sentinel-2 files from GoogleDrive 
   It combines all the files into a single data frame
