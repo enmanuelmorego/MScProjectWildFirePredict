@@ -315,4 +315,71 @@ def load_from_drive_sentinel(sentinel_2_path: Path, relevant_files: list) -> pd.
   This is to allow users to run small batch tests, and flexibility
 
   Args:
+    sentinel_2_path (Path): A Path object contaning the parent location of where all the Sentinel-2 files are stored 
+
+    relevant_files (List): A list of strings containing the files names of the relevant files for the current processing pipeline
+
+  Returns:
+    Dataframe: A data frame containing all the data from all relevant files 
+  """
+  df = pd.DataFrame()
+  for f in relevant_files:
+    file_path = Path(sentinel_2_path)/f
+    df_in = pd.read_csv(file_path)
+    df = pd.concat([df, df_in])
+  return df
+
+def sentinel_load_pipeline(data_dir_sentinel: Path,
+                           df_uk_daily_grid: pd.DataFrame,
+                           sat_img: str) -> pd.DataFrame:
+  """
+  Wrapper function to load the Sentinel data
+  - Takes the input data of the UK Gridded df by day
+  - Checks if there are any dates to request from GoogleEE
+  - If data is needed, sends the request to Google EE
+  - Loads the available files from GoogleDrive
+  - Returns a dataframe with a single df containing all the data from all files covering the requested period 
+
+  Args:
+    data_dir_sentinel (Path): Path contaning the directory of where the Sentinel data is stored in Google Drive
+
+    df_uk_daily_grid (DataFrame): Data frame contaning all the 12x12 grids for the UK for each of the relevant days in the analysis
+
+    sat_img (str): A string containing the name of the satelites images used 
+
+  Returns:
+    DataFrame containing all the Sentinel-2 metadata in a single data frame for the relevant period defined in df_uk_daily_grid
+
+  """
+  #sentinel_path  = Path(DATA_DIR)/"sentinel2"
+  sentinel_files = os.listdir(data_dir_sentinel)
+
+  # Get required dates to fetch from Google EE
+  avail_files_req_days = check_drive_sentinel(df_uk_daily_grid, sentinel_files)
+  available_files = avail_files_req_days['available_files']
+  required_days = avail_files_req_days['required_days']
+  if required_days:
+      print("\t🌍  Google EE connect ")
+      gee.google_ee_request_runner(satelite     = sat_img,
+                                  df_grid_date  = df_uk_daily_grid,
+                                  required_days = required_days)
+  else:
+    print(f"\t🗂️  All data available in Drive - No connection to Google Earth required")
     
+  df_sentinel = load_from_drive_sentinel(data_dir_sentinel, available_files)
+  return df_sentinel
+
+
+if __name__ == "__main__":
+    os.environ.setdefault("RUN_DEMO", "ON")
+    import config as c
+    YEAR_LIST = []
+    files_list = ['20250101-20250120_.csv', '20250121-20250130_.csv']
+    df = pd.DataFrame({"date": ["2025-01-01", "2025-01-30"]})
+
+  
+  # dir_name = 'VIIRS'
+  # files = u.get_filepaths(dir_name)
+  # to_load = to_load_viirs(files)
+  # data = load_viirs(to_load)
+  # print(data)
