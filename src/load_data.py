@@ -339,7 +339,7 @@ def sentinel_load_pipeline(data_dir_sentinel: Path,
   - If data is needed, sends the request to Google EE
   - Loads the available files from GoogleDrive
   - Returns a dataframe with a single df containing all the data from all files covering the requested period 
-   
+
   Args:
     data_dir_sentinel (Path): Path contaning the directory of where the Sentinel data is stored in Google Drive
 
@@ -358,12 +358,13 @@ def sentinel_load_pipeline(data_dir_sentinel: Path,
   avail_files_req_days = check_drive_sentinel(df_uk_daily_grid, sentinel_files)
   available_files = avail_files_req_days['available_files']
   required_days = avail_files_req_days['required_days']
-  required_days = False
   if required_days:
-      print("Google EE connect ")
+      print("\t🌍  Google EE connect ")
       gee.google_ee_request_runner(satelite     = sat_img,
                                   df_grid_date  = df_uk_daily_grid,
                                   required_days = required_days)
+  else:
+    print(f"\t🗂️  All data available in Drive - No connection to Google Earth required")
     
   df_sentinel = load_from_drive_sentinel(data_dir_sentinel, available_files)
   return df_sentinel
