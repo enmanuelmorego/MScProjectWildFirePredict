@@ -321,7 +321,12 @@ def sentinel_load_from_drive(sentinel_2_path: Path, relevant_files: list) -> pd.
   Returns:
     Dataframe: A data frame containing all the data from all relevant files 
   """
-  pass
+  df = pd.DataFrame()
+  for f in relevant_files:
+    file_path = Path(sentinel_2_path)/f
+    df_in = pd.read_csv(file_path)
+    df = pd.concat([df, df_in])
+  return df
 
 if __name__ == "__main__":
   os.environ.setdefault("RUN_DEMO", "ON")
