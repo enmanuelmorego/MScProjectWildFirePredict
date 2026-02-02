@@ -302,7 +302,7 @@ def sentinel_batch_create(df: pd.DataFrame, required_days: list, batch_size: int
   dur = timedelta(minutes=total_minutes)
   hrs, rmdr = divmod(dur.total_seconds(), 3600)
   mins = rmdr // 60
-  print(f"\t⏱️  Google Earth engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
+  print(f"\t⏱️  Google Earth Engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
   return dict_out
 
 
