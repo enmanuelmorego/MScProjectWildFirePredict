@@ -315,7 +315,7 @@ if __name__ == "__main__":
   df = pd.DataFrame({"date": ["2025-01-01", "2025-01-30"]})
 
   req = sentinel_check_drive(df, files_list)
-  sent
+  
   # dir_name = 'VIIRS'
   # files = u.get_filepaths(dir_name)
   # to_load = to_load_viirs(files)
