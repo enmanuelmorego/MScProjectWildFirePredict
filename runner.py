@@ -55,9 +55,17 @@ print(f"Shape: {df_daily_grid.shape}")
 from datetime import datetime 
 print(f"{'='*80}")
 print(f"🛰️ GOOGLE EE SENTINEL-2")  
-test = gee.google_ee_request_runner(satelite     = SATELITE_IMAGES,
-                                    df_grid_date = df_daily_grid[df_daily_grid['date'] < '2019-01-18'],
-                                    data_dir     = DATA_DIR)
+# Get stored files 
+sentinel_path = Path(DATA_DIR)/"sentinel2"
+
+# Get required dates to fetch from Google EE
+avail_files_req_days = ld.sentinel_check_drive(df_daily_grid, sentinel_path)
+available_files = avail_files_req_days['available_files']
+required_days = avail_files_req_days['required_days']
+if required_days:
+    gee.google_ee_request_runner(satelite     = SATELITE_IMAGES,
+                                 df_grid_date = df_daily_grid[df_daily_grid['date'] < '2019-02-18'],
+                                 required_days     = required_days)
 # sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
 # req_files = ld.sentinel_check_drive(df_daily_grid, sentinel_files)
 # if req_files['required_days']:

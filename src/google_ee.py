@@ -118,10 +118,26 @@ def google_ee_request(batch_dict: dict, sat_img_collection: ee.ImageCollection) 
                                              fileFormat  = "CSV")
         task.start()
 
-def google_ee_request_runner(satelite: str, df_grid_date: pd.DataFrame, data_dir: str):
+def google_ee_request_runner(satelite: str, df_grid_date: pd.DataFrame, required_days: list) -> None:
     """
     Runs the Google EarthEngine functions to request Sentinel Images from Google EarthEngine
-    Runner splits the requests to max of 15 days at the time, given that more days causes a request limit error
+    
+    Steps:
+    - Authenticates with Google Earth Engine
+    - Ensures to retrieve/request only data not currently available in GoogleDrive of the project 
+    - If requests are needed, these are split into manageable batches 
+    - Submits GoogleEE task request
+
+    Args:
+        satelite (str): Earth Engine image collection identifier
+
+        df_grid_date (DataFrame): UK grid expanded by day, containing at least:
+                                  - 'date'
+                                  - 'id'
+                                  - 'geometry'
+
+        required_days (List): Lsit containing all of the daily dates of data required 
+            
     """
     # Authenticate connection
     try:
@@ -131,16 +147,12 @@ def google_ee_request_runner(satelite: str, df_grid_date: pd.DataFrame, data_dir
         ee.Initialize(project = "ee-enmanuelmorego")
     # Get image collection     
     sat_img_col = ee.ImageCollection(satelite)
-    # Get stored files 
-    sentinel_files = os.listdir(Path(data_dir)/"sentinel2")
-    # Get required dates to fetch from Google EE
-    req_files = ld.sentinel_check_drive(df_grid_date, sentinel_files)
+    # Split the data into manageable batches for Google EE
+    data_batch = ld.sentinel_batch_create(df_grid_date, required_days)
+    # Iterate thru each batch and request the metadata for each batch
+    google_ee_request(data_batch, sat_img_col)
+    print(f"\t⚠️ Please note: Currently requesting data from Google EE. Please check GoogleDrive to ensure the requested data is available\n\tGoogle EE request may take hrs/days ")
 
-    if req_files['required_days']:
-        # Split the data into manageable batches for Google EE
-        data_batch = ld.sentinel_batch_create(df_grid_date, req_files['required_days'])
-        # Iterate thru each batch and request the metadata for each batch
-        google_ee_request(data_batch, sat_img_col)
 
 
 
