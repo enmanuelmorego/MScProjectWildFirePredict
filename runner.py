@@ -30,7 +30,6 @@ print(f"🔥 VIIRS Data")
 print(f"\tData Type: {type(df_viirs)}")
 print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
 
-
 # --------------------------
 # UK GRID 
 # --------------------------
@@ -52,7 +51,6 @@ print(f"Shape: {df_daily_grid.shape}")
 # -------------------------
 # GOOGLE EE SENTINEL-2
 # -------------------------
-from datetime import datetime 
 print(f"{'='*80}")
 print(f"🛰️ GOOGLE EE SENTINEL-2")  
 # Get stored files 
@@ -62,24 +60,3 @@ df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
                                         SATELITE_IMAGES)
 print(df_sentinel.head())
 
-
-# sentinel_files = os.listdir(sentinel_path)
-
-# # Get required dates to fetch from Google EE
-# avail_files_req_days = ld.check_drive_sentinel(df_daily_grid, sentinel_files)
-# available_files = avail_files_req_days['available_files']
-# required_days = avail_files_req_days['required_days']
-# required_days = False
-# if required_days:
-#     print("Google EE connect ")
-#     gee.google_ee_request_runner(satelite      = SATELITE_IMAGES,
-#                                  df_grid_date  = df_daily_grid[df_daily_grid['date'] < '2019-01-05'],
-#                                  required_days = required_days)
-# print(available_files)
-# df_sentinel = ld.load_from_drive_sentinel(sentinel_path, available_files)
-# df_sentinel
-
-# sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
-# req_files = ld.sentinel_check_drive(df_daily_grid, sentinel_files)
-# if req_files['required_days']:
-#     test = ld.sentinel_batch_create(df_daily_grid, req_files['required_days'])
