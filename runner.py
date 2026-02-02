@@ -57,21 +57,28 @@ print(f"{'='*80}")
 print(f"🛰️ GOOGLE EE SENTINEL-2")  
 # Get stored files 
 sentinel_path  = Path(DATA_DIR)/"sentinel2"
-sentinel_files = os.listdir(sentinel_path)
 
-# Get required dates to fetch from Google EE
-avail_files_req_days = ld.check_drive_sentinel(df_daily_grid, sentinel_files)
-available_files = avail_files_req_days['available_files']
-required_days = avail_files_req_days['required_days']
-required_days = False
-if required_days:
-    print("Google EE connect ")
-    gee.google_ee_request_runner(satelite      = SATELITE_IMAGES,
-                                 df_grid_date  = df_daily_grid[df_daily_grid['date'] < '2019-01-05'],
-                                 required_days = required_days)
-print(available_files)
-df_sentinel = ld.sentinel_load_from_drive(sentinel_path, available_files)
+df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
+                                        df_daily_grid[df_daily_grid['date'] < '2019-01-05'],
+                                        SATELITE_IMAGES)
 df_sentinel
+
+
+# sentinel_files = os.listdir(sentinel_path)
+
+# # Get required dates to fetch from Google EE
+# avail_files_req_days = ld.check_drive_sentinel(df_daily_grid, sentinel_files)
+# available_files = avail_files_req_days['available_files']
+# required_days = avail_files_req_days['required_days']
+# required_days = False
+# if required_days:
+#     print("Google EE connect ")
+#     gee.google_ee_request_runner(satelite      = SATELITE_IMAGES,
+#                                  df_grid_date  = df_daily_grid[df_daily_grid['date'] < '2019-01-05'],
+#                                  required_days = required_days)
+# print(available_files)
+# df_sentinel = ld.load_from_drive_sentinel(sentinel_path, available_files)
+# df_sentinel
 
 # sentinel_files = os.listdir(Path(DATA_DIR)/"sentinel2")
 # req_files = ld.sentinel_check_drive(df_daily_grid, sentinel_files)
