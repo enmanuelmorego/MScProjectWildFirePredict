@@ -17,6 +17,8 @@ folium = "*"
 leafmap = "*"
 ee = "*"
 geemap = "*"
+pygrib = "*"
+xarray = "*"
 
 [dev-packages]
 ipykernel = "*"
