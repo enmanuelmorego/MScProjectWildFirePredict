@@ -386,8 +386,4 @@ def fwi_load_pipeline(fwi_path: Path):
 if __name__ == "__main__":
     os.environ.setdefault("RUN_DEMO", "ON")
     import config as c
-    DATA_DIR = os.environ.get("DATA_DIR")
-    fwi_p    = Path(DATA_DIR)/"FWI"
-
-    t = fwi_load_pipeline(fwi_p)
-    print(t)
+    DATA_DIR = os.environ.get("DATA_D
