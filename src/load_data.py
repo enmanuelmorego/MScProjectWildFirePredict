@@ -8,6 +8,7 @@ import math
 #from config import CRS
 import utils as u
 import google_ee as gee
+import cdsapi
 
 # -------------------------
 # VIIRS DATA
@@ -394,13 +395,62 @@ def check_drive_fwi(df_uk_daily_grid: gpd.GeoDataFrame, available_files: list) -
   """
 
   requested_years = set(df_uk_daily_grid['date'].dt.strftime("%Y"))
-  available_years = [fy[0:4] for fy in available_files]
+  available_years = [fy.name[0:4] for fy in available_files]
   available_years = set(available_years)
-  matched_files   = [f for f in available_files if f[0:4] in requested_years]
+  matched_files   = [f for f in available_files if f.name[0:4] in requested_years]
   
   return {'available_files': matched_files,
           'required_years': requested_years - available_years}
 
+def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
+  """
+  Function to fetch the FWI data from CEMS Early Warning Data Store for the required years passed in the argument
+  Uses cdsapi to fetch the data and download the corresponding .grib file
+
+  Args:
+    required_years (set): A set of strings containing the years required to download
+
+    fwi_data_dir (path): Path of the FWI data folder
+
+  Returns:
+    None 
+  """
+  for y in required_years:
+    fname = f"{y}FWI.grib"
+    out_file_path = Path(fwi_data_dir)/fname
+
+    dataset = "cems-fire-historical-v1"
+    request = {
+        "product_type": "reanalysis",
+        "variable": ["fire_weather_index"],
+        "dataset_type": "consolidated_dataset",
+        "system_version": ["4_1"],
+        "year": [y],
+        "month": [
+            "01", "02", "03",
+            "04", "05", "06",
+            "07", "08", "09",
+            "10", "11", "12"
+        ],
+        "day": [
+            "01", "02", "03",
+            "04", "05", "06",
+            "07", "08", "09",
+            "10", "11", "12",
+            "13", "14", "15",
+            "16", "17", "18",
+            "19", "20", "21",
+            "22", "23", "24",
+            "25", "26", "27",
+            "28", "29", "30",
+            "31"
+        ],
+        "grid": "original_grid",
+        "data_format": "grib"
+    }
+
+    client = cdsapi.Client()
+    client.retrieve(dataset, request, out_file_path.as_posix())
 
 def fwi_load_pipeline(fwi_path: Path,
                       df_uk_daily_grid: gpd.GeoDataFrame):
@@ -408,21 +458,29 @@ def fwi_load_pipeline(fwi_path: Path,
   Function to load and fetch the Fire Weather Index data
   
   """
+  # Get available .csv files
   fwi_files = list(Path(fwi_path).glob('*.csv'))
+  # Find available and required files/years
+  requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+  fetch_from_api = requirements['required_years']
+  if fetch_from_api:
+    print("\t📈 Fetching FWI data from CDS API...")
+    #fetch_fwi_api(fetch_from_api, fwi_path)
+  else:
+    print("\t All data available in GoogleDrive - Loading csv")
 
-  return fwi_files
+  return requirements
 
 
 if __name__ == "__main__":
     os.environ.setdefault("RUN_DEMO", "ON")
     import config as c
     DATA_DIR = os.environ.get("DATA_DIR")
-    dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
+
+    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
     df_uk_grid = pd.DataFrame({'date': dates})
-    t = df_uk_grid
+
+
     fwi_p    = Path(DATA_DIR)/"FWI"
-    #sentinel_load_pipeline()
-    f = []
-    #f = fwi_load_pipeline(fwi_p, df_uk_grid)
-    t = check_drive_fwi(df_uk_grid, f)
-    print(t)
+    f = fwi_load_pipeline(fwi_p, df_uk_grid)
+    print(f)

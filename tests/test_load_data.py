@@ -2,6 +2,7 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 import load_data as ld
 from datetime import datetime, date
+from pathlib import Path
 
 
 '''
@@ -211,15 +212,17 @@ def test_batch_create_sentinel():
 def test_check_drive_fwi_correct_years():
     dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
     df_test = pd.DataFrame({'date': dates})
-    f = ['2018FWI.csv', '2020FWI.csv']
+    f = [Path('2018FWI.csv'), 
+         Path('2020FWI.csv')]
     out = ld.check_drive_fwi(df_test, f)
-    expect = {'available_files': ['2020FWI.csv'], 'required_years': {'2017', '2019'}}
+    expect = {'available_files': [Path('2020FWI.csv')], 'required_years': {'2017', '2019'}}
     assert out == expect
 
 def test_check_drive_fwi_nomatching_years():
     dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
     df_test = pd.DataFrame({'date': dates})
-    f = ['2015FWI.csv', '2010FWI.csv']
+    f = [Path('2015FWI.csv'), 
+         Path('2010FWI.csv')]
     out = ld.check_drive_fwi(df_test, f)
     expect = {'available_files': [], 'required_years': {'2017', '2019', '2020'}}
     assert out == expect
@@ -227,9 +230,16 @@ def test_check_drive_fwi_nomatching_years():
 def test_check_drive_fwi_full_match():
     dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
     df_test = pd.DataFrame({'date': dates})
-    f = ['2018FWI.csv', '2020FWI.csv', '2019FWI.csv', '2017FWI.csv', '1990FWI.csv']
+    f = [Path('2018FWI.csv'), 
+         Path('2020FWI.csv'), 
+         Path('2019FWI.csv'), 
+         Path('2017FWI.csv'), 
+         Path('1990FWI.csv')]
     out = ld.check_drive_fwi(df_test, f)
-    expect = {'available_files': ['2020FWI.csv', '2019FWI.csv', '2017FWI.csv'], 'required_years': set()}
+    expect = {'available_files': [Path('2020FWI.csv'), 
+                                  Path('2019FWI.csv'), 
+                                  Path('2017FWI.csv')], 
+             'required_years': set()}
     assert out == expect
 
 def test_check_drive_fwi_empty_files():
