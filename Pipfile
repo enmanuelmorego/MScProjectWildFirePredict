@@ -19,10 +19,11 @@ ee = "*"
 geemap = "*"
 pygrib = "*"
 xarray = "*"
+cdsapi = "*"
 
 [dev-packages]
 ipykernel = "*"
 pandas-stubs = "*"
 
 [requires]
-python_version = "3.12"
+python_vers
