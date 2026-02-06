@@ -390,14 +390,14 @@ def check_drive_fwi(df_uk_daily_grid: gpd.GeoDataFrame, available_files: list) -
   Example::
 
     out_dict = {'available_files': ['2017FWI.csv', '2018FWI.csv'],
-                'required_years' : ['2019', '2020']}
+                'required_years' : {'2019', '2020'}}
   """
 
   requested_years = set(df_uk_daily_grid['date'].dt.strftime("%Y"))
   available_years = [fy[0:4] for fy in available_files]
   available_years = set(available_years)
-
-  matched_files = [f for f in available_files if f[0:4] in requested_years]
+  matched_files   = [f for f in available_files if f[0:4] in requested_years]
+  
   return {'available_files': matched_files,
           'required_years': requested_years - available_years}
 
@@ -422,7 +422,7 @@ if __name__ == "__main__":
     t = df_uk_grid
     fwi_p    = Path(DATA_DIR)/"FWI"
     #sentinel_load_pipeline()
-    f = ['2018FWI.csv', '2020FWI.csv']
+    f = []
     #f = fwi_load_pipeline(fwi_p, df_uk_grid)
     t = check_drive_fwi(df_uk_grid, f)
     print(t)
