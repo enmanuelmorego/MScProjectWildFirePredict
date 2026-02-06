@@ -26,4 +26,4 @@ ipykernel = "*"
 pandas-stubs = "*"
 
 [requires]
-python_vers
+python_version = "3.12"
