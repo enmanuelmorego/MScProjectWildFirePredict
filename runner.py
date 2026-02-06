@@ -48,6 +48,7 @@ df_daily_grid = df_daily_grid.rename(columns={'id': 'grid_id'})
 df_daily_grid['join_key'] = 1
 df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
 print(f"Daily UK Grid Columns: \n\t{df_daily_grid.columns}")
+print(type(df_daily_grid['date'][0]))
 print(f"Shape: \n\t{df_daily_grid.shape}")
 
 # -------------------------
@@ -58,7 +59,4 @@ print(f"🛰️ GOOGLE EE SENTINEL-2")
 # Get stored files 
 sentinel_path  = Path(DATA_DIR)/"sentinel2"
 df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
-                                        df_daily_grid[df_daily_grid['date'] < '2019-01-05'],
-                                        SATELITE_IMAGES)
-print(df_sentinel.head())
-
+                                        df_daily_grid[df_daily_grid['date']

@@ -330,7 +330,7 @@ def load_from_drive_sentinel(sentinel_2_path: Path, relevant_files: list) -> pd.
   return df
 
 def sentinel_load_pipeline(data_dir_sentinel: Path,
-                           df_uk_daily_grid: pd.DataFrame,
+                           df_uk_daily_grid: gpd.GeoDataFrame,
                            sat_img: str) -> pd.DataFrame:
   """
   Wrapper function to load the Sentinel data
@@ -372,8 +372,38 @@ def sentinel_load_pipeline(data_dir_sentinel: Path,
 # -------------------------
 # FIRE WEATHER INDEX
 # -------------------------  
+def check_drive_fwi(df_uk_daily_grid: gpd.GeoDataFrame, available_files: list) -> dict:
+  """
+  Function to check .csv file availability in Google Drive for Fire Weather Index data
+  Each FWI file corresponds to a full year worth of data, therefore, the checks are performed in a year by year basis 
+  - Extracts the unique years in the input data frame (which sets the dates required)
+  - Compare the years with a list of available files provided
 
-def fwi_load_pipeline(fwi_path: Path):
+  Args:
+    df_uk_daily_grid (GeoDataFrame): Data frame containing the full range of dates required for the analysis
+
+    available_files (Path): A list of available files in GoogleDrive, ready for use 
+
+  Returns:
+    Dictionary with available files (if there are existing files in storage that matches the required years) and required years if the prior is not true
+    
+  Example::
+
+    out_dict = {'available_files': ['2017FWI.csv', '2018FWI.csv'],
+                'required_years' : ['2019', '2020']}
+  """
+
+  requested_years = set(df_uk_daily_grid['date'].dt.strftime("%Y"))
+  available_years = [fy[0:4] for fy in available_files]
+  available_years = set(available_years)
+
+  matched_files = [f for f in available_files if f[0:4] in requested_years]
+  return {'available_files': matched_files,
+          'required_years': requested_years - available_years}
+
+
+def fwi_load_pipeline(fwi_path: Path,
+                      df_uk_daily_grid: gpd.GeoDataFrame):
   """
   Function to load and fetch the Fire Weather Index data
   
@@ -386,4 +416,13 @@ def fwi_load_pipeline(fwi_path: Path):
 if __name__ == "__main__":
     os.environ.setdefault("RUN_DEMO", "ON")
     import config as c
-    DATA_DIR = os.environ.get("DATA_D
+    DATA_DIR = os.environ.get("DATA_DIR")
+    dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
+    df_uk_grid = pd.DataFrame({'date': dates})
+    t = df_uk_grid
+    fwi_p    = Path(DATA_DIR)/"FWI"
+    #sentinel_load_pipeline()
+    f = ['2018FWI.csv', '2020FWI.csv']
+    #f = fwi_load_pipeline(fwi_p, df_uk_grid)
+    t = check_drive_fwi(df_uk_grid, f)
+    print(t)
