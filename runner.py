@@ -79,6 +79,4 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_daily_grid = df_daily_grid,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
-                              grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
-print(df_fwi.shape)
-print(df_fwi.head())
+                              grb_name         = 'Forest fire weather index (as defined by the Canadi
