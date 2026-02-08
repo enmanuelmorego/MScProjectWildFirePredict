@@ -10,6 +10,7 @@ import re
 import utils as u
 import google_ee as gee
 import cdsapi
+import pygrib
 
 # -------------------------
 # VIIRS DATA
@@ -452,64 +453,4 @@ def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
             "04", "05", "06",
             "07", "08", "09",
             "10", "11", "12",
-            "13", "14", "15",
-            "16", "17", "18",
-            "19", "20", "21",
-            "22", "23", "24",
-            "25", "26", "27",
-            "28", "29", "30",
-            "31"
-        ],
-        "grid": "original_grid",
-        "data_format": "grib"
-    }
-
-    client = cdsapi.Client()
-    client.retrieve(dataset, request, out_file_path.as_posix())
-
-def fwi_load_pipeline(fwi_path: Path,
-                      df_uk_daily_grid: gpd.GeoDataFrame):
-  """
-  Function to load and fetch the Fire Weather Index data
-  
-  """
-  # Get available .csv files
-  fwi_files = os.listdir(fwi_path)
-  # Find available and required files/years
-  requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
-
-  # 1. Check if any files are required from CEMS API
-  fetch_from_api = requirements['required_years']
-  if fetch_from_api:
-    print("\t📈 Fetching FWI data from CDS API...")
-    fetch_fwi_api(fetch_from_api, fwi_path)
-    # Refresh requirements to include newly downloaded data
-    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
-  
-  # 2. If Grib file needs to be transformed to csv
-  grib_to_csv = requirements['available_grid']
-  if grib_to_csv:
-    print("\t➡️ Transforming .grib to .csv...")
-    # TODO grib to csv function  
-    # Refresh requirements to include newly transformed data
-    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
-
-  # 3. Load csv data
-  fwi_csv_files = requirements['available_csv']
-  
-
-  return requirements
-
-
-if __name__ == "__main__":
-    os.environ.setdefault("RUN_DEMO", "ON")
-    import config as c
-    DATA_DIR = os.environ.get("DATA_DIR")
-
-    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
-    df_uk_grid = pd.DataFrame({'date': dates})
-
-
-    fwi_p    = Path(DATA_DIR)/"FWI"
-    f = fwi_load_pipeline(fwi_p, df_uk_grid)
-    print(f)
+            "13", "14"
