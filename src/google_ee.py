@@ -152,7 +152,3 @@ def google_ee_request_runner(satelite: str, df_grid_date: pd.DataFrame, required
     # Iterate thru each batch and request the metadata for each batch
     google_ee_request(data_batch, sat_img_col)
     print(f"\t⚠️ Please note: Currently requesting data from Google EE. Please check GoogleDrive to ensure the requested data is available\n\tGoogle EE request may take hrs/days ")
-
-
-
-
