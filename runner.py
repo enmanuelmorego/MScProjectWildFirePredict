@@ -2,6 +2,7 @@
 # SET UP
 # --------------------------
 import os
+RUN_DEMO = 'ON'
 os.environ.setdefault("RUN_DEMO", "ON")
 import src.config as c
 import src.load_data as ld
@@ -18,6 +19,14 @@ YEAR_FILTER     = [2019]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
+FWI_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
+UK_GRID         = 'ukcp18-uk-land-12km.shp'
+
+data_load_report = {'run details': {},
+                    'variables': {'crs': CRS,
+                                  'satelite': SATELITE_IMAGES,
+                                  'fire weather index': FWI_NAME,
+                                  'uk grid': UK_GRID}}
 # --------------------------
 # VIIRS DATA
 # --------------------------
@@ -34,7 +43,7 @@ print(df_viirs.head())
 # --------------------------
 # UK GRID 
 # --------------------------
-df_uk_grid = ld.load_uk_grid(file_name ='ukcp18-uk-land-12km.shp', 
+df_uk_grid = ld.load_uk_grid(file_name = UK_GRID, 
                              crs       = CRS)
 print(f"{'='*80}")
 print(f"UK Grid")
@@ -65,7 +74,7 @@ print(f"🛰️ GOOGLE EE SENTINEL-2")
 # Get stored files 
 sentinel_path  = Path(DATA_DIR)/"sentinel2"
 df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
-                                        df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
+                                        df_daily_grid[df_daily_grid['date'] < '2019-03-31'],
                                         SATELITE_IMAGES)
 print(df_sentinel.head())
 
@@ -79,6 +88,7 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_daily_grid = df_daily_grid,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
-                              grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
+                              grb_name         = FWI_NAME)
 print(df_fwi.shape)
 print(df_fwi.head())
+
