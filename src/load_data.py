@@ -534,7 +534,7 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   
   df_fwi = pd.concat(list_fwi, ignore_index = True)
   fname_out = Path(fwi_path)/grib_fname.replace(".grib", ".csv")
-  df_fwi.to_csv(fname_out)
+  df_fwi.to_csv(fname_out, index = False)
   print(f"\n\t...✅  Succesfully processed {grib_fname}")
 
 
@@ -558,6 +558,7 @@ def fwi_load_pipeline(fwi_path: Path,
     print("\t📈 Fetching FWI data from CDS API...")
     fetch_fwi_api(fetch_from_api, fwi_path)
     # Refresh requirements to include newly downloaded data
+    fwi_files = os.listdir(fwi_path)
     requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
   
   # 2. If Grib file needs to be transformed to csv
@@ -571,6 +572,7 @@ def fwi_load_pipeline(fwi_path: Path,
                             df_uk_grid = df_uk_grid,
                             crs_val    = crs)
     # Refresh requirements to include newly transformed data
+    fwi_files = os.listdir(fwi_path)
     requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
 
   # 3. Load csv data
