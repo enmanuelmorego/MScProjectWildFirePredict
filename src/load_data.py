@@ -477,12 +477,26 @@ def fwi_load_pipeline(fwi_path: Path,
   fwi_files = os.listdir(fwi_path)
   # Find available and required files/years
   requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+
+  # 1. Check if any files are required from CEMS API
   fetch_from_api = requirements['required_years']
   if fetch_from_api:
     print("\t📈 Fetching FWI data from CDS API...")
-    #fetch_fwi_api(fetch_from_api, fwi_path)
-  else:
-    print("\t🗂️  All data available in GoogleDrive - Loading csv")
+    fetch_fwi_api(fetch_from_api, fwi_path)
+    # Refresh requirements to include newly downloaded data
+    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+  
+  # 2. If Grib file needs to be transformed to csv
+  grib_to_csv = requirements['available_grid']
+  if grib_to_csv:
+    print("\t➡️ Transforming .grib to .csv...")
+    # TODO grib to csv function  
+    # Refresh requirements to include newly transformed data
+    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+
+  # 3. Load csv data
+  fwi_csv_files = requirements['available_csv']
+  
 
   return requirements
 
