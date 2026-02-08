@@ -453,4 +453,140 @@ def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
             "04", "05", "06",
             "07", "08", "09",
             "10", "11", "12",
-            "13", "14"
+            "13", "14", "15",
+            "16", "17", "18",
+            "19", "20", "21",
+            "22", "23", "24",
+            "25", "26", "27",
+            "28", "29", "30",
+            "31"
+        ],
+        "grid": "original_grid",
+        "data_format": "grib"
+    }
+
+    client = cdsapi.Client()
+    client.retrieve(dataset, request, out_file_path.as_posix())
+
+def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_grid, crs_val: str) -> None:
+  """
+  Function that transform a grib file into a csv file. It takes the .grib file, and iterates thru all its elements/message 
+  to extract the corresponding data. 
+  Then it joins the data to the UK Grid data frame, retaining the `grid_id` to later match using primary key of
+  (`df_grid`, `date`)
+  For each 12km x 12km grid, it computes both the Max FWI and Mean FWI to be later used for analysis
+  It saves the transformed data as a csv file 
+
+  Args:
+    fwi_path (Path): Path of the directory containing all the FWI data
+  
+    grib_fname (str): String containing the file name to load 
+
+    grb_name (str): name of the object to extract from the grib file
+
+    df_uk_grid (df): Data frame contaning the UK grid coordinates. Not dated
+
+    crs_val (str): CRS value used across the project 
+
+  Returns:
+    None
+  """
+  fname_path = Path(fwi_path)/grib_fname
+  grbs       = pygrib.open(fname_path)
+  fwi_msgs   = grbs.select(name=grb_name)
+
+  # Initialise object to store data
+  list_fwi = []
+  total = len(fwi_msgs)
+  i = 1
+  # Process data
+  for grb in fwi_msgs:
+    print(f"\r\t...⚙️  [{grib_fname}] Processing {i} of {total} [{round((i/total)*100,2)}]%", end="")
+    # Extract variables
+    date       = grb.validDate
+    date       = datetime.strptime(f"{grb.dataDate}{grb.dataTime:04d}", "%Y%m%d%H%M")
+    lats, lons = grb.latlons()
+    fwi_values = grb.values
+    n          = fwi_values.size
+    # Load onto a temp dataframe
+    df_grib = pd.DataFrame({'date'     : [date] * n,
+                            'longitude': lons.ravel(),
+                            'latitude' : lats.ravel(),
+                            'fwi'      : fwi_values.ravel()})
+    # Transform longitude from [0, 360] range (as in grib files) to [-180, 180] range as in UK grid file
+    df_grib["longitude"] = df_grib["longitude"].where(df_grib["longitude"] <= 180,
+                                                      df_grib["longitude"] - 360)
+    df_geo_grib = gpd.GeoDataFrame(df_grib,
+                                   geometry = gpd.points_from_xy(df_grib.longitude,
+                                                                 df_grib.latitude),
+                                   crs = crs_val)
+    # Join FWI to UK Grid to get value per Grid
+    df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'within')
+    df_grouped = (df_join
+                  .group_by(['grid_id', 'date'], as_index = False)
+                  .agg(fwi_max  = ('fwi', 'max'),
+                       fwi_mean = ('fwi', 'mean')))
+    list_fwi.append(df_grouped)
+  
+  df_fwi = pd.concat(list_fwi, ignore_index = True)
+  fname_out = Path(fwi_path)/grib_fname.replace(".grib", ".csv")
+  df_fwi.to_csv(fname_out)
+  print(f"\n\t...✅  Succesfully processed {grib_fname}")
+
+
+def fwi_load_pipeline(fwi_path: Path,
+                      df_uk_daily_grid: gpd.GeoDataFrame,
+                      df_uk_grid: gpd.GeoDataFrame,
+                      crs: str,
+                      grb_name: str):
+  """
+  Function to load and fetch the Fire Weather Index data
+  
+  """
+  # Get available .csv files
+  fwi_files = os.listdir(fwi_path)
+  # Find available and required files/years
+  requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+
+  # 1. Check if any files are required from CEMS API
+  fetch_from_api = requirements['required_years']
+  if fetch_from_api:
+    print("\t📈 Fetching FWI data from CDS API...")
+    fetch_fwi_api(fetch_from_api, fwi_path)
+    # Refresh requirements to include newly downloaded data
+    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+  
+  # 2. If Grib file needs to be transformed to csv
+  grib_to_csv = requirements['available_grib']
+  if grib_to_csv:
+    print("\t➡️ Transforming .grib to .csv...")
+    for g in grib_to_csv:
+      transform_grib_to_csv(fwi_path   = fwi_path, 
+                            grib_fname = g,
+                            grb_name   = grb_name,
+                            df_uk_grid = df_uk_grid,
+                            crs_val    = crs)
+    # Refresh requirements to include newly transformed data
+    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+
+  # 3. Load csv data
+  fwi_csv_files = requirements['available_csv']
+  
+
+  return fwi_csv_files
+
+
+if __name__ == "__main__":
+    os.environ.setdefault("RUN_DEMO", "ON")
+    import config as c
+    DATA_DIR = os.environ.get("DATA_DIR")
+    CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
+
+
+    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
+    df_uk_grid = pd.DataFrame({'date': dates})
+
+
+    fwi_p    = Path(DATA_DIR)/"FWI"
+    f = fwi_load_pipeline(fwi_p, df_uk_grid)
+    print(f)

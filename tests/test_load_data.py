@@ -257,4 +257,14 @@ def test_check_drive_fwi_full_match():
     expect = {'available_csv': ['2017FWI.csv',
                                 '2019FWI.csv', 
                                 '2020FWI.csv'], 
-          
+             'available_grib': ['2021FWI.grib'],
+             'required_years': set()}
+    assert out == expect
+
+def test_check_drive_fwi_empty_files():
+    dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
+    df_test = pd.DataFrame({'date': dates})
+    f = []
+    out = ld.check_drive_fwi(df_test, f)
+    expect = {'available_csv': [], 'available_grib': [], 'required_years': {'2017', '2019', '2020'}}
+    assert out == expect
