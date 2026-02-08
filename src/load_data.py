@@ -400,22 +400,22 @@ def check_drive_fwi(df_uk_daily_grid: gpd.GeoDataFrame, available_files: list) -
     
   Example::
 
-    out_dict = {'available_csv_files' : ['2017FWI.csv', '2018FWI.csv'],
-                'available_grib_files': ['2019FWI.grib', '20202FWI.grib']
-                'required_years'      : {'2021', '2022'}}
+    out_dict = {'available_csv' : ['2017FWI.csv', '2018FWI.csv'],
+                'available_grib': ['2019FWI.grib', '20202FWI.grib']
+                'required_years': {'2021', '2022'}}
   """
   # Get the requested years for each of the files types
   requested_years      = set(df_uk_daily_grid['date'].dt.strftime("%Y"))
   available_years_csv  = set([fy[0:4] for fy in available_files if re.search(r".csv$" , fy) and fy[0:4] in requested_years])
   available_years_grib = set([fy[0:4] for fy in available_files if re.search(r".grib$", fy) and fy[0:4] in requested_years and fy[0:4] not in available_years_csv])
-  available_all        = set(available_years_csv + available_years_grib)
+  available_all        = available_years_csv | available_years_grib
 
   matched_csv_files   = [f for f in available_files if f[0:4] in available_years_csv  and re.search(r".csv$", f)]
   matched_grib_files  = [f for f in available_files if f[0:4] in available_years_grib and re.search(r".grib$", f)]
 
-  return {'available_csv_files' : matched_csv_files,
-          'available_grib_files': matched_grib_files,
-          'required_years'      : requested_years - available_all}
+  return {'available_csv' : matched_csv_files,
+          'available_grib': matched_grib_files,
+          'required_years': requested_years - available_all}
 
 def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
   """
