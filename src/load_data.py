@@ -5,6 +5,7 @@ import geopandas as gpd
 from datetime import date, datetime, timedelta
 from typing import Dict, List, Tuple
 import math
+import re
 #from config import CRS
 import utils as u
 import google_ee as gee
@@ -375,10 +376,19 @@ def sentinel_load_pipeline(data_dir_sentinel: Path,
 # -------------------------  
 def check_drive_fwi(df_uk_daily_grid: gpd.GeoDataFrame, available_files: list) -> dict:
   """
-  Function to check .csv file availability in Google Drive for Fire Weather Index data
+  Function to check .csv and .grib file availability in Google Drive for Fire Weather Index data
   Each FWI file corresponds to a full year worth of data, therefore, the checks are performed in a year by year basis 
   - Extracts the unique years in the input data frame (which sets the dates required)
-  - Compare the years with a list of available files provided
+  - Compare the years with a list of available files provided 
+  - It extracts the csv that matches the requested years
+  - Then it extracts the .grib files if the year is part of the `requested_years` set and `not in` the extracted/available .csv files
+  - Then it extract the years for which no .csv nor .grib are available (this is later used to download the .grib from the API)
+
+  Purpose:
+    Reduce the computational load of donwloading the .grib files from the API anytime time the analysis is ran
+    - For the required analysis, extract the .csv file names to be used if available 
+    - Identify any .grib files that have not yet been transformed to .csv so these can be transformed rather than downlaoding new data again
+    - Identify gaps in the data and download data only relevant for the present analysis
 
   Args:
     df_uk_daily_grid (GeoDataFrame): Data frame containing the full range of dates required for the analysis
@@ -390,17 +400,22 @@ def check_drive_fwi(df_uk_daily_grid: gpd.GeoDataFrame, available_files: list) -
     
   Example::
 
-    out_dict = {'available_files': ['2017FWI.csv', '2018FWI.csv'],
-                'required_years' : {'2019', '2020'}}
+    out_dict = {'available_csv_files' : ['2017FWI.csv', '2018FWI.csv'],
+                'available_grib_files': ['2019FWI.grib', '20202FWI.grib']
+                'required_years'      : {'2021', '2022'}}
   """
+  # Get the requested years for each of the files types
+  requested_years      = set(df_uk_daily_grid['date'].dt.strftime("%Y"))
+  available_years_csv  = set([fy[0:4] for fy in available_files if re.search(r".csv$" , fy) and fy[0:4] in requested_years])
+  available_years_grib = set([fy[0:4] for fy in available_files if re.search(r".grib$", fy) and fy[0:4] in requested_years and fy[0:4] not in available_years_csv])
+  available_all        = set(available_years_csv + available_years_grib)
 
-  requested_years = set(df_uk_daily_grid['date'].dt.strftime("%Y"))
-  available_years = [fy.name[0:4] for fy in available_files]
-  available_years = set(available_years)
-  matched_files   = [f for f in available_files if f.name[0:4] in requested_years]
-  
-  return {'available_files': matched_files,
-          'required_years': requested_years - available_years}
+  matched_csv_files   = [f for f in available_files if f[0:4] in available_years_csv  and re.search(r".csv$", f)]
+  matched_grib_files  = [f for f in available_files if f[0:4] in available_years_grib and re.search(r".grib$", f)]
+
+  return {'available_csv_files' : matched_csv_files,
+          'available_grib_files': matched_grib_files,
+          'required_years'      : requested_years - available_all}
 
 def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
   """
@@ -459,7 +474,7 @@ def fwi_load_pipeline(fwi_path: Path,
   
   """
   # Get available .csv files
-  fwi_files = list(Path(fwi_path).glob('*.csv'))
+  fwi_files = os.listdir(fwi_path)
   # Find available and required files/years
   requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
   fetch_from_api = requirements['required_years']
@@ -467,7 +482,7 @@ def fwi_load_pipeline(fwi_path: Path,
     print("\t📈 Fetching FWI data from CDS API...")
     #fetch_fwi_api(fetch_from_api, fwi_path)
   else:
-    print("\t All data available in GoogleDrive - Loading csv")
+    print("\t🗂️  All data available in GoogleDrive - Loading csv")
 
   return requirements
 
