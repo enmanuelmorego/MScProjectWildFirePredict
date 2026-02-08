@@ -11,6 +11,7 @@ import utils as u
 import google_ee as gee
 import cdsapi
 import pygrib
+import time
 
 # -------------------------
 # VIIRS DATA
@@ -528,6 +529,8 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                   .agg(fwi_max  = ('fwi', 'max'),
                        fwi_mean = ('fwi', 'mean')))
     list_fwi.append(df_grouped)
+    # User Messages objects
+    i += 1
   
   df_fwi = pd.concat(list_fwi, ignore_index = True)
   fname_out = Path(fwi_path)/grib_fname.replace(".grib", ".csv")
@@ -572,9 +575,14 @@ def fwi_load_pipeline(fwi_path: Path,
 
   # 3. Load csv data
   fwi_csv_files = requirements['available_csv']
-  
-
-  return fwi_csv_files
+  # Initialise object to store data
+  fwi_list = []
+  for f in fwi_csv_files:
+    fname_load = Path(fwi_path)/f
+    df_load = pd.read_csv(fname_load)
+    fwi_list.append(df_load)
+  df_fwi = pd.concat(fwi_list, ignore_index = True)
+  return df_fwi
 
 
 if __name__ == "__main__":
