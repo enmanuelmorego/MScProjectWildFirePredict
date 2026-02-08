@@ -179,6 +179,7 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   """
   grid_path = Path(os.environ.get('DATA_DIR'))/'UKGrid'/file_name
   uk_grid = gpd.read_file(grid_path)
+  uk_grid = uk_grid.rename(columns = {'id': 'grid_id'})
   uk_grid = uk_grid.to_crs(crs)
   return uk_grid
 
@@ -523,7 +524,7 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
     # Join FWI to UK Grid to get value per Grid
     df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'within')
     df_grouped = (df_join
-                  .group_by(['grid_id', 'date'], as_index = False)
+                  .groupby(['grid_id', 'date'], as_index = False)
                   .agg(fwi_max  = ('fwi', 'max'),
                        fwi_mean = ('fwi', 'mean')))
     list_fwi.append(df_grouped)

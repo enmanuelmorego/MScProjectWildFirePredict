@@ -37,6 +37,7 @@ df_uk_grid = ld.load_uk_grid(file_name ='ukcp18-uk-land-12km.shp',
                              crs       = CRS)
 print(f"{'='*80}")
 print(f"UK Grid")
+print(f"Columns: \n\t{df_uk_grid.columns}")
 print(f"Shape: \n\t{df_uk_grid.shape}")
 
 # Grids by Day
@@ -44,7 +45,7 @@ print(f"{'='*80}")
 print(f"🇬🇧 UK Grid Daily")
 dates = u.extract_year_range(df_viirs)
 df_daily_grid = df_uk_grid.copy()
-df_daily_grid = df_daily_grid.rename(columns={'id': 'grid_id'})
+#df_daily_grid = df_daily_grid.rename(columns={'id': 'grid_id'})
 df_daily_grid['join_key'] = 1
 df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
 print(f"Daily UK Grid Columns: \n\t{df_daily_grid.columns}")
@@ -68,9 +69,9 @@ print(df_sentinel.head())
 # -------------------------
 print(f"{'='*80}")
 print(f"🌡️ FIRE WEATHER INDEX")  
-fwi_path    = Path(DATA_DIR)/"FWI"
-fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path, 
-                           df_uk_daily_grid = df_daily_grid,
-                           df_uk_grid       = df_uk_grid,
-                           crs              = CRS,
-                           grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
+# fwi_path    = Path(DATA_DIR)/"FWI"
+# fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path, 
+#                            df_uk_daily_grid = df_daily_grid,
+#                            df_uk_grid       = df_uk_grid,
+#                            crs              = CRS,
+#                            grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
