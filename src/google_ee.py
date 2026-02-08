@@ -29,7 +29,7 @@ def geodf_to_ee(geo_df: gpd.GeoDataFrame) -> ee.FeatureCollection:
         geom    = ee.Geometry.Polygon(coords)
         feature = ee.Feature(geom,
                              {'date'       : date_f,
-                              'grid_id'    : r['id'],
+                              'grid_id'    : r['grid_id'],
                               'sentinel_id': None,
                               'cloud_pct'  : None})
         features.append(feature)

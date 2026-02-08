@@ -542,9 +542,57 @@ def fwi_load_pipeline(fwi_path: Path,
                       df_uk_daily_grid: gpd.GeoDataFrame,
                       df_uk_grid: gpd.GeoDataFrame,
                       crs: str,
-                      grb_name: str):
+                      grb_name: str) -> pd.DataFrame:
   """
-  Function to load and fetch the Fire Weather Index data
+  Function to load, fetch, and prepare Fire Weather Index (FWI) data for analysis.
+
+  For the relevant period of time, check for the FWI data as follows:
+  
+  The function performs the following steps:
+    - Inspects available FWI files (.csv and .grib) in the specified directory
+    - Determines which years are already available as CSV files
+    - Identifies GRIB files that require transformation to CSV
+    - Detects any missing years and downloads the corresponding GRIB files
+      from the CEMS API
+    - Transforms GRIB files to grid-level daily summaries (mean and max FWI)
+    - Loads all relevant CSV files and concatenates them into a single dataframe
+
+  Purpose:
+    Provide a reproducible and efficient mechanism to load Fire Weather Index
+    data aligned to the UK grid and daily time step, while minimising unnecessary
+    API calls and repeated transformations across multiple runs of the analysis.
+
+  Args:
+    fwi_path (Path): Path to the directory containing Fire Weather Index data
+                     files (.csv and .grib)
+
+    df_uk_daily_grid (GeoDataFrame): Data frame defining the full spatio-temporal
+                                     backbone of the analysis (UK grid × date),
+                                     used to infer the required range of years
+
+    df_uk_grid (GeoDataFrame): Static UK grid geometry used to spatially join
+                               FWI values to grid cells during GRIB processing
+
+    crs (str): Coordinate Reference System (CRS) used consistently across
+               spatial datasets in the project
+
+    grb_name (str): Name of the Fire Weather Index variable to extract from
+                    the GRIB files
+
+  Returns:
+    DataFrame containing Fire Weather Index data aggregated to daily UK grid
+    cells, with one row per (grid_id, date) and corresponding summary statistics
+    (e.g. mean and maximum FWI values)
+
+  Example::
+
+    df_fwi = fwi_load_pipeline(
+        fwi_path          = Path("data/FWI"),
+        df_uk_daily_grid  = df_daily_grid,
+        df_uk_grid        = df_uk_grid,
+        crs               = "EPSG:4326",
+        grb_name          = "Fire Weather Index"
+    )
   
   """
   # Get available .csv files
