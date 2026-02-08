@@ -588,4 +588,64 @@ def fwi_load_pipeline(fwi_path: Path,
 
     df_fwi = fwi_load_pipeline(
         fwi_path          = Path("data/FWI"),
-        df_uk_daily_grid  = df_dai
+        df_uk_daily_grid  = df_daily_grid,
+        df_uk_grid        = df_uk_grid,
+        crs               = "EPSG:4326",
+        grb_name          = "Fire Weather Index"
+    )
+  
+  """
+  # Get available .csv files
+  fwi_files = os.listdir(fwi_path)
+  # Find available and required files/years
+  requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+
+  # 1. Check if any files are required from CEMS API
+  fetch_from_api = requirements['required_years']
+  if fetch_from_api:
+    print("\t📈 Fetching FWI data from CDS API...")
+    fetch_fwi_api(fetch_from_api, fwi_path)
+    # Refresh requirements to include newly downloaded data
+    fwi_files = os.listdir(fwi_path)
+    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+  
+  # 2. If Grib file needs to be transformed to csv
+  grib_to_csv = requirements['available_grib']
+  if grib_to_csv:
+    print("\t➡️ Transforming .grib to .csv...")
+    for g in grib_to_csv:
+      transform_grib_to_csv(fwi_path   = fwi_path, 
+                            grib_fname = g,
+                            grb_name   = grb_name,
+                            df_uk_grid = df_uk_grid,
+                            crs_val    = crs)
+    # Refresh requirements to include newly transformed data
+    fwi_files = os.listdir(fwi_path)
+    requirements = check_drive_fwi(df_uk_daily_grid, fwi_files)
+
+  # 3. Load csv data
+  fwi_csv_files = requirements['available_csv']
+  # Initialise object to store data
+  fwi_list = []
+  for f in fwi_csv_files:
+    fname_load = Path(fwi_path)/f
+    df_load = pd.read_csv(fname_load)
+    fwi_list.append(df_load)
+  df_fwi = pd.concat(fwi_list, ignore_index = True)
+  return df_fwi
+
+
+if __name__ == "__main__":
+    os.environ.setdefault("RUN_DEMO", "ON")
+    import config as c
+    DATA_DIR = os.environ.get("DATA_DIR")
+    CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
+
+
+    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
+    df_uk_grid = pd.DataFrame({'date': dates})
+
+
+    fwi_p    = Path(DATA_DIR)/"FWI"
+    f = fwi_load_pipeline(fwi_p, df_uk_grid)
+    print(f)
