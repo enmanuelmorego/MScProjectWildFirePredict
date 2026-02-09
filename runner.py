@@ -92,24 +92,4 @@ except:
 
 # Date range
 date       = df_sentinel.iloc[1,2]
-date_str   = date.strftime("%Y-%m-%d")
-date_start = ee.Date(date_str).advance(-7, "day")
-date_end   = ee.Date(date_str)
-
-gid  = df_sentinel.iloc[1,3]
-img  = df_sentinel.iloc[1,4]
-
-plygon = df_daily_grid.loc[(df_daily_grid['grid_id'] == gid) & 
-                           (df_daily_grid['date'] == date),
-                           'geometry'].iloc[0]
-coords = list(plygon.exterior.coords)
-ee_polygon = ee.Geometry.Polygon(coords)
-
-import ee
-test = (ee.ImageCollection(img)
-        .filterBounds(ee_polygon)
-        .filterDate(date_start, date_end)
-        .select(['B2','B3','B4','B8'])
-    )
-test_composite = test.median().clip(ee_polygon)
-print(test)
+date_str   = date.strft
