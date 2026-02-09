@@ -23,18 +23,28 @@ def get_filepaths(dir_name: str) -> list[Path]:
 
 def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
   """
-  Function that takes a data frame, extracts the earliest and latest dates
-  and generates a dataframe with a date for each date in the given range
+  Generate a daily date range covering full calendar years based on the
+  minimum and maximum acquisition dates in the input DataFrame.
+
+  The function identifies the earliest and latest dates in the input data
+  and expands the range to include complete calendar years.
+
+  For example:
+    - If the minimum date is `2024-04-10` and the maximum date is `2025-10-05`
+    - The output date range will span from `2024-01-01` to `2025-12-31`
+
+  A constant `join_key` column is added to facilitate later joins with
+  the UK spatial grid.
 
   Args:
-    df (dataframe): Dataframe containing a date column (acq_date as in VIIRS dataframe)
+    df (pd.DataFrame):
+      Input DataFrame containing an acquisition date column named `acq_date`.
 
   Returns:
-    df (dataframe): Dataframe containing dates for each date between min-max of given data frame, and key = 1
-      { date: [....], key: [1,1,1,...] }
-
-  Note: 
-    join_key column is later used to join with UK grid
+    pd.DataFrame:
+      A DataFrame with:
+        - `date`: daily dates covering the full-year range
+        - `join_key`: constant value (1) used for joining with the UK grid
   """
   min_date, max_date = df['acq_date'].min(), df['acq_date'].max()
 
