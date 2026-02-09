@@ -46,4 +46,11 @@ def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
         - `date`: daily dates covering the full-year range
         - `join_key`: constant value (1) used for joining with the UK grid
   """
-  min_date, max_date = df['acq_date'].min(), 
+  min_date, max_date = df['acq_date'].min(), df['acq_date'].max()
+
+  dates_covered = pd.date_range(start = f"{datetime.strptime(min_date, "%Y-%m-%d").year}-01-01", 
+                                end   = f"{datetime.strptime(max_date, "%Y-%m-%d").year}-12-31",
+                                freq  = "D")
+  dates_df = pd.DataFrame({'date': dates_covered})
+  dates_df['join_key'] = 1
+  return dates_df
