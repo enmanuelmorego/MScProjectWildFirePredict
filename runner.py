@@ -18,9 +18,13 @@ YEAR_FILTER     = [2019]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
+
+# LOAD DATA
+#region
 # --------------------------
 # VIIRS DATA
 # --------------------------
+
 viirs_dict = ld.viirs_load_pipeline(dir_name   = 'VIIRS',
                                     crs        = CRS,
                                     date_range = YEAR_FILTER)
@@ -75,6 +79,8 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
 print(df_fwi.shape)
 print(df_fwi.head())
+
+#endregion
 
 ##################################
 import ee

@@ -642,27 +642,4 @@ def fwi_load_pipeline(fwi_path: Path,
 
   # 3. Load csv data
   fwi_csv_files = requirements['available_csv']
-  # Initialise object to store data
-  fwi_list = []
-  for f in fwi_csv_files:
-    fname_load = Path(fwi_path)/f
-    df_load = pd.read_csv(fname_load)
-    fwi_list.append(df_load)
-  df_fwi = pd.concat(fwi_list, ignore_index = True)
-  return df_fwi
-
-
-if __name__ == "__main__":
-    os.environ.setdefault("RUN_DEMO", "ON")
-    import config as c
-    DATA_DIR = os.environ.get("DATA_DIR")
-    CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
-
-
-    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
-    df_uk_grid = pd.DataFrame({'date': dates})
-
-
-    fwi_p    = Path(DATA_DIR)/"FWI"
-    f = fwi_load_pipeline(fwi_p, df_uk_grid)
-    print(f)
+  # Initi
