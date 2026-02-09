@@ -51,6 +51,7 @@ df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key
 print(f"Daily UK Grid Columns: \n\t{df_daily_grid.columns}")
 print(type(df_daily_grid['date'][0]))
 print(f"Shape: \n\t{df_daily_grid.shape}")
+print(df_daily_grid.head())
 
 print(f"Check that grid_id corresponds to same lon-lat across whole df")
 grid_id_sample = df_daily_grid['grid_id'].sample(n=1).iloc[0]
@@ -80,5 +81,4 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
                               grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
-print(df_fwi.shape)
-print(df_fwi.head())
+print(df_fwi.
