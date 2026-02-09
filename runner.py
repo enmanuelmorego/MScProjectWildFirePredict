@@ -101,8 +101,7 @@ data_load_report = {'Run Metadata': {'Demo Run': RUN_DEMO,
                     'Variables': {'CRS': CRS,
                                   'Satelite': SATELITE_IMAGES,
                                   'Fire Weather Index': FWI_NAME,
-                                  'UK Grid': UK_GRID},
-                    'Data Details': {'df_daily_grid': {'date_range': (df_daily_grid['date'].min(), df_daily_grid['date'].max())}}}
+                                  'UK Grid': UK_GRID}}
 print(data_load_report)
 
 '''
@@ -125,6 +124,8 @@ dict_report = {}
 import re
 for name, df in df_dict.items():
     dict_report[name] = {}
+
+    dict_report[name]['Rows'] = df.shape[0]
 
     colnames = df.columns.tolist()
     date_colname = [c for c in colnames if re.search('date', c)]
@@ -157,6 +158,7 @@ for name, df in df_dict.items():
     if cols_sum == 2:
         grid_id_dates_pairs = df[['grid_id', date_col]].drop_duplicates().shape[0]
         nrows = len(df)
-        dict_report[name]['Grid ID-Date pairs'] = {'total rows': nrows, 
-                                                   'unique grid date pairs': grid_id_dates_pairs}
+        date_grid_check = nrows == grid_id_dates_pairs
+        dict_report[name]['Grid-Date pair unique'] = date_grid_check
+
 print(dict_report)
