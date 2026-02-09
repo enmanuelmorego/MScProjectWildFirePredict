@@ -44,19 +44,11 @@ print(f"Shape: \n\t{df_uk_grid.shape}")
 # Grids by Day
 print(f"{'='*80}")
 print(f"🇬🇧 UK Grid Daily")
-dates = u.extract_year_range(df_viirs)
-df_daily_grid = df_uk_grid.copy()
-df_daily_grid['join_key'] = 1
-df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
+df_daily_grid = ld.uk_grid_data_pipeline(df_uk_grid, df_viirs)
 print(f"Daily UK Grid Columns: \n\t{df_daily_grid.columns}")
 print(type(df_daily_grid['date'][0]))
 print(f"Shape: \n\t{df_daily_grid.shape}")
 print(df_daily_grid.head())
-
-print(f"Check that grid_id corresponds to same lon-lat across whole df")
-grid_id_sample = df_daily_grid['grid_id'].sample(n=1).iloc[0]
-print(f"Randomly selected grid_id: {grid_id_sample}")
-
 
 # -------------------------
 # GOOGLE EE SENTINEL-2
@@ -81,4 +73,37 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
                               grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
-print(df_fwi.
+print(df_fwi.shape)
+print(df_fwi.head())
+
+##################################
+import ee
+try:
+    ee.Initialize(project = "ee-enmanuelmorego")
+except:
+    ee.Authenticate()
+    ee.Initialize(project = "ee-enmanuelmorego")
+
+# Date range
+date       = df_sentinel.iloc[1,2]
+date_str   = date.strftime("%Y-%m-%d")
+date_start = ee.Date(date_str).advance(-7, "day")
+date_end   = ee.Date(date_str)
+
+gid  = df_sentinel.iloc[1,3]
+img  = df_sentinel.iloc[1,4]
+
+plygon = df_daily_grid.loc[(df_daily_grid['grid_id'] == gid) & 
+                           (df_daily_grid['date'] == date),
+                           'geometry'].iloc[0]
+coords = list(plygon.exterior.coords)
+ee_polygon = ee.Geometry.Polygon(coords)
+
+import ee
+test = (ee.ImageCollection(img)
+        .filterBounds(ee_polygon)
+        .filterDate(date_start, date_end)
+        .select(['B2','B3','B4','B8'])
+    )
+test_composite = test.median().clip(ee_polygon)
+print(test)

@@ -184,6 +184,23 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   uk_grid = uk_grid.to_crs(crs)
   return uk_grid
 
+def uk_grid_data_pipeline(df_grid: pd.DataFrame, df_viirs_in: pd.DataFrame) -> pd.DataFrame:
+  """
+  Pipeline that takes the df_uk_grid loaded and creates a grid per day in the date range specified 
+
+  Args:
+    df_grid (dataframe): Dataframe containing the UK map gridded into 12 x 12 km grids
+    df_viirs_in (dataframe): Dataframe containing the data from VIIRS to be used as fire flag
+
+  Returns:
+    df (dataframe): Dataframe containing the UK grid for each day specified in the computed date range
+  """
+  dates = u.extract_year_range(df_viirs_in)
+  df_daily_grid = df_grid.copy()
+  df_daily_grid['join_key'] = 1
+  df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
+  return df_daily_grid
+
 #sentinel_batch_create
 # -------------------------
 # GOOGLE EE SENTINEL-2
