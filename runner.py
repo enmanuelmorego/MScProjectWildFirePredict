@@ -19,7 +19,9 @@ CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) 
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
 
+# --------------------------
 # LOAD DATA
+# --------------------------
 #region
 # --------------------------
 # VIIRS DATA
@@ -82,6 +84,10 @@ print(df_fwi.head())
 
 #endregion
 
+# --------------------------
+# PRE PROCESSING
+# --------------------------
+#region
 ##################################
 import ee
 try:
@@ -89,7 +95,33 @@ try:
 except:
     ee.Authenticate()
     ee.Initialize(project = "ee-enmanuelmorego")
+df_month = df_daily_grid[(df_daily_grid['date'] >= '2019-01-01') &
+                         (df_daily_grid['date'] <= '2019-01-15')]
+# Convert df to google feature collection
+fc = gee.geodf_to_ee(df_month)
+# function to make sentinel patch
+def make_sentinel_patch(feature):
+    date = ee.Date(feature.get('date'))
+    geom = feature.geometry()
 
-# Date range
-date       = df_sentinel.iloc[1,2]
-date_str   = date.strft
+    composite_img = (ee.ImageCollection(SATELITE_IMAGES)
+                     .filterBounds(geom)
+                     .filterDate(date.advance(-7, 'day'), date)
+                     .select(['B2','B3','B4','B8'])
+                     .median()
+                     .clip(geom))
+    patch = composite_img.sampleRectangle(region = geom,
+                                          defaultValue = 0)
+    return feature.set({'patch': patch})
+
+fc_patches = fc.map(make_sentinel_patch)
+
+task = ee.batch.Export.table.toDrive(
+    collection=fc_patches,
+    description="sentinel_patches_2019_01",
+    folder="SentinelPixels",
+    fileFormat="TFRecord"
+)
+task.start()
+
+#endregion

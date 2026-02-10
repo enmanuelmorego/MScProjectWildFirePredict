@@ -20,6 +20,7 @@ geemap = "*"
 pygrib = "*"
 xarray = "*"
 cdsapi = "*"
+tensorflow = "*"
 
 [dev-packages]
 ipykernel = "*"

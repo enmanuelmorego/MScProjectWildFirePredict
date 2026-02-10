@@ -3,4 +3,6 @@ src/mscprojectwildfirepredict.egg-info/PKG-INFO
 src/mscprojectwildfirepredict.egg-info/SOURCES.txt
 src/mscprojectwildfirepredict.egg-info/dependency_links.txt
 src/mscprojectwildfirepredict.egg-info/top_level.txt
+src/preprocessing/__init__.py
+src/preprocessing/pp_sentinel.py
 tests/test_load_data.py
