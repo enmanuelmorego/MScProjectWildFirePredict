@@ -47,6 +47,7 @@ print(f"{'='*80}")
 print(f"UK Grid")
 print(f"Columns: \n\t{df_uk_grid.columns}")
 print(f"Shape: \n\t{df_uk_grid.shape}")
+print(df_uk_grid.head())
 
 # Grids by Day
 print(f"{'='*80}")
@@ -90,7 +91,58 @@ print(df_fwi.head())
 # PRE PROCESSING
 # --------------------------
 #region
-##################################
+import numpy as np
+import webbrowser
+print(f"{'='*80}")
+print(f"++ PRE PROCESSING")  
+
+df_viirs_joined = gpd.sjoin(df_viirs, df_uk_grid, how = 'inner', predicate = 'within')
+print(df_viirs_joined.head())
+
+grid_geo_only = df_uk_grid[['grid_id', 'geometry']]
+print(grid_geo_only.head())
+
+import pandas as pd
+import folium
+choice_selected = False
+while not choice_selected:
+    random_day = np.random.choice(df_viirs_joined['acq_date'].unique())
+    print("Random day selected:", random_day)
+
+    df_day = df_viirs_joined[df_viirs_joined['acq_date'] == random_day]
+    print(df_day.shape)
+
+    ui = input("Happy with selection? y/n")
+
+    if ui == 'y':
+        choice_selected = True
+
+grids_day = df_uk_grid[df_uk_grid['grid_id'].isin(df_day['grid_id'])]
+
+m = grids_day.explore(
+    color="black",
+    style_kwds={"fillOpacity": 0},
+    tiles="Esri.WorldImagery"
+)
+# Add label overlay
+folium.TileLayer(
+    tiles="CartoDB PositronOnlyLabels",
+    name="Labels",
+    overlay=True,
+    control=True
+).add_to(m)
+
+df_day.explore(
+    m=m,
+    color="red",
+    marker_kwds={"radius": 5}
+)
+
+folium.LayerControl().add_to(m)
+fp = os.path.abspath("validation_map.html")
+m.save("validation_map.html")
+webbrowser.open("file://" + fp)
+
 
 
 #endregion

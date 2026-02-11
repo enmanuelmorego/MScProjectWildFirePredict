@@ -65,4 +65,4 @@ import tensorflow as tf
 #     patch = tf.io.parse_tensor(
 #         example.features.feature['patch'].bytes_list.value[0],
 #         out_type=tf.float32
-#   
+#     ).numpy()
