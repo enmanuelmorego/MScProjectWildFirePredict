@@ -33,6 +33,7 @@ viirs_dict = ld.viirs_load_pipeline(dir_name   = 'VIIRS',
 df_viirs = viirs_dict.get('df_viirs')
 print(f"{'='*80}")
 print(f"🔥 VIIRS Data")
+print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")
 print(f"\tData Type: {type(df_viirs)}")
 print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
 print(df_viirs.head())
@@ -59,14 +60,14 @@ print(df_daily_grid.head())
 # -------------------------
 # GOOGLE EE SENTINEL-2
 # -------------------------
-print(f"{'='*80}")
-print(f"🛰️ GOOGLE EE SENTINEL-2")  
-# Get stored files 
-sentinel_path  = Path(DATA_DIR)/"sentinel2"
-df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
-                                        df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
-                                        SATELITE_IMAGES)
-print(df_sentinel.head())
+# print(f"{'='*80}")
+# print(f"🛰️ GOOGLE EE SENTINEL-2")  
+# # Get stored files 
+# sentinel_path  = Path(DATA_DIR)/"sentinel2"
+# df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
+#                                         df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
+#                                         SATELITE_IMAGES)
+# print(df_sentinel.head())
 
 # -------------------------
 # FIRE WEATHER INDEX 
@@ -79,6 +80,7 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
                               grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
+print(type(df_fwi))
 print(df_fwi.shape)
 print(df_fwi.head())
 

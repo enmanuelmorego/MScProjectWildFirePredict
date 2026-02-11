@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.6 Chrome/140.0.7339.249 Electron/38.8.0 Safari/537.36" version="29.3.6">
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.6 Chrome/140.0.7339.249 Electron/38.8.0 Safari/537.36" version="29.3.6" pages="2">
   <diagram name="Page-1" id="jiYA0BbSPlPBukLob_3C">
-    <mxGraphModel dx="2102" dy="1509" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1426" dy="859" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -274,6 +274,151 @@
         </mxCell>
         <mxCell id="ht3m0Zr6vv9DjcVxEw4r-34" edge="1" parent="1" source="rItALh5PbES4pMdWCuFn-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ht3m0Zr6vv9DjcVxEw4r-33">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Copy of Page-1" id="-4xwShxCMKZd5bGvRTVG">
+    <mxGraphModel dx="3565" dy="3317" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-0" />
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-1" parent="LrYqxPvZOILsHqb8xlcf-0" />
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-3" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="165" width="380" x="520" y="-4" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-4" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;" value="VIIRS NOAA-20&lt;div&gt;2018-2024&lt;br&gt;&lt;div&gt;&lt;div&gt;Fire Labels&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="160" x="559" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-5" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;" value="VIIRS S-NPP&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;2018-2024&lt;/span&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;Fire Labels&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="160" x="556" y="91" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-6" parent="LrYqxPvZOILsHqb8xlcf-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=8;labelBackgroundColor=none;fontStyle=1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp;Google Drive - /data/VIIRS&amp;nbsp;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="203" x="535" y="-12" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-17" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="190" width="381" x="520" y="192" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-18" parent="LrYqxPvZOILsHqb8xlcf-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=8;labelBackgroundColor=none;fontStyle=1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp;Google Drive - /data/UKGrid&amp;nbsp;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="203" x="537" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-19" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="&lt;span&gt;ukcp18-uk-land-12km.dbf&lt;/span&gt;" vertex="1">
+          <mxGeometry height="33" width="203" x="537" y="219" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-20" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="&lt;span&gt;ukcp18-uk-land-12km.shx&lt;/span&gt;" vertex="1">
+          <mxGeometry height="33" width="203" x="537" y="334" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-21" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="&lt;span&gt;ukcp18-uk-land-12km.shp&lt;/span&gt;" vertex="1">
+          <mxGeometry height="33" width="203" x="537" y="296" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-22" parent="LrYqxPvZOILsHqb8xlcf-1" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="ukcp18-uk-land-12km.prj" vertex="1">
+          <mxGeometry height="33" width="203" x="537" y="258" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-42" connectable="0" parent="LrYqxPvZOILsHqb8xlcf-1" style="group" value="" vertex="1">
+          <mxGeometry height="133" width="382" x="520" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-43" parent="LrYqxPvZOILsHqb8xlcf-42" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="126" width="382" y="7" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-44" parent="LrYqxPvZOILsHqb8xlcf-42" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=8;labelBackgroundColor=none;fontStyle=1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp;Google Drive - /data/Sentinel2&amp;nbsp;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="217.63947368421051" x="13.571052631578947" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-45" parent="LrYqxPvZOILsHqb8xlcf-42" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="yyymmdd - yyyymmdd_sentinel2_layer1" vertex="1">
+          <mxGeometry height="30" width="351.59078947368425" x="20.35657894736842" y="43" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-46" parent="LrYqxPvZOILsHqb8xlcf-42" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="..." vertex="1">
+          <mxGeometry height="28" width="311.3802631578947" x="20.35657894736842" y="89" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-58" parent="LrYqxPvZOILsHqb8xlcf-1" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;align=left;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;h5 style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;font-size: 11px;&quot;&gt;Request data from CEMS&lt;/span&gt;&lt;/h5&gt;&lt;div&gt;&lt;span style=&quot;font-size: 11px;&quot;&gt;via API - Yearly blocks&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 11px;&quot;&gt;Transform .grib to .csv&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="105" width="210" x="1892" y="1274" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-68" parent="LrYqxPvZOILsHqb8xlcf-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=11;labelBackgroundColor=default;fontStyle=1" value="&lt;font&gt;NO&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="105" x="1943.5" y="1227" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-0" parent="LrYqxPvZOILsHqb8xlcf-1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#a20025;strokeColor=#6F0000;fontColor=#ffffff;labelBackgroundColor=none;" value="EXTERNAL DATA SOURCES" vertex="1">
+          <mxGeometry height="1000" width="402" x="25" y="-80" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-23" connectable="0" parent="KyOj-fMh_73qf5zfZf-D-0" style="group" value="" vertex="1">
+          <mxGeometry height="74" width="279" x="56.239999999999995" y="416.5" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; Map is already split into 12x12km grids&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; https://ukclimateprojections-&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;ui.metoffice.gov.uk/help/spatial_files&lt;/span&gt;&lt;/div&gt;" link="https://firms.modaps.eosdis.nasa.gov/country/" id="LrYqxPvZOILsHqb8xlcf-24">
+          <mxCell parent="LrYqxPvZOILsHqb8xlcf-23" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;align=left;" vertex="1">
+            <mxGeometry height="66" width="279" y="8" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-25" parent="LrYqxPvZOILsHqb8xlcf-23" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=12;labelBackgroundColor=none;fontStyle=1" value="&lt;font&gt;MET Office - UK 12KM Grid&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="233.64" x="16.36" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-32" connectable="0" parent="KyOj-fMh_73qf5zfZf-D-0" style="group" value="" vertex="1">
+          <mxGeometry height="59" width="278.48" x="56.760000000000005" y="342.5" as="geometry" />
+        </mxCell>
+        <UserObject label="https://firms.modaps.eosdis.nasa.gov/country/" link="https://firms.modaps.eosdis.nasa.gov/country/" id="LrYqxPvZOILsHqb8xlcf-33">
+          <mxCell parent="LrYqxPvZOILsHqb8xlcf-32" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1">
+            <mxGeometry height="51" width="278.48" y="8" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-34" parent="LrYqxPvZOILsHqb8xlcf-32" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=12;labelBackgroundColor=none;fontStyle=1" value="&lt;font&gt;NASA FIIRMS- VIIRS&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="142.63609756097563" x="15.525017421602788" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; Images used for feature extraction&lt;/div&gt;" id="LrYqxPvZOILsHqb8xlcf-38">
+          <mxCell parent="KyOj-fMh_73qf5zfZf-D-0" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;align=left;" vertex="1">
+            <mxGeometry height="66" width="280" x="56.75999999999999" y="507.5" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-39" parent="KyOj-fMh_73qf5zfZf-D-0" style="text;whiteSpace=wrap;html=1;" value="&lt;b&gt;Google Earth Engine - Sentinel-2&amp;nbsp;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="274.4816053511706" x="72.27839464882942" y="500.5" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-52" connectable="0" parent="KyOj-fMh_73qf5zfZf-D-0" style="group" value="" vertex="1">
+          <mxGeometry height="72" width="280" x="55.239999999999995" y="585.5" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; Variable that encloses weather information&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; into a single index&lt;/div&gt;" id="LrYqxPvZOILsHqb8xlcf-53">
+          <mxCell parent="LrYqxPvZOILsHqb8xlcf-52" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;align=left;fontStyle=0" vertex="1">
+            <mxGeometry height="66" width="280" y="6" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-54" parent="LrYqxPvZOILsHqb8xlcf-52" style="text;whiteSpace=wrap;html=1;fontStyle=1" value="CEMS - Fire Weather Index (FWI)" vertex="1">
+          <mxGeometry height="40" width="191.3125925925926" x="15.057777777777774" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-2" connectable="0" parent="LrYqxPvZOILsHqb8xlcf-1" style="group" value="" vertex="1">
+          <mxGeometry height="199" width="380" x="520" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-61" parent="KyOj-fMh_73qf5zfZf-D-2" style="shape=internalStorage;whiteSpace=wrap;html=1;dx=15;dy=15;rounded=1;arcSize=8;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="190" width="380" y="9" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-63" parent="KyOj-fMh_73qf5zfZf-D-2" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=8;labelBackgroundColor=none;fontStyle=1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp;Google Drive - /data/FWI&amp;nbsp;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="357.69565217391306" x="19" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-64" parent="KyOj-fMh_73qf5zfZf-D-2" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="&lt;span&gt;2019FWI.grib&lt;/span&gt;" vertex="1">
+          <mxGeometry height="33" width="335.39130434782606" x="44.608695652173914" y="49" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-65" parent="KyOj-fMh_73qf5zfZf-D-2" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="&lt;span&gt;2019FWI.csv&lt;/span&gt;" vertex="1">
+          <mxGeometry height="33" width="335.39130434782606" x="41.30434782608695" y="99" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-66" parent="KyOj-fMh_73qf5zfZf-D-2" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" value="&lt;span&gt;...&lt;/span&gt;" vertex="1">
+          <mxGeometry height="33" width="335.39130434782606" x="41.30434782608695" y="149" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-3" parent="LrYqxPvZOILsHqb8xlcf-1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;" value="DATA STORAGE (GOOGLE DRIVE)" vertex="1">
+          <mxGeometry height="1000" width="547" x="460" y="-80" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-4" parent="KyOj-fMh_73qf5zfZf-D-3" style="swimlane;whiteSpace=wrap;html=1;align=center;fillColor=#fad7ac;strokeColor=#b46504;" value="MANUAL DOWNLOAD" vertex="1">
+          <mxGeometry height="439" width="440" x="21" y="41" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-5" parent="LrYqxPvZOILsHqb8xlcf-1" style="swimlane;whiteSpace=wrap;html=1;align=center;fillColor=#fad7ac;strokeColor=#b46504;" value="API DOWNLOAD" vertex="1">
+          <mxGeometry height="400" width="439" x="481" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-7" parent="LrYqxPvZOILsHqb8xlcf-1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;fontSize=13;" value="PROCESSING AND TRANSFORMATION LAYER" vertex="1">
+          <mxGeometry height="1000" width="632" x="1037" y="-80" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-10" parent="KyOj-fMh_73qf5zfZf-D-7" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;align=left;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;h5 style=&quot;text-align: center;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-family: Verdana; white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size: 16px;&quot;&gt;viirs_load_pipeline()&lt;/font&gt;&lt;/font&gt;&lt;/h5&gt;&lt;div&gt;&lt;font&gt;&lt;font face=&quot;Verdana&quot; style=&quot;&quot;&gt;-&lt;/font&gt;&lt;font face=&quot;Verdana&quot; style=&quot;&quot;&gt; Get file paths based on parameter &lt;i&gt;selected years []&lt;/i&gt;&lt;/font&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;- Load VIIRS files&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;- Merge SNPP and NOA (SNPP then NOA)&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;- Filter to keep:&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;-&amp;nbsp;Type&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; == 0&amp;nbsp; &amp;nbsp; &amp;nbsp;(Vegetation fires)&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;- Confidence == n, h (Nominal and high)&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;b style=&quot;&quot;&gt;Returns &#39;df_viirs&#39; and &#39;data_report&#39;&amp;nbsp;&lt;/b&gt;&lt;/font&gt;&lt;b style=&quot;font-family: Verdana; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;font style=&quot;color: rgb(0, 204, 0);&quot;&gt;GeoPandasDataFrame&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b style=&quot;font-family: Verdana; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;font style=&quot;color: rgb(0, 204, 0);&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="209" width="530" x="50.5" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="LrYqxPvZOILsHqb8xlcf-27" parent="KyOj-fMh_73qf5zfZf-D-7" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;align=left;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;" value="&lt;h5 style=&quot;text-align: center;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-family: Verdana; white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size: 16px;&quot;&gt;load_uk_grid()&lt;/font&gt;&lt;/font&gt;&lt;/h5&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&amp;nbsp;&lt;font&gt;- Loads UK Grid shp file&lt;/font&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;font&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;- Ensure CRS (EPSG: 4326)&lt;/font&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;font&gt;&lt;br&gt;&lt;/font&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;&lt;font face=&quot;Verdana&quot; style=&quot;&quot;&gt;&lt;b&gt;Returns &#39;df_uk_grid&#39;&amp;nbsp;&lt;/b&gt;&lt;/font&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-family: Verdana;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-family: Verdana;&quot;&gt;&lt;font style=&quot;color: rgb(0, 204, 0);&quot;&gt;GeoPandasDataFrame&lt;/font&gt;&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="124" width="526" x="53.5" y="394" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-8" parent="KyOj-fMh_73qf5zfZf-D-7" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;align=left;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;" value="&lt;h5 style=&quot;text-align: center;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-family: Verdana; white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size: 16px;&quot;&gt;uk_grid_data_pipeline(df_uk_grid, df_viirs)&lt;/font&gt;&lt;/font&gt;&lt;/h5&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&amp;nbsp;- Replicates the full UK grid for each day in the years present in df_viirs&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;&lt;font face=&quot;Verdana&quot; style=&quot;&quot;&gt;&lt;b&gt;Returns &#39;df_daily_grid&#39;&amp;nbsp;&lt;/b&gt;&lt;/font&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-family: Verdana;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-family: Verdana;&quot;&gt;&lt;font style=&quot;color: rgb(0, 204, 0);&quot;&gt;GeoPandasDataFrame&lt;/font&gt;&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="124" width="499" x="82.5" y="524" as="geometry" />
+        </mxCell>
+        <mxCell id="KyOj-fMh_73qf5zfZf-D-9" parent="KyOj-fMh_73qf5zfZf-D-7" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;align=left;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;" value="&lt;h5 style=&quot;text-align: center;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size: 16px;&quot;&gt;fwi_load_pipeline(...,df_daily_grid,df_uk_grid...)&lt;/font&gt;&lt;/font&gt;&lt;/h5&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;- Get FWI data for each of the grids and days required&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;- If FWI already exists in drive, load .csv,&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;- Else request data via API call&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;- For each (grid_id, date) get the max and avg FWI for the grid and store as a single FWI row per&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;font-family: Verdana; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;(grid_id, date)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;&lt;font face=&quot;Verdana&quot; style=&quot;&quot;&gt;&lt;b&gt;Returns &#39;df_fwi&#39;&amp;nbsp;&lt;/b&gt;&lt;/font&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-family: Verdana;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-family: Verdana;&quot;&gt;&lt;font style=&quot;color: rgb(0, 204, 0);&quot;&gt;DataFrame&lt;/font&gt;&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="165" width="526" x="50.5" y="695" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
