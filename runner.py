@@ -114,35 +114,4 @@ while not choice_selected:
 
     ui = input("Happy with selection? y/n")
 
-    if ui == 'y':
-        choice_selected = True
-
-grids_day = df_uk_grid[df_uk_grid['grid_id'].isin(df_day['grid_id'])]
-
-m = grids_day.explore(
-    color="black",
-    style_kwds={"fillOpacity": 0},
-    tiles="Esri.WorldImagery"
-)
-# Add label overlay
-folium.TileLayer(
-    tiles="CartoDB PositronOnlyLabels",
-    name="Labels",
-    overlay=True,
-    control=True
-).add_to(m)
-
-df_day.explore(
-    m=m,
-    color="red",
-    marker_kwds={"radius": 5}
-)
-
-folium.LayerControl().add_to(m)
-fp = os.path.abspath("validation_map.html")
-m.save("validation_map.html")
-webbrowser.open("file://" + fp)
-
-
-
-#endregion
+    if u
