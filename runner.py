@@ -89,38 +89,6 @@ print(df_fwi.head())
 # --------------------------
 #region
 ##################################
-import ee
-try:
-    ee.Initialize(project = "ee-enmanuelmorego")
-except:
-    ee.Authenticate()
-    ee.Initialize(project = "ee-enmanuelmorego")
-row              = df_sentinel.iloc[0]
-test_grid_id     = int(row["grid_id"])
-test_date        = row["date"]
-test_sentinel_id = row["sentinel_id"]
-geom = df_uk_grid.loc[df_uk_grid["grid_id"] == test_grid_id, "geometry"].iloc[0]
-
-coords = [list(geom.exterior.coords)]
-ee_geom = ee.Geometry.Polygon(coords)
-img = ee.Image(test_sentinel_id)
-bands = ["B2", "B3", "B4", "B8"]  # Blue, Green, Red, NIR
-img = img.select(bands)
-img = img.clip(ee_geom)
-scale = 60
-img = img.reproject(crs=CRS, scale=scale)
-
-task = ee.batch.Export.image.toDrive(
-    image      = img,
-    description= "TEST_single_grid_tile",
-    folder     = "SentinelPixels",
-    fileNamePrefix = f"grid_{test_grid_id}_{test_date}",
-    region     = ee_geom,
-    scale      = scale,
-    maxPixels  = 1e9
-)
-
-task.start()
 
 
 #endregion
