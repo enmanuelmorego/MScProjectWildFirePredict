@@ -6,10 +6,12 @@ os.environ.setdefault("RUN_DEMO", "ON")
 import src.config as c
 import src.load_data as ld
 import src.google_ee as gee
+import src.preprocessing.pp_summaries as pps
 import geopandas as gpd
 from pathlib import Path
 import matplotlib.pyplot as plt
 import utils as u
+
 
 # --------------------------
 # VARIABLES
@@ -91,27 +93,67 @@ print(df_fwi.head())
 # PRE PROCESSING
 # --------------------------
 #region
+
 import numpy as np
 import webbrowser
 print(f"{'='*80}")
 print(f"++ PRE PROCESSING")  
+df_pp = pps.summarise_viirs(df_viirs, df_uk_grid)
+print(df_pp.head())
 
-df_viirs_joined = gpd.sjoin(df_viirs, df_uk_grid, how = 'inner', predicate = 'within')
-print(df_viirs_joined.head())
 
-grid_geo_only = df_uk_grid[['grid_id', 'geometry']]
-print(grid_geo_only.head())
-
-import pandas as pd
-import folium
+# import pandas as pd
+# import folium
 choice_selected = False
 while not choice_selected:
-    random_day = np.random.choice(df_viirs_joined['acq_date'].unique())
+    random_day = np.random.choice(df_pp['acq_date'].unique())
     print("Random day selected:", random_day)
 
-    df_day = df_viirs_joined[df_viirs_joined['acq_date'] == random_day]
+    df_day = df_pp[df_pp['acq_date'] == random_day]
     print(df_day.shape)
 
     ui = input("Happy with selection? y/n")
 
-    if u
+    if ui == 'y':
+        choice_selected = True
+
+df_plot = df_uk_grid.merge(df_day,
+                           on = 'grid_id',
+                           how = 'left')
+df_plot["fire_lbl"] = df_plot["fire_lbl"].fillna(False)
+import geopandas as gpd
+
+gdf_plot = gpd.GeoDataFrame(df_plot, geometry="geometry", crs=df_uk_grid.crs)
+
+
+m = gdf_plot.explore(
+        color="#aaaaaa",   # light grey (hex gives more control)
+    style_kwds={
+        "fillOpacity": 0,
+        "weight": 0.5,        # thinner lines
+        "opacity": 0.6        # lighter lines
+    }
+)
+# # Add label overlay
+# folium.TileLayer(
+#     tiles="CartoDB PositronOnlyLabels",
+#     name="Labels",
+#     overlay=True,
+#     control=True
+# ).add_to(m)
+
+# Overlay: fire grids filled red
+gdf_plot[gdf_plot["fire_lbl"]].explore(
+    m=m,
+    color="red",
+    style_kwds={"fillOpacity": 0.6}
+)
+
+# folium.LayerControl().add_to(m)
+fp = os.path.abspath("validation_map.html")
+m.save("validation_map.html")
+webbrowser.open("file://" + fp)
+
+
+
+#endregion
