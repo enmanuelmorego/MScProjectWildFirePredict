@@ -95,33 +95,32 @@ try:
 except:
     ee.Authenticate()
     ee.Initialize(project = "ee-enmanuelmorego")
-df_month = df_daily_grid[(df_daily_grid['date'] >= '2019-01-01') &
-                         (df_daily_grid['date'] <= '2019-01-15')]
-# Convert df to google feature collection
-fc = gee.geodf_to_ee(df_month)
-# function to make sentinel patch
-def make_sentinel_patch(feature):
-    date = ee.Date(feature.get('date'))
-    geom = feature.geometry()
+row              = df_sentinel.iloc[0]
+test_grid_id     = int(row["grid_id"])
+test_date        = row["date"]
+test_sentinel_id = row["sentinel_id"]
+geom = df_uk_grid.loc[df_uk_grid["grid_id"] == test_grid_id, "geometry"].iloc[0]
 
-    composite_img = (ee.ImageCollection(SATELITE_IMAGES)
-                     .filterBounds(geom)
-                     .filterDate(date.advance(-7, 'day'), date)
-                     .select(['B2','B3','B4','B8'])
-                     .median()
-                     .clip(geom))
-    patch = composite_img.sampleRectangle(region = geom,
-                                          defaultValue = 0)
-    return feature.set({'patch': patch})
+coords = [list(geom.exterior.coords)]
+ee_geom = ee.Geometry.Polygon(coords)
+img = ee.Image(test_sentinel_id)
+bands = ["B2", "B3", "B4", "B8"]  # Blue, Green, Red, NIR
+img = img.select(bands)
+img = img.clip(ee_geom)
+scale = 60
+img = img.reproject(crs=CRS, scale=scale)
 
-fc_patches = fc.map(make_sentinel_patch)
-
-task = ee.batch.Export.table.toDrive(
-    collection=fc_patches,
-    description="sentinel_patches_2019_01",
-    folder="SentinelPixels",
-    fileFormat="TFRecord"
+task = ee.batch.Export.image.toDrive(
+    image      = img,
+    description= "TEST_single_grid_tile",
+    folder     = "SentinelPixels",
+    fileNamePrefix = f"grid_{test_grid_id}_{test_date}",
+    region     = ee_geom,
+    scale      = scale,
+    maxPixels  = 1e9
 )
+
 task.start()
+
 
 #endregion
