@@ -98,6 +98,7 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
     # Find values in NOAA not in SNPP 
     df_diff = df_noaa.loc[~df_noaa.set_index(cols_merge).index.isin(df_snpp.set_index(cols_merge).index)]
     df_out = pd.concat([df_snpp, df_diff], ignore_index = True)
+
     data_report = {'total_rows_snpp': df_snpp.shape[0],
                    'total_rows_noaa': df_diff.shape[0]}
     return {'df': df_out,
@@ -153,14 +154,16 @@ def viirs_load_pipeline(dir_name: str,
     Dictionary containing the final data frame and the data report (the dataframe returned is a GeoPandas df)
     `{'df_viirs': df_viirs, 'data_report': df_viirs_report}`
   """
-  viirs_files =     u.get_filepaths(dir_name)
-  viirs_to_load =   to_load_viirs(viirs_files,date_range)
-  viirs_data =      load_viirs(viirs_to_load)
-  df_viirs_raw =    merge_viirs(viirs_data)
-  df_viirs_report = df_viirs_raw.get('data_report')
-  df_viirs_temp =   df_viirs_raw.get('df')
-  df_viirs =        filter_viirs(df_viirs_temp)
-  df_viirs_geo =    geo_viirs(df_viirs, crs)
+  viirs_files      = u.get_filepaths(dir_name)
+  viirs_to_load    = to_load_viirs(viirs_files,date_range)
+  viirs_data       = load_viirs(viirs_to_load)
+  df_viirs_raw     = merge_viirs(viirs_data)
+  df_viirs_report  = df_viirs_raw.get('data_report')
+  df_viirs_temp    = df_viirs_raw.get('df')
+  df_viirs         = filter_viirs(df_viirs_temp)
+  df_viirs         = df_viirs.rename(columns = {'acq_date': 'date'})
+  df_viirs["date"] = pd.to_datetime(df_viirs["date"])
+  df_viirs_geo     = geo_viirs(df_viirs, crs)
   return {'df_viirs': df_viirs_geo,
           'data_report': df_viirs_report}
 
