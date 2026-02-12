@@ -99,16 +99,29 @@ import numpy as np
 import webbrowser
 print(f"{'='*80}")
 print(f"++ PRE PROCESSING")  
-df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
-print(df_viirs_summary.head())
+
+dfs_loaded = {'df_viirs'     : df_viirs,
+              'df_daily_grid': df_daily_grid,
+              'df_fwi'       : df_fwi}
+print(ld.validate_data_load(dfs_loaded))
+# df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
+# print(df_viirs_summary.head())
 
 
-df_viirs_grid = df_daily_grid.merge(df_viirs_summary,
-                                        on = ['grid_id','date'])
+# df_viirs_grid = df_daily_grid.merge(df_viirs_summary,
+#                                         on = ['grid_id','date'],
+#                                         how = 'left')
+# df_viirs_grid['fire_lbl'] = (df_viirs_grid['fire_lbl']
+#                              .astype('boolean')
+#                              .fillna(False))
+
 # df_fwi_viirs_grid = df_viirs_grid.merge(df_fwi,
-#                                         on = ['grid_id','date'])
+#                                         on = ['grid_id','date'],
+#                                         how = 'left')
 
 # print(df_fwi_viirs_grid.head())
+
+
 
 # import pandas as pd
 # import folium
@@ -134,24 +147,4 @@ df_viirs_grid = df_daily_grid.merge(df_viirs_summary,
 #         color="#aaaaaa",   # light grey (hex gives more control)
 #     style_kwds={
 #         "fillOpacity": 0,
-#         "weight": 0.5,        # thinner lines
-#         "opacity": 0.6        # lighter lines
-#     }
-# )
-
-# # Overlay: fire grids filled red
-# gdf_plot[gdf_plot["fire_lbl"]].explore(
-#     m=m,
-#     color="red",
-#     style_kwds={"fillOpacity": 0.6}
-# )
-
-# # folium.LayerControl().add_to(m)
-# map_name = f"{datetime.now().strftime("%Y%m%d %H:%M:%S")}_validation_map.html"
-# fp = os.path.abspath(f"outputs/maps/" + map_name)
-# m.save(fp)
-# webbrowser.open("file://" + fp)
-
-
-
-#endregion
+#         "weight": 0.5,        # thi

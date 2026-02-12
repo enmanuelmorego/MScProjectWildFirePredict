@@ -542,8 +542,13 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                                    geometry = gpd.points_from_xy(df_grib.longitude,
                                                                  df_grib.latitude),
                                    crs = crs_val)
+    
+    print("Raster points count:", len(df_geo_grib))
+    print("Raster bounds:", df_geo_grib.total_bounds)
+    print("UK grid bounds:", df_uk_grid.total_bounds)
+    input("DEbug breakpoint...: ")
     # Join FWI to UK Grid to get value per Grid
-    df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'within')
+    df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'intersects')
     df_grouped = (df_join
                   .groupby(['grid_id', 'date'], as_index = False)
                   .agg(fwi_max  = ('fwi', 'max'),
@@ -654,6 +659,31 @@ def fwi_load_pipeline(fwi_path: Path,
   df_fwi = pd.concat(fwi_list, ignore_index = True)
   df_fwi["date"] = pd.to_datetime(df_fwi["date"])
   return df_fwi
+
+# -------------------------
+# DATA LOAD VALIDATION
+# ------------------------- 
+def validate_data_load(dfs_dict: dict):
+  """
+  Function to validate the loaded data before combining into the df_model data frame 
+  """
+  # loop over each item in the dictionary and extract objects
+  dict_out = {}
+  for name, df in dfs_dict.items():
+    print(name)
+
+    current_dict = {'date_from': df['date'].min().strftime("%Y-%m-%d"),
+                    'date_to'  : df['date'].max().strftime("%Y-%m-%d"),
+                    'total_rows': df.shape[0]}
+    if 'grid_id' in df.columns:
+      current_dict['total_grids'] = len(df['grid_id'].unique())
+      current_dict['grid_min']    = df['grid_id'].min()
+      current_dict['grid_max']    = df['grid_id'].max()
+
+    dict_out[name] = current_dict
+
+  
+  return dict_out
 
 
 if __name__ == "__main__":
