@@ -38,7 +38,7 @@ print(f"{'='*80}")
 print(f"🔥 VIIRS Data")
 print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")
 print(f"\tData Type: {type(df_viirs)}")
-print(f"\t📅 Date Range: {df_viirs['acq_date'].min()} to {df_viirs['acq_date'].max()}")
+print(f"\t📅 Date Range: {df_viirs['date'].min()} to {df_viirs['date'].max()}")
 print(df_viirs.head())
 
 # --------------------------
@@ -84,7 +84,7 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
                               grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
-print(type(df_fwi))
+print(type(df_fwi['date'].max()))
 print(df_fwi.shape)
 print(df_fwi.head())
 
@@ -103,12 +103,12 @@ df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
 print(df_viirs_summary.head())
 
 
-print(f"viirs summary: {type(df_viirs_summary['date'].max())}")
-print(f"daily grid: {type(df_daily_grid['date'].max())}")
-
-# df_fwi_viirs_grid = df_daily_grid.merge(df_viirs_summary,
+df_viirs_grid = df_daily_grid.merge(df_viirs_summary,
+                                        on = ['grid_id','date'])
+# df_fwi_viirs_grid = df_viirs_grid.merge(df_fwi,
 #                                         on = ['grid_id','date'])
 
+# print(df_fwi_viirs_grid.head())
 
 # import pandas as pd
 # import folium
