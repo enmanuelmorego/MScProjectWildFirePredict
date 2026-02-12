@@ -165,6 +165,36 @@ print(ld.validate_data_load(dfs_loaded))
 # m.save(fp)
 # webbrowser.open("file://" + fp)
 
+import geopandas as gpd
+
+# Pick one day
+day = "2019-12-15"
+
+df_day = df_fwi[df_fwi["date"] == day]
+
+# Merge geometry back
+gdf_plot = df_uk_grid.merge(df_day, on="grid_id", how="left")
+
+# m = gdf_plot.explore(
+#     column="fwi_mean", # Assigns a color based gradiaent on the values of the column
+#     #cmap="OrRd",
+#    # legend=True,
+#     tiles="Esri.WorldImagery"
+# )
+
+m = gdf_plot.explore(
+        color="#aaaaaa",   # light grey (hex gives more control)
+    style_kwds={
+        "fillOpacity": 0,
+        "weight": 0.5,        # thinner lines
+        "opacity": 0.6        # lighter lines
+    }
+)
+
+map_name = f"{datetime.now().strftime("%Y%m%d %H:%M:%S")}_fwi_validation_map.html"
+fp = os.path.abspath(f"outputs/maps/" + map_name)
+m.save(fp)
+webbrowser.open("file://" + fp)
 
 
 #endregion
