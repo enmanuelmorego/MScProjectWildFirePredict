@@ -147,4 +147,24 @@ print(ld.validate_data_load(dfs_loaded))
 #         color="#aaaaaa",   # light grey (hex gives more control)
 #     style_kwds={
 #         "fillOpacity": 0,
-#         "weight": 0.5,        # thi
+#         "weight": 0.5,        # thinner lines
+#         "opacity": 0.6        # lighter lines
+#     }
+# )
+
+# # Overlay: fire grids filled red
+# gdf_plot[gdf_plot["fire_lbl"]].explore(
+#     m=m,
+#     color="red",
+#     style_kwds={"fillOpacity": 0.6}
+# )
+
+# # folium.LayerControl().add_to(m)
+# map_name = f"{datetime.now().strftime("%Y%m%d %H:%M:%S")}_validation_map.html"
+# fp = os.path.abspath(f"outputs/maps/" + map_name)
+# m.save(fp)
+# webbrowser.open("file://" + fp)
+
+
+
+#endregion

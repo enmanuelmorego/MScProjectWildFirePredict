@@ -521,6 +521,12 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   list_fwi = []
   total = len(fwi_msgs)
   i = 1
+
+  # Compute grid centroids
+  df_grid_centroids             = df_uk_grid.copy()
+  df_grid_centroids['geometry'] = df_grid_centroids.geometry.centroid
+  df_grid_centroids             = df_grid_centroids.to_crs(crs_val
+                                               )
   # Process data
   for grb in fwi_msgs:
     print(f"\r\t...⚙️  [{grib_fname}] Processing {i} of {total} [{round((i/total)*100,2)}]%", end="")
