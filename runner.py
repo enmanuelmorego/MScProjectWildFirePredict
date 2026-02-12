@@ -11,6 +11,7 @@ import geopandas as gpd
 from pathlib import Path
 import matplotlib.pyplot as plt
 import utils as u
+from datetime import datetime
 
 
 # --------------------------
@@ -98,61 +99,58 @@ import numpy as np
 import webbrowser
 print(f"{'='*80}")
 print(f"++ PRE PROCESSING")  
-df_pp = pps.summarise_viirs(df_viirs, df_uk_grid)
-print(df_pp.head())
+df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
+print(df_viirs_summary.head())
+
+
+print(f"viirs summary: {type(df_viirs_summary['date'].max())}")
+print(f"daily grid: {type(df_daily_grid['date'].max())}")
+
+# df_fwi_viirs_grid = df_daily_grid.merge(df_viirs_summary,
+#                                         on = ['grid_id','date'])
 
 
 # import pandas as pd
 # import folium
-choice_selected = False
-while not choice_selected:
-    random_day = np.random.choice(df_pp['acq_date'].unique())
-    print("Random day selected:", random_day)
 
-    df_day = df_pp[df_pp['acq_date'] == random_day]
-    print(df_day.shape)
+# random_day = np.random.choice(df_viirs_summary['acq_date'].unique())
+# print("Random day selected:", random_day)
 
-    ui = input("Happy with selection? y/n")
-
-    if ui == 'y':
-        choice_selected = True
-
-df_plot = df_uk_grid.merge(df_day,
-                           on = 'grid_id',
-                           how = 'left')
-df_plot["fire_lbl"] = df_plot["fire_lbl"].fillna(False)
-import geopandas as gpd
-
-gdf_plot = gpd.GeoDataFrame(df_plot, geometry="geometry", crs=df_uk_grid.crs)
+# df_day = df_viirs_summary[df_viirs_summary['acq_date'] == random_day]
+# print(df_day.shape)
 
 
-m = gdf_plot.explore(
-        color="#aaaaaa",   # light grey (hex gives more control)
-    style_kwds={
-        "fillOpacity": 0,
-        "weight": 0.5,        # thinner lines
-        "opacity": 0.6        # lighter lines
-    }
-)
-# # Add label overlay
-# folium.TileLayer(
-#     tiles="CartoDB PositronOnlyLabels",
-#     name="Labels",
-#     overlay=True,
-#     control=True
-# ).add_to(m)
 
-# Overlay: fire grids filled red
-gdf_plot[gdf_plot["fire_lbl"]].explore(
-    m=m,
-    color="red",
-    style_kwds={"fillOpacity": 0.6}
-)
+# df_plot = df_uk_grid.merge(df_day,
+#                            on = 'grid_id',
+#                            how = 'left')
+# df_plot["fire_lbl"] = df_plot["fire_lbl"].fillna(False)
+# import geopandas as gpd
 
-# folium.LayerControl().add_to(m)
-fp = os.path.abspath("validation_map.html")
-m.save("validation_map.html")
-webbrowser.open("file://" + fp)
+# gdf_plot = gpd.GeoDataFrame(df_plot, geometry="geometry", crs=df_uk_grid.crs)
+
+
+# m = gdf_plot.explore(
+#         color="#aaaaaa",   # light grey (hex gives more control)
+#     style_kwds={
+#         "fillOpacity": 0,
+#         "weight": 0.5,        # thinner lines
+#         "opacity": 0.6        # lighter lines
+#     }
+# )
+
+# # Overlay: fire grids filled red
+# gdf_plot[gdf_plot["fire_lbl"]].explore(
+#     m=m,
+#     color="red",
+#     style_kwds={"fillOpacity": 0.6}
+# )
+
+# # folium.LayerControl().add_to(m)
+# map_name = f"{datetime.now().strftime("%Y%m%d %H:%M:%S")}_validation_map.html"
+# fp = os.path.abspath(f"outputs/maps/" + map_name)
+# m.save(fp)
+# webbrowser.open("file://" + fp)
 
 
 
