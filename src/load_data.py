@@ -652,6 +652,7 @@ def fwi_load_pipeline(fwi_path: Path,
     df_load = pd.read_csv(fname_load)
     fwi_list.append(df_load)
   df_fwi = pd.concat(fwi_list, ignore_index = True)
+  df_fwi["date"] = pd.to_datetime(df_fwi["date"])
   return df_fwi
 
 
