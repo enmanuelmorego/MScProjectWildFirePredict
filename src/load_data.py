@@ -523,9 +523,8 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   i = 1
 
   # Compute grid centroids
-  df_grid_centroids             = df_uk_grid.copy()
-  df_grid_centroids['geometry'] = df_grid_centroids.geometry.centroid
-  df_grid_centroids             = df_grid_centroids.to_crs(crs_val)
+  df_grid_centroids_proj = df_uk_grid.to_crs("EPSG:27700")
+  df_grid_centroids_proj["geometry"] = df_grid_centroids_proj.geometry.centroid
 
   # Process data
   for grb in fwi_msgs:
@@ -548,10 +547,11 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                                                                  df_grib.latitude),
                                    crs = crs_val)
     
+    df_geo_grib_proj = df_geo_grib.to_crs("EPSG:27700")
     # Join FWI to UK Grid to get value per Grid
     #df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'intersects')
-    df_join = gpd.sjoin_nearest(df_grid_centroids,
-                                df_geo_grib[['geometry','fwi']],
+    df_join = gpd.sjoin_nearest(df_grid_centroids_proj,
+                                df_geo_grib_proj[['geometry','fwi']],
                                 how = 'left')
     df_join['date'] = date
     df_grouped = (df_join
