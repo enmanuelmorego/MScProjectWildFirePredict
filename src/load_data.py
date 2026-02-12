@@ -525,13 +525,12 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   # Compute grid centroids
   df_grid_centroids             = df_uk_grid.copy()
   df_grid_centroids['geometry'] = df_grid_centroids.geometry.centroid
-  df_grid_centroids             = df_grid_centroids.to_crs(crs_val
-                                               )
+  df_grid_centroids             = df_grid_centroids.to_crs(crs_val)
+
   # Process data
   for grb in fwi_msgs:
     print(f"\r\t...⚙️  [{grib_fname}] Processing {i} of {total} [{round((i/total)*100,2)}]%", end="")
     # Extract variables
-    date       = grb.validDate
     date       = datetime.strptime(f"{grb.dataDate}{grb.dataTime:04d}", "%Y%m%d%H%M")
     lats, lons = grb.latlons()
     fwi_values = grb.values
@@ -549,12 +548,12 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                                                                  df_grib.latitude),
                                    crs = crs_val)
     
-    print("Raster points count:", len(df_geo_grib))
-    print("Raster bounds:", df_geo_grib.total_bounds)
-    print("UK grid bounds:", df_uk_grid.total_bounds)
-    input("DEbug breakpoint...: ")
     # Join FWI to UK Grid to get value per Grid
-    df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'intersects')
+    #df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'intersects')
+    df_join = gpd.sjoin_nearest(df_grid_centroids,
+                                df_geo_grib[['geometry','fwi']],
+                                how = 'left')
+    df_join['date'] = date
     df_grouped = (df_join
                   .groupby(['grid_id', 'date'], as_index = False)
                   .agg(fwi_max  = ('fwi', 'max'),
