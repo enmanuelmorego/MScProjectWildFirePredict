@@ -103,7 +103,7 @@ print(f"++ PRE PROCESSING")
 dfs_loaded = {'df_viirs'     : df_viirs,
               'df_daily_grid': df_daily_grid,
               'df_fwi'       : df_fwi}
-print(ld.validate_data_load(dfs_loaded))
+print(u.dfs_metadata(dfs_loaded))
 # df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
 # print(df_viirs_summary.head())
 
