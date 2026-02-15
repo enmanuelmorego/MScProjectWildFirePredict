@@ -91,14 +91,25 @@ def dfs_metadata(dfs_dict: dict):
 
   return dict_out
 
-def save_json(dict_save: dict,obj_name:str, run_id: str):
+def save_json(dict_save: dict, obj_name:str, run_id: str) -> None:
   """
   Helper function that saves a simple dictionary as a json file in the outputs folder
+
+  Args:
+    - dict_save (dict): Dictionary to save as json file
+    - obj_name (str): The string with the file name
+    - run_id (str): ID for specific run of project, set at the start of the script
+
+  Returns: 
+    None
   """
   path = f"outputs/{run_id}"
   os.makedirs(path, exist_ok = True)
   fout = f"{path}/{run_id}_{obj_name}.json"
-  print(fout)
-  with open(fout, "w") as f:
-    json.dump(dict_save, f, indent = 4)
+  try:
+    with open(fout, "w") as f:
+      json.dump(dict_save, f, indent = 4)
+      print(f"\t✅ Succesfully saved {fout}")
+  except IOError as e:
+    print(f"❌ ERROR {e}")
 

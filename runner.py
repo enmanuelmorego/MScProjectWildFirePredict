@@ -112,22 +112,6 @@ df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
 
 
 
-print("\n....................................................")
-
-
-df_model_summary = {'date_from'         : df_model_pre['date'].min().strftime("%Y-%m-%d"),
-                    'date_to'           : df_model_pre['date'].max().strftime("%Y-%m-%d"),
-                    'total_rows'        : df_model_pre.shape[0],
-                    'total_grids'       : df_model_pre['grid_id'].nunique(),
-                    'grid_min'          : df_model_pre['grid_id'].min(),
-                    'grid_max'          : df_model_pre['grid_id'].max(),
-                    'viirs_true_obs'    : df_model_pre[df_model_pre['fire_lbl'] == True].shape[0],
-                    'unique_viirs_grids': df_model_pre[df_model_pre['fire_lbl'] == True]['grid_id'].nunique(),
-                    'fwi_notna'         : df_model_pre[df_model_pre['fwi_max'].notna()].shape[0]}
-
-
-print("\n....................................................")
-print(df_model_summary)
 
 
 
