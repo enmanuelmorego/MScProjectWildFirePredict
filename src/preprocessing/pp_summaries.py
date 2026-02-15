@@ -93,5 +93,12 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     remove = ((df['grid_id'] == 1) &
               (df['fwi_max'].isna())
               )
+  
+    rr = remove.sum()
+    if rr > 0:
+        print(f"ℹ️  Removed {rr} rows with grid_id == 1")
+    else:
+        print(f"✅  No grids to remove - grid_id contains data")
+        
     df_out = df[~remove].copy()
     return df_out
