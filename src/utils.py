@@ -100,5 +100,5 @@ def save_json(dict_save: dict,obj_name:str, run_id: str):
   fout = f"{path}/{run_id}_{obj_name}.json"
   print(fout)
   with open(fout, "w") as f:
-    json.dump(dict_save, f)
+    json.dump(dict_save, f, indent = 4)
 

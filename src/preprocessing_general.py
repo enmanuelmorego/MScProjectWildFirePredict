@@ -122,8 +122,6 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
     df_viirs_summary            = summarise_viirs(df_viirs, df_uk_grid)
     df_dict['df_viirs_summary'] = df_viirs_summary
     loaded_data_mt = u.dfs_metadata(df_dict)
-    print(loaded_data_mt)
-    input("break")
     u.save_json(loaded_data_mt,"LOAD_METADATA", run_id)
 
     df_model_pre_raw = combined_dfs(df_dict)
