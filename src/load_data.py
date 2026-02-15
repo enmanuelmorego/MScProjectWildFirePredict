@@ -665,30 +665,7 @@ def fwi_load_pipeline(fwi_path: Path,
   df_fwi["date"] = pd.to_datetime(df_fwi["date"])
   return df_fwi
 
-# -------------------------
-# DATA LOAD VALIDATION
-# ------------------------- 
-def validate_data_load(dfs_dict: dict):
-  """
-  Function to validate the loaded data before combining into the df_model data frame 
-  """
-  # loop over each item in the dictionary and extract objects
-  dict_out = {}
-  for name, df in dfs_dict.items():
-    print(name)
 
-    current_dict = {'date_from': df['date'].min().strftime("%Y-%m-%d"),
-                    'date_to'  : df['date'].max().strftime("%Y-%m-%d"),
-                    'total_rows': df.shape[0]}
-    if 'grid_id' in df.columns:
-      current_dict['total_grids'] = len(df['grid_id'].unique())
-      current_dict['grid_min']    = df['grid_id'].min()
-      current_dict['grid_max']    = df['grid_id'].max()
-
-    dict_out[name] = current_dict
-
-  
-  return dict_out
 
 
 if __name__ == "__main__":

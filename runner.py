@@ -100,29 +100,38 @@ import webbrowser
 print(f"{'='*80}")
 print(f"++ PRE PROCESSING")  
 
-dfs_loaded = {'df_viirs'     : df_viirs,
-              'df_daily_grid': df_daily_grid,
-              'df_fwi'       : df_fwi}
+
+df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
+print(df_viirs_summary.head())
+
+dfs_loaded = {'df_viirs'         : df_viirs,
+              'df_viirs_summary' : df_viirs_summary,
+              'df_daily_grid'    : df_daily_grid,
+              'df_fwi'           : df_fwi}
 print(u.dfs_metadata(dfs_loaded))
-# df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
-# print(df_viirs_summary.head())
+
+df_viirs_grid = df_daily_grid.merge(df_viirs_summary, on = ['grid_id','date'], how = 'left')
+
+df_viirs_grid['fire_lbl'] = (df_viirs_grid['fire_lbl']
+                             .astype('boolean')
+                             .fillna(False))
+
+df_viirs_grid[['viirs_n', 'frp_max', 'frp_mean']] = df_viirs_grid[['viirs_n', 'frp_max', 'frp_mean']].fillna(0)
+
+df_fwi_viirs_grid = df_viirs_grid.merge(df_fwi,
+                                        on = ['grid_id','date'],
+                                        how = 'left')
 
 
-# df_viirs_grid = df_daily_grid.merge(df_viirs_summary,
-#                                         on = ['grid_id','date'],
-#                                         how = 'left')
-# df_viirs_grid['fire_lbl'] = (df_viirs_grid['fire_lbl']
-#                              .astype('boolean')
-#                              .fillna(False))
+df_model_summary = {'date_from'         : df_fwi_viirs_grid['date'].min().strftime("%Y-%m-%d"),
+                    'date_to'           : df_fwi_viirs_grid['date'].max().strftime("%Y-%m-%d"),
+                    'total_rows'        : df_fwi_viirs_grid.shape[0],
+                    'total_grids'       : df_fwi_viirs_grid['grid_id'].nunique(),
+                    'viirs_true_obs'    : df_fwi_viirs_grid[df_fwi_viirs_grid['fire_lbl'] == True].shape[0],
+                    'unique_viirs_grids': df_fwi_viirs_grid[df_fwi_viirs_grid['fire_lbl'] == True]['grid_id'].nunique(),
+                    'fwi_notna'         : df_fwi_viirs_grid[df_fwi_viirs_grid['fwi_max'].notna()].shape[0]}
 
-# df_fwi_viirs_grid = df_viirs_grid.merge(df_fwi,
-#                                         on = ['grid_id','date'],
-#                                         how = 'left')
-
-# print(df_fwi_viirs_grid.head())
-
-
-
+print(df_model_summary)
 # import pandas as pd
 # import folium
 
@@ -165,36 +174,36 @@ print(u.dfs_metadata(dfs_loaded))
 # m.save(fp)
 # webbrowser.open("file://" + fp)
 
-import geopandas as gpd
+# import geopandas as gpd
 
-# Pick one day
-day = "2019-12-15"
+# # Pick one day
+# day = "2019-12-15"
 
-df_day = df_fwi[df_fwi["date"] == day]
+# df_day = df_fwi[df_fwi["date"] == day]
 
-# Merge geometry back
-gdf_plot = df_uk_grid.merge(df_day, on="grid_id", how="left")
+# # Merge geometry back
+# gdf_plot = df_uk_grid.merge(df_day, on="grid_id", how="left")
+
+# # m = gdf_plot.explore(
+# #     column="fwi_mean", # Assigns a color based gradiaent on the values of the column
+# #     #cmap="OrRd",
+# #    # legend=True,
+# #     tiles="Esri.WorldImagery"
+# # )
 
 # m = gdf_plot.explore(
-#     column="fwi_mean", # Assigns a color based gradiaent on the values of the column
-#     #cmap="OrRd",
-#    # legend=True,
-#     tiles="Esri.WorldImagery"
+#         color="#aaaaaa",   # light grey (hex gives more control)
+#     style_kwds={
+#         "fillOpacity": 0,
+#         "weight": 0.5,        # thinner lines
+#         "opacity": 0.6        # lighter lines
+#     }
 # )
 
-m = gdf_plot.explore(
-        color="#aaaaaa",   # light grey (hex gives more control)
-    style_kwds={
-        "fillOpacity": 0,
-        "weight": 0.5,        # thinner lines
-        "opacity": 0.6        # lighter lines
-    }
-)
-
-map_name = f"{datetime.now().strftime("%Y%m%d %H:%M:%S")}_fwi_validation_map.html"
-fp = os.path.abspath(f"outputs/maps/" + map_name)
-m.save(fp)
-webbrowser.open("file://" + fp)
+# map_name = f"{datetime.now().strftime("%Y%m%d %H:%M:%S")}_fwi_validation_map.html"
+# fp = os.path.abspath(f"outputs/maps/" + map_name)
+# m.save(fp)
+# webbrowser.open("file://" + fp)
 
 
 #endregion
