@@ -58,3 +58,33 @@ def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
   dates_df['join_key'] = 1
   return dates_df
 
+def dfs_metadata(dfs_dict: dict):
+  """
+  Function to validate the loaded data before combining into the df_model data frame 
+  Extracts key relevant information that is useful to ensure the data was loaded as expected
+
+  Args:
+    dfs_dict (dict): A dictionary containing all the data frames to inspect
+
+  Returns:
+    dict_out (dict): A dictionary containing data details of each of the processed data frames
+  """
+  # loop over each item in the dictionary and extract objects
+  dict_out = {}
+  for name, df in dfs_dict.items():
+
+    current_dict = {'df_type'  : type(df),
+                    'columns'  : df.columns,
+                    'date_from': df['date'].min().strftime("%Y-%m-%d"),
+                    'date_to'  : df['date'].max().strftime("%Y-%m-%d"),
+                    'total_rows': df.shape[0]}
+    if 'grid_id' in df.columns:
+      current_dict['total_grids'] = len(df['grid_id'].unique())
+      current_dict['grid_min']    = df['grid_id'].min()
+      current_dict['grid_max']    = df['grid_id'].max()
+
+    dict_out[name] = current_dict
+
+  
+  return dict_out
+

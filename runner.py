@@ -102,36 +102,53 @@ print(f"++ PRE PROCESSING")
 
 
 df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
-print(df_viirs_summary.head())
 
 dfs_loaded = {'df_viirs'         : df_viirs,
               'df_viirs_summary' : df_viirs_summary,
               'df_daily_grid'    : df_daily_grid,
               'df_fwi'           : df_fwi}
+print("\n....................................................")
 print(u.dfs_metadata(dfs_loaded))
 
-df_viirs_grid = df_daily_grid.merge(df_viirs_summary, on = ['grid_id','date'], how = 'left')
+df_model_pre_raw = pps.combined_dfs(dfs_loaded)
+df_model_pre     = pps.remove_na_fwi_grid1(df_model_pre_raw)
 
-df_viirs_grid['fire_lbl'] = (df_viirs_grid['fire_lbl']
-                             .astype('boolean')
-                             .fillna(False))
+df_model_summary = {'date_from'         : df_model_pre['date'].min().strftime("%Y-%m-%d"),
+                    'date_to'           : df_model_pre['date'].max().strftime("%Y-%m-%d"),
+                    'total_rows'        : df_model_pre.shape[0],
+                    'total_grids'       : df_model_pre['grid_id'].nunique(),
+                    'grid_min'          : df_model_pre['grid_id'].min(),
+                    'grid_max'          : df_model_pre['grid_id'].max(),
+                    'viirs_true_obs'    : df_model_pre[df_model_pre['fire_lbl'] == True].shape[0],
+                    'unique_viirs_grids': df_model_pre[df_model_pre['fire_lbl'] == True]['grid_id'].nunique(),
+                    'fwi_notna'         : df_model_pre[df_model_pre['fwi_max'].notna()].shape[0]}
 
-df_viirs_grid[['viirs_n', 'frp_max', 'frp_mean']] = df_viirs_grid[['viirs_n', 'frp_max', 'frp_mean']].fillna(0)
 
-df_fwi_viirs_grid = df_viirs_grid.merge(df_fwi,
-                                        on = ['grid_id','date'],
-                                        how = 'left')
-
-
-df_model_summary = {'date_from'         : df_fwi_viirs_grid['date'].min().strftime("%Y-%m-%d"),
-                    'date_to'           : df_fwi_viirs_grid['date'].max().strftime("%Y-%m-%d"),
-                    'total_rows'        : df_fwi_viirs_grid.shape[0],
-                    'total_grids'       : df_fwi_viirs_grid['grid_id'].nunique(),
-                    'viirs_true_obs'    : df_fwi_viirs_grid[df_fwi_viirs_grid['fire_lbl'] == True].shape[0],
-                    'unique_viirs_grids': df_fwi_viirs_grid[df_fwi_viirs_grid['fire_lbl'] == True]['grid_id'].nunique(),
-                    'fwi_notna'         : df_fwi_viirs_grid[df_fwi_viirs_grid['fwi_max'].notna()].shape[0]}
-
+print("\n....................................................")
 print(df_model_summary)
+
+
+
+
+# import webbrowser
+# import os
+
+# gdf_grid1 = df_uk_grid.loc[df_uk_grid['grid_id'] == 1]
+
+# m = gdf_grid1.explore(
+#     color="red",
+#     style_kwds={"fillOpacity": 0.4},
+#     tiles="Esri.WorldImagery"
+# )
+
+# # Save to file
+# fp = os.path.abspath("grid1_check.html")
+# m.save(fp)
+
+# # Open in browser
+# webbrowser.open("file://" + fp)
+
+
 # import pandas as pd
 # import folium
 
