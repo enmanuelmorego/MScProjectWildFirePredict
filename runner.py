@@ -21,6 +21,7 @@ YEAR_FILTER     = [2018]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
+RUN_ID          = f"{datetime.strftime(datetime.now(), "%Y%m%d%H%M")}_RUNNING_DEMO_{os.environ.get("RUN_DEMO")}"
 
 # --------------------------
 # LOAD DATA
@@ -100,18 +101,19 @@ import webbrowser
 print(f"{'='*80}")
 print(f"++ PRE PROCESSING")  
 
-
-df_viirs_summary = pps.summarise_viirs(df_viirs, df_uk_grid)
-
 dfs_loaded = {'df_viirs'         : df_viirs,
-              'df_viirs_summary' : df_viirs_summary,
+              'df_uk_grid'       : df_uk_grid,
+              #'df_viirs_summary' : df_viirs_summary,
               'df_daily_grid'    : df_daily_grid,
               'df_fwi'           : df_fwi}
-print("\n....................................................")
-print(u.dfs_metadata(dfs_loaded))
 
-df_model_pre_raw = pps.combined_dfs(dfs_loaded)
-df_model_pre     = pps.remove_na_fwi_grid1(df_model_pre_raw)
+df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
+
+
+
+
+print("\n....................................................")
+
 
 df_model_summary = {'date_from'         : df_model_pre['date'].min().strftime("%Y-%m-%d"),
                     'date_to'           : df_model_pre['date'].max().strftime("%Y-%m-%d"),

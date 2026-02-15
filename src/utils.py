@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime
 from typing import List 
 import geopandas as gpd
+import json
 
 # -------------------------
 # GENERAL FUNCTIONS
@@ -62,6 +63,7 @@ def dfs_metadata(dfs_dict: dict):
   """
   Function to validate the loaded data before combining into the df_model data frame 
   Extracts key relevant information that is useful to ensure the data was loaded as expected
+  Saves it to the run report folder in outputs
 
   Args:
     dfs_dict (dict): A dictionary containing all the data frames to inspect
@@ -72,7 +74,9 @@ def dfs_metadata(dfs_dict: dict):
   # loop over each item in the dictionary and extract objects
   dict_out = {}
   for name, df in dfs_dict.items():
-
+    # Skip df uk grid as the checks are not relevant for this object 
+    if name == 'df_uk_grid':
+      continue
     current_dict = {'df_type'  : type(df),
                     'columns'  : df.columns,
                     'date_from': df['date'].min().strftime("%Y-%m-%d"),
@@ -87,4 +91,15 @@ def dfs_metadata(dfs_dict: dict):
 
   
   return dict_out
+
+def save_json(dict_save: dict,obj_name:str, run_id: str):
+  """
+  Helper function that saves a simple dictionary as a json file in the outputs folder
+  """
+  path = f"outputs/{run_id}"
+  os.makedirs(path, exist_ok = True)
+  fout = f"{path}/{run_id}_{obj_name}.json"
+  print(fout)
+  with open(fout, "w") as f:
+    json.dump(dict_save, f)
 

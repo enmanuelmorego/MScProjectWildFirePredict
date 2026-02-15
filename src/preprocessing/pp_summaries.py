@@ -3,6 +3,7 @@ Scripts that collapses and summarises data frames into specified format for anal
 '''
 import pandas as pd
 import geopandas as gpd
+import src.utils as u
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """
@@ -88,17 +89,4 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     Returns:
         
         pd.DataFrame
-            Dataset excluding grid_id = 1.
-    """
-    remove = ((df['grid_id'] == 1) &
-              (df['fwi_max'].isna())
-              )
-  
-    rr = remove.sum()
-    if rr > 0:
-        print(f"ℹ️  Removed {rr} rows with grid_id == 1")
-    else:
-        print(f"✅  No grids to remove - grid_id contains data")
-        
-    df_out = df[~remove].copy()
-    return df_out
+            Datas
