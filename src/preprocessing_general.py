@@ -97,9 +97,9 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
   
     rr = remove.sum()
     if rr > 0:
-        print(f"ℹ️  Removed {rr} rows with grid_id == 1")
+        print(f"\tℹ️  Removed {rr} rows with grid_id == 1")
     else:
-        print(f"✅  No grids to remove - grid_id contains data")
+        print(f"\t✅  No grids to remove - grid_id contains data")
 
     df_out = df[~remove].copy()
     return df_out
@@ -121,7 +121,7 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
 
     df_viirs_summary            = summarise_viirs(df_viirs, df_uk_grid)
     df_dict['df_viirs_summary'] = df_viirs_summary
-    loaded_data_mt = u.dfs_metadata(df_dict)
+    loaded_data_mt              = u.dfs_metadata(df_dict)
     u.save_json(loaded_data_mt,"LOAD_METADATA", run_id)
 
     df_model_pre_raw = combined_dfs(df_dict)
