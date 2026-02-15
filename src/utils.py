@@ -77,19 +77,18 @@ def dfs_metadata(dfs_dict: dict):
     # Skip df uk grid as the checks are not relevant for this object 
     if name == 'df_uk_grid':
       continue
-    current_dict = {'df_type'  : type(df),
-                    'columns'  : df.columns,
+    current_dict = {'df_type'  : type(df).__name__,
+                    'columns'  : list(df.columns),
                     'date_from': df['date'].min().strftime("%Y-%m-%d"),
                     'date_to'  : df['date'].max().strftime("%Y-%m-%d"),
-                    'total_rows': df.shape[0]}
+                    'total_rows': int(df.shape[0])}
     if 'grid_id' in df.columns:
       current_dict['total_grids'] = len(df['grid_id'].unique())
-      current_dict['grid_min']    = df['grid_id'].min()
-      current_dict['grid_max']    = df['grid_id'].max()
+      current_dict['grid_min']    = int(df['grid_id'].min())
+      current_dict['grid_max']    = int(df['grid_id'].max())
 
     dict_out[name] = current_dict
 
-  
   return dict_out
 
 def save_json(dict_save: dict,obj_name:str, run_id: str):

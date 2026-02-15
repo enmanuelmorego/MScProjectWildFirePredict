@@ -6,7 +6,7 @@ os.environ.setdefault("RUN_DEMO", "ON")
 import src.config as c
 import src.load_data as ld
 import src.google_ee as gee
-import src.preprocessing.pp_summaries as pps
+import src.preprocessing_general as pps
 import geopandas as gpd
 from pathlib import Path
 import matplotlib.pyplot as plt
