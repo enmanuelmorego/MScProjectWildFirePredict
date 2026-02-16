@@ -127,7 +127,8 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
     df_model_pre_raw = combined_dfs(df_dict)
     df_model_pre     = remove_na_fwi_grid1(df_model_pre_raw)
 
-    df_model_summary = {'date_from'         : df_model_pre['date'].min().strftime("%Y-%m-%d"),
+    df_model_summary = {'df_type'           : type(df_model_pre).__name__,
+                        'date_from'         : df_model_pre['date'].min().strftime("%Y-%m-%d"),
                         'date_to'           : df_model_pre['date'].max().strftime("%Y-%m-%d"),
                         'total_rows'        : int(df_model_pre.shape[0]),
                         'total_grids'       : int(df_model_pre['grid_id'].nunique()),
@@ -136,6 +137,7 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
                         'viirs_true_obs'    : int(df_model_pre[df_model_pre['fire_lbl'] == True].shape[0]),
                         'unique_viirs_grids': int(df_model_pre[df_model_pre['fire_lbl'] == True]['grid_id'].nunique()),
                         'fwi_notna'         : int(df_model_pre[df_model_pre['fwi_max'].notna()].shape[0])}
+                        
     u.save_json(df_model_summary,"PREPROCESSING_METADATA", run_id)
     
 

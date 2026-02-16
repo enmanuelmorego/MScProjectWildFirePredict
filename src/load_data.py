@@ -554,11 +554,8 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                                 df_geo_grib_proj[['geometry','fwi']],
                                 how = 'left')
     df_join['date'] = date
-    df_grouped = (df_join
-                  .groupby(['grid_id', 'date'], as_index = False)
-                  .agg(fwi_max  = ('fwi', 'max'),
-                       fwi_mean = ('fwi', 'mean')))
-    list_fwi.append(df_grouped)
+
+    list_fwi.append(df_join)
     # User Messages objects
     i += 1
   

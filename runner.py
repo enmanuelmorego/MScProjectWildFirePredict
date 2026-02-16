@@ -103,12 +103,13 @@ print(f"++ PRE PROCESSING")
 
 dfs_loaded = {'df_viirs'         : df_viirs,
               'df_uk_grid'       : df_uk_grid,
-              #'df_viirs_summary' : df_viirs_summary,
               'df_daily_grid'    : df_daily_grid,
               'df_fwi'           : df_fwi}
 
 df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
 
+print(df_model_pre['fwi_max'].describe())
+print(df_model_pre['fwi_mean'].describe())
 
 
 
