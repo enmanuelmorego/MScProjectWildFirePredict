@@ -92,7 +92,7 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
             Dataset excluding grid_id = 1.
     """
     remove = ((df['grid_id'] == 1) &
-              (df['fwi_max'].isna())
+              (df['fwi'].isna())
               )
   
     rr = remove.sum()
@@ -103,6 +103,20 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     df_out = df[~remove].copy()
     return df_out
+
+def create_matched_fire_sample(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """
+    Samples the data from the full, combined data frame into the values for analysis
+    For each grid with a fire label, it finds 3 instances of the same grid without a fire label within +/- 30 days range
+    Then for each of the fire and no fire selected days, it also includes the prior 7 days of data for each of the days 
+
+    Args:
+        df (GeoDataFrame): A data frame containing the combined, pre processed data
+
+    Returns:
+        df (GeoDataFrame): Sampled data frame with fire/nofire data points along with 7 days worth of data for each of these datapoints 
+    """
+    pass
 
 def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
     """
@@ -126,17 +140,21 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
 
     df_model_pre_raw = combined_dfs(df_dict)
     df_model_pre     = remove_na_fwi_grid1(df_model_pre_raw)
+  #  df_model_sampled = sample_by_fire_lbl(df_model_pre)
 
-    df_model_summary = {'df_type'           : type(df_model_pre).__name__,
-                        'date_from'         : df_model_pre['date'].min().strftime("%Y-%m-%d"),
-                        'date_to'           : df_model_pre['date'].max().strftime("%Y-%m-%d"),
-                        'total_rows'        : int(df_model_pre.shape[0]),
-                        'total_grids'       : int(df_model_pre['grid_id'].nunique()),
-                        'grid_min'          : int(df_model_pre['grid_id'].min()),
-                        'grid_max'          : int(df_model_pre['grid_id'].max()),
-                        'viirs_true_obs'    : int(df_model_pre[df_model_pre['fire_lbl'] == True].shape[0]),
-                        'unique_viirs_grids': int(df_model_pre[df_model_pre['fire_lbl'] == True]['grid_id'].nunique()),
-                        'fwi_notna'         : int(df_model_pre[df_model_pre['fwi_max'].notna()].shape[0])}
+    df_model_summary = {'df_type'            : type(df_model_pre).__name__,
+                        'columns'            : list(df_model_pre.columns),
+                        'date_from'          : df_model_pre['date'].min().strftime("%Y-%m-%d"),
+                        'date_to'            : df_model_pre['date'].max().strftime("%Y-%m-%d"),
+                        'total_rows'         : int(df_model_pre.shape[0]),
+                        'total_grids'        : int(df_model_pre['grid_id'].nunique()),
+                        'grid_min'           : int(df_model_pre['grid_id'].min()),
+                        'grid_max'           : int(df_model_pre['grid_id'].max()),
+                        'viirs_true_obs'     : int(df_model_pre[df_model_pre['fire_lbl'] == True].shape[0]),
+                        'fire_lbl_proportion': int(df_model_pre[df_model_pre['fire_lbl'] == True].shape[0]) / int(df_model_pre.shape[0]),
+                        'unique_viirs_grids' : int(df_model_pre[df_model_pre['fire_lbl'] == True]['grid_id'].nunique()),
+                        'fwi_notna'          : int(df_model_pre[df_model_pre['fwi'].notna()].shape[0])
+                        }
                         
     u.save_json(df_model_summary,"PREPROCESSING_METADATA", run_id)
     
