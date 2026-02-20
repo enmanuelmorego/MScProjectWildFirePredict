@@ -21,7 +21,7 @@ YEAR_FILTER     = [2018]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
-RUN_ID          = f"{datetime.strftime(datetime.now(), "%Y%m%d%H%M")}_RUNNING_DEMO_{os.environ.get("RUN_DEMO")}"
+RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
 
 # --------------------------
 # LOAD DATA
@@ -107,6 +107,7 @@ dfs_loaded = {'df_viirs'     : df_viirs,
               'df_fwi'       : df_fwi}
 
 df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
+print(df_model_pre.head())
 
 print(df_model_pre['fwi'].describe())
 

@@ -21,6 +21,7 @@ pygrib = "*"
 xarray = "*"
 cdsapi = "*"
 tensorflow = "*"
+opencv-python = "*"
 
 [dev-packages]
 pandas-stubs = "*"
