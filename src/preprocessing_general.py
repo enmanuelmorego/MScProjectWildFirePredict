@@ -4,6 +4,7 @@ Scripts that collapses and summarises data frames into specified format for anal
 import pandas as pd
 import geopandas as gpd
 import src.utils as u
+from datetime import datetime
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """
@@ -104,20 +105,6 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     df_out = df[~remove].copy()
     return df_out
 
-def create_matched_fire_sample(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    """
-    Samples the data from the full, combined data frame into the values for analysis
-    For each grid with a fire label, it finds 3 instances of the same grid without a fire label within +/- 30 days range
-    Then for each of the fire and no fire selected days, it also includes the prior 7 days of data for each of the days 
-
-    Args:
-        df (GeoDataFrame): A data frame containing the combined, pre processed data
-
-    Returns:
-        df (GeoDataFrame): Sampled data frame with fire/nofire data points along with 7 days worth of data for each of these datapoints 
-    """
-    pass
-
 def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
     """
     Wrapper function to execute the preprocessing tasks
@@ -160,3 +147,53 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
     
 
     return df_model_pre
+
+# -------------------------
+# SAMPLING FIRE DATAPOINTS
+# -------------------------  
+"""
+Sampling is necessary to reduce computational power and address the imbalanced dataset due to low wildfire occurrence
+The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ratio if needed
+"""
+def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
+    """
+    Function that extracts the fire label data points from the preprocessed data set
+    It selects all rows where a fire was detected, and generates a window of the preceeding X number of days
+    which will be used to fetch the satellite images
+
+    Args:
+        df_preprocessed (GeoDataframe): Preprocessed dataframe containing FWI, FireLabel per day/grid
+        window_size (int): How many days of data prior to the fire datapoint
+    
+    Returns:
+        df_out (df): Dataframe containing `date`, `grid_id`, `fire_lbl`,`composite_key'
+    """
+    # Initialise dictionary to store results per iteration
+    dict_sampled_values = {'composite_key': [],
+                           'date'         : [],
+                           'grid_id'      : [],
+                           'fire_lbl'     : []}
+
+    # Generate subset of fire labels
+    df_fire                  = df_preprocessed[df_preprocessed['fire_lbl'] == True].copy()
+    df_fire['composite_key'] = (df_fire['grid_id'].astype(str) + 
+                                df_fire['date'].dt.strftime("%Y%m%d"))
+
+    for r in df_preprocessed.itertuples():
+        current_date     = r.date
+        current_grid     = r.grid_id
+        current_comp_key = r.composite_key
+        print(current_date)
+        # Generate window of dates
+        current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
+                                       end   =  current_date)
+        n_repeat = len(current_window)
+        dict_sampled_values['date'].extend(current_window)
+        dict_sampled_values['fire_lbl'].extend([True] * n_repeat)
+        dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
+        dict_sampled_values['composite_key'].extend([current_comp_key] * n_repeat)
+
+    df_out = pd.DataFrame(dict_sampled_values)
+    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
+    return df_out
+       
