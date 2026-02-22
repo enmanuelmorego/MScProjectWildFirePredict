@@ -3,7 +3,7 @@ Scripts that collapses and summarises data frames into specified format for anal
 '''
 import pandas as pd
 import geopandas as gpd
-import src.utils as u
+import utils as u
 from datetime import datetime
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
@@ -178,11 +178,10 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
     df_fire['composite_key'] = (df_fire['grid_id'].astype(str) + 
                                 df_fire['date'].dt.strftime("%Y%m%d"))
 
-    for r in df_preprocessed.itertuples():
+    for r in df_fire.itertuples():
         current_date     = r.date
         current_grid     = r.grid_id
         current_comp_key = r.composite_key
-        print(current_date)
         # Generate window of dates
         current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
                                        end   =  current_date)
