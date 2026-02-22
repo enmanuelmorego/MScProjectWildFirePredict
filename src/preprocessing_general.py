@@ -129,6 +129,9 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
     df_model_pre     = remove_na_fwi_grid1(df_model_pre_raw)
   #  df_model_sampled = sample_by_fire_lbl(df_model_pre)
 
+    df_model_pre['composite_key'] = (df_model_pre['grid_id'].astype(str) + 
+                                     df_model_pre['date'].dt.strftime("%Y%m%d"))
+
     df_model_summary = {'df_type'            : type(df_model_pre).__name__,
                         'columns'            : list(df_model_pre.columns),
                         'date_from'          : df_model_pre['date'].min().strftime("%Y-%m-%d"),
@@ -176,8 +179,6 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
 
     # Generate subset of fire labels
     df_fire                  = df_preprocessed[df_preprocessed['fire_lbl'] == True].copy()
-    df_fire['composite_key'] = (df_fire['grid_id'].astype(str) + 
-                                df_fire['date'].dt.strftime("%Y%m%d"))
 
     for r in df_fire.itertuples():
         current_date     = r.date
@@ -194,4 +195,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
     df_out = pd.DataFrame(dict_sampled_values)
     df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
     return df_out
+
+def sample_nofire_candidates():
+    pass   
        
