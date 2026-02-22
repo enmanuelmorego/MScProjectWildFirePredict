@@ -195,7 +195,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> p
         window_size (int): How many days of data prior to the fire datapoint
     
     Returns:
-        df_out (df): Dataframe containing `date`, `grid_id`, `fire_lbl`,`composite_key'
+        df_out (df): Dataframe containing `date`, `grid_id`, `fire_lbl`,`composite_key`
     """
 
     # Initialise dictionary to store results per iteration
@@ -236,7 +236,7 @@ def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window
     df_fire           = df_preprocessed[df_preprocessed['fire_lbl'] == True].copy()
     df_nofire         = df_preprocessed[df_preprocessed['fire_lbl'] == False].copy()
     nofire_candidates = {}
-
+  
     for r in df_fire.itertuples():
         fire_grid_id       = r.grid_id
         fire_date          = r.date
@@ -251,7 +251,8 @@ def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window
                                     )]
         # Save in dictionary
         nofire_candidates[fire_composite_key] = nofire_sample
-
+        r_count += 1
+    print(r_count)
     return nofire_candidates
 
 def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window_size: int, sampled_set: set):
@@ -291,13 +292,13 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
         match_count = 0
 
         for r in v.itertuples():
-            if match_count > no_fire_per_fire_obs:
+            if match_count >= no_fire_per_fire_obs:
                 break
             current_date     = r.date
             current_grid     = r.grid_id
             # Generate window of dates
-            current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
-                                           end   =  current_date)
+            window_dict    =  generate_date_window(current_grid, current_date, 7)
+            current_window = set(window_dict['composite_key'])
             # intersection check
             if len(current_window.intersection(sampled_set)) > 0:
                 continue
@@ -305,8 +306,8 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             n_repeat = len(current_window)
 
             # Add value to sampling report dict
-            sampling_report['fire_composite_key']    = k
-            sampling_report['no_fire_composite_key'] = r.composite_key
+            sampling_report[['fire_composite_key']]    = k
+            sampling_report[['no_fire_composite_key']] = r.composite_key
 
             # Add values to dictionary of values
             dict_sampled_values['date'].extend(current_window)
