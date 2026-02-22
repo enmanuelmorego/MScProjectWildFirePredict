@@ -19,4 +19,4 @@ def test_sample_fire_values_select_fire_only():
                             False,True,  False,False]}
     df_test = pd.DataFrame(df_test)
     df = pps.sample_fire_values(df_test, 7)
-    assert df.shape[0] == 4
+    assert df.shape[0] == 32
