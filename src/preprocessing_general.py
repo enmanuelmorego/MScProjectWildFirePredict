@@ -173,16 +173,14 @@ def generate_date_window(grid_id: str, anchor_date: pd.Timestamp, window_size: i
 
     Expect size of `window_size` + 1
     """
-    date_window = {}
-    # Generate window of dates
-    current_window = pd.date_range(start = (anchor_date - pd.Timedelta(days = window_size)),
-                                    end   =  anchor_date)
-    n_repeat = len(current_window)
-    date_window['date'].extend(current_window)
-    date_window['grid_id'].extend([grid_id] * n_repeat)
-    date_window['composite_key'].extend(f"{grid_id}{d:%Y%m%d}" for d in current_window)
 
-    return date_window
+    # Generate window of dates
+    current_window = pd.date_range(start = anchor_date - pd.Timedelta(days = window_size),
+                                    end  = anchor_date)
+
+    return {'date'         : list(current_window),
+            'grid_id'      : [grid_id] * len(current_window),
+            'composite_key': [f"{grid_id}{d:%Y%m%d}" for d in current_window] }
 
 
 def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> pd.DataFrame:
@@ -211,8 +209,12 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> p
     for r in df_fire.itertuples():
         current_date     = r.date
         current_grid     = r.grid_id
-        current_comp_key = r.composite_key
-
+        # Generate window of dates
+        window_dict = generate_date_window(current_grid, current_date, 7)
+        # Append values to existing master dictionary
+        dict_sampled_values['date'].extend(window_dict['date'])
+        dict_sampled_values['grid_id'].extend(window_dict['grid_id'])
+        dict_sampled_values['composite_key'].extend(window_dict['composite_key'])
 
     df_out = pd.DataFrame(dict_sampled_values)
     df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
@@ -307,4 +309,19 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             sampling_report['no_fire_composite_key'] = r.composite_key
 
             # Add values to dictionary of values
-            dict_sample
+            dict_sampled_values['date'].extend(current_window)
+            dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
+            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
+            # Add count 
+            match_count += 1
+    
+        if match_count == 0:
+            sampling_report[['fire_composite_key']]    = k
+            sampling_report[['no_fire_composite_key']] = None
+
+    df_out = pd.DataFrame(dict_sampled_values)
+    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
+    return {'no_fire_df': df_out,
+            'sampling_report': sampling_report}
+
+       
