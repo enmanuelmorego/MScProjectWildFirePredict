@@ -190,7 +190,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> p
         n_repeat = len(current_window)
         dict_sampled_values['date'].extend(current_window)
         dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-        dict_sampled_values['composite_key'].extend([current_comp_key] * n_repeat)
+        dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
 
     df_out = pd.DataFrame(dict_sampled_values)
     df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
