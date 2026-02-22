@@ -9,6 +9,7 @@ import src.google_ee as gee
 import src.preprocessing_general as pps
 import geopandas as gpd
 from pathlib import Path
+import pandas as pd
 import matplotlib.pyplot as plt
 import utils as u
 from datetime import datetime
@@ -108,6 +109,7 @@ dfs_loaded = {'df_viirs'     : df_viirs,
 
 df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
 print(df_model_pre.head())
+
 
 print(df_model_pre['fwi'].describe())
 
