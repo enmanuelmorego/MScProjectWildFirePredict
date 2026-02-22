@@ -183,15 +183,4 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
         current_grid     = r.grid_id
         current_comp_key = r.composite_key
         print(current_date)
-        # Generate window of dates
-        current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
-                                       end   =  current_date)
-        n_repeat = len(current_window)
-        dict_sampled_values['date'].extend(current_window)
-        dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-        dict_sampled_values['composite_key'].extend([current_comp_key] * n_repeat)
-
-    df_out = pd.DataFrame(dict_sampled_values)
-    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
-    return df_out
-       
+        #
