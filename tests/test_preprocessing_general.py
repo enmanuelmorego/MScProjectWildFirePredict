@@ -83,3 +83,22 @@ def test_sample_nofire_candidates_valid_candidates():
     dict_test = pps.sample_nofire_candidates(df_test, 30)
     for k, v in dict_test.items():
         assert_frame_equal(dict_test.get(k), dict_expect.get(k))
+
+def test_sample_nofire_candidates_nofire_candidates():
+    df_test = {"grid_id": [1,2,1,2,   1,2,1,2],
+               "date": pd.to_datetime(["2020-01-12",     
+                                       "2020-02-10",     
+                                       "2020-03-01",     
+                                       "2020-02-04",     
+
+                                       "2020-01-18",    # Include  
+                                       "2019-12-28",    # Exclude     
+                                       "2020-02-15",    # Include
+                                       "2020-03-16"]),  # Exclude  
+               "fire_lbl": [False] * 8}
+    df_test = pd.DataFrame(df_test)
+    df_test['composite_key'] = (df_test['grid_id'].astype(str) + 
+                                df_test['date'].dt.strftime("%Y%m%d")) 
+    dict_test = pps.sample_nofire_candidates(df_test, 30)
+    dict_expect = {}
+    assert dict_test == dict_expect
