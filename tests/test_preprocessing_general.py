@@ -18,6 +18,8 @@ def test_sample_fire_values_select_fire_only():
                "fire_lbl": [True, False, True, True,
                             False,True,  False,False]}
     df_test = pd.DataFrame(df_test)
+    df_test['composite_key'] = (df_test['grid_id'].astype(str) + 
+                                df_test['date'].dt.strftime("%Y%m%d"))
     df = pps.sample_fire_values(df_test, 7)
     assert df.shape[0] == 32
 
@@ -30,6 +32,8 @@ def test_sample_fire_values_overlapping_windows():
                                                         # 8 + 3 + 8 = 19
                "fire_lbl": [False, True, True, True]}
     df_test = pd.DataFrame(df_test)
+    df_test['composite_key'] = (df_test['grid_id'].astype(str) + 
+                                df_test['date'].dt.strftime("%Y%m%d"))
     df = pps.sample_fire_values(df_test, 7)
     assert df.shape[0] == 20
     assert df['date'].min() == pd.Timestamp('2020-02-04')
@@ -44,6 +48,8 @@ def test_sample_fire_values_non_overlapping_windows():
                                                         # 8 + 3 + 8 = 19
                "fire_lbl": [False, True, True, False]}
     df_test = pd.DataFrame(df_test)
+    df_test['composite_key'] = (df_test['grid_id'].astype(str) + 
+                                df_test['date'].dt.strftime("%Y%m%d"))    
     df = pps.sample_fire_values(df_test, 7)
     assert df.shape[0] == 16
     assert df['date'].min() == pd.Timestamp('2020-02-04')
