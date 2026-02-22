@@ -158,6 +158,33 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
 Sampling is necessary to reduce computational power and address the imbalanced dataset due to low wildfire occurrence
 The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ratio if needed
 """
+def generate_date_window(grid_id: str, anchor_date: pd.TimeStamp, window_size: int):
+    """
+    Function to generate a window of dates given an anchor date. The days generated as X number of days before the provided anchor date
+
+    Args:
+        grid_id (str): The grid id value of the current iteration
+        anchor_date (pd.TimeStamp): Date object to use as ancho/main value
+        window_size (int): Number of days to add to the window
+
+    Returns:
+        out_dict (dict): A dictionary containing the `grid_id`, `date` and `composite_key` for each of the generated values
+                         It also includes the anchor date value
+
+    Expect size of `window_size` + 1
+    """
+    date_window = {}
+    # Generate window of dates
+    current_window = pd.date_range(start = (anchor_date - pd.Timedelta(days = window_size)),
+                                    end   =  anchor_date)
+    n_repeat = len(current_window)
+    date_window['date'].extend(current_window)
+    date_window['grid_id'].extend([grid_id] * n_repeat)
+    date_window['composite_key'].extend(f"{grid_id}{d:%Y%m%d}" for d in current_window)
+
+    return date_window
+
+
 def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> pd.DataFrame:
     """
     Function that extracts the fire label data points from the preprocessed data set
@@ -172,6 +199,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> p
     Returns:
         df_out (df): Dataframe containing `date`, `grid_id`, `fire_lbl`,`composite_key'
     """
+
     # Initialise dictionary to store results per iteration
     dict_sampled_values = {'composite_key': [],
                            'date'         : [],
@@ -184,13 +212,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> p
         current_date     = r.date
         current_grid     = r.grid_id
         current_comp_key = r.composite_key
-        # Generate window of dates
-        current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
-                                       end   =  current_date)
-        n_repeat = len(current_window)
-        dict_sampled_values['date'].extend(current_window)
-        dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-        dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
+
 
     df_out = pd.DataFrame(dict_sampled_values)
     df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
@@ -271,7 +293,6 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
                 break
             current_date     = r.date
             current_grid     = r.grid_id
-            current_comp_key = r.composite_key
             # Generate window of dates
             current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
                                            end   =  current_date)
