@@ -218,18 +218,16 @@ def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window
         fire_date          = r.date
         fire_composite_key = r.composite_key
 
-        try:
-            # Extract ALL potential no fire candidate values
-            nofire_sample = df_nofire[(
-                                        (df_nofire['grid_id'] == fire_grid_id) &
-                                        # Find days within a 30 day range of current date 
-                                        ((df_nofire['date'] >= (fire_date - pd.DateOffset(days=candidate_window))) &
-                                         (df_nofire['date'] <= (fire_date + pd.DateOffset(days=candidate_window)))) 
-                                      )]
-            # Save in dictionary
-            nofire_candidates[fire_composite_key] = nofire_sample
-        except ValueError:
-            nofire_candidates[fire_composite_key] = None
+        # Extract ALL potential no fire candidate values
+        nofire_sample = df_nofire[(
+                                    (df_nofire['grid_id'] == fire_grid_id) &
+                                    # Find days within a 30 day range of current date 
+                                    ((df_nofire['date'] >= (fire_date - pd.DateOffset(days=candidate_window))) &
+                                     (df_nofire['date'] <= (fire_date + pd.DateOffset(days=candidate_window)))) 
+                                    )]
+        # Save in dictionary
+        nofire_candidates[fire_composite_key] = nofire_sample
+
     return nofire_candidates
 
        
