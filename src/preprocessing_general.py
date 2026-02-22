@@ -251,8 +251,6 @@ def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window
                                     )]
         # Save in dictionary
         nofire_candidates[fire_composite_key] = nofire_sample
-        r_count += 1
-    print(r_count)
     return nofire_candidates
 
 def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window_size: int, sampled_set: set):
@@ -306,19 +304,19 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             n_repeat = len(current_window)
 
             # Add value to sampling report dict
-            sampling_report[['fire_composite_key']]    = k
-            sampling_report[['no_fire_composite_key']] = r.composite_key
+            sampling_report['fire_composite_key'].append(k)
+            sampling_report['no_fire_composite_key'].append(r.composite_key)
 
             # Add values to dictionary of values
             dict_sampled_values['date'].extend(current_window)
             dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
+            dict_sampled_values['composite_key'].extend(f"{current_grid}{d}" for d in current_window)
             # Add count 
             match_count += 1
     
         if match_count == 0:
-            sampling_report[['fire_composite_key']]    = k
-            sampling_report[['no_fire_composite_key']] = None
+            sampling_report['fire_composite_key'].append(k)
+            sampling_report['no_fire_composite_key'].append(None)
 
     df_out = pd.DataFrame(dict_sampled_values)
     df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
