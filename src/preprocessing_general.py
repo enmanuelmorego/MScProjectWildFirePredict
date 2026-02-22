@@ -158,7 +158,7 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
 Sampling is necessary to reduce computational power and address the imbalanced dataset due to low wildfire occurrence
 The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ratio if needed
 """
-def generate_date_window(grid_id: str, anchor_date: pd.TimeStamp, window_size: int):
+def generate_date_window(grid_id: str, anchor_date: pd.Timestamp, window_size: int) -> dict:
     """
     Function to generate a window of dates given an anchor date. The days generated as X number of days before the provided anchor date
 
@@ -307,19 +307,4 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             sampling_report['no_fire_composite_key'] = r.composite_key
 
             # Add values to dictionary of values
-            dict_sampled_values['date'].extend(current_window)
-            dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
-            # Add count 
-            match_count += 1
-    
-        if match_count == 0:
-            sampling_report[['fire_composite_key']]    = k
-            sampling_report[['no_fire_composite_key']] = None
-
-    df_out = pd.DataFrame(dict_sampled_values)
-    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
-    return {'no_fire_df': df_out,
-            'sampling_report': sampling_report}
-
-       
+            dict_sample
