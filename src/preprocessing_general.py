@@ -158,7 +158,7 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
 Sampling is necessary to reduce computational power and address the imbalanced dataset due to low wildfire occurrence
 The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ratio if needed
 """
-def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
+def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> pd.DataFrame:
     """
     Function that extracts the fire label data points from the preprocessed data set
     It selects all rows where a fire was detected, and generates a window of the preceeding X number of days
@@ -196,6 +196,40 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
     df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
     return df_out
 
-def sample_nofire_candidates():
-    pass   
+def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window: int) -> dict:
+    """
+    Function to sample the possible non-fire candidate observations for the sampling ratio process
+    For each fire label value, finds all possible non fire labels for the same grid that are +/- X days (defaults to 30) from
+    the fire label
+
+    Args: 
+        df_preprocessed (GeoDataFrame): Preprocessed dataframe containing FWI, FireLabel per day/grid
+        candidate_window (int): Number of days to +/- to find corresponding non fire values for same grid
+
+    Returns:
+        dict_out (dict): Dictionary containing composite key for fire label as dict key and no fire valid rows for given composite key
+    """  
+    df_fire           = df_preprocessed[df_preprocessed['fire_lbl'] == True].copy()
+    df_nofire         = df_preprocessed[df_preprocessed['fire_lbl'] == False].copy()
+    nofire_candidates = {}
+
+    for r in df_fire.itertuples():
+        fire_grid_id       = r.grid_id
+        fire_date          = r.date
+        fire_composite_key = r.composite_key
+
+        try:
+            # Extract ALL potential no fire candidate values
+            nofire_sample = df_nofire[(
+                                        (df_nofire['grid_id'] == fire_grid_id) &
+                                        # Find days within a 30 day range of current date 
+                                        ((df_nofire['date'] >= (fire_date - pd.DateOffset(days=candidate_window))) &
+                                         (df_nofire['date'] <= (fire_date + pd.DateOffset(days=candidate_window)))) 
+                                      )]
+            # Save in dictionary
+            nofire_candidates[fire_composite_key] = nofire_sample
+        except ValueError:
+            nofire_candidates[fire_composite_key] = None
+    return nofire_candidates
+
        
