@@ -288,8 +288,7 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             # Add values to dictionary of values
             dict_sampled_values['date'].extend(current_window)
             dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-            dict_sampled_values['composite_key'].extend([current_comp_key] * n_repeat)
-
+            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
             # Add count 
             match_count += 1
     
