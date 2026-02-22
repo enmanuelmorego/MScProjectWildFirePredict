@@ -295,7 +295,7 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             current_date     = r.date
             current_grid     = r.grid_id
             # Generate window of dates
-            window_dict    =  generate_date_window(current_grid, current_date, 7)
+            window_dict    =  generate_date_window(current_grid, current_date, window_size)
             current_window = set(window_dict['composite_key'])
             # intersection check
             if len(current_window.intersection(sampled_set)) > 0:
@@ -308,9 +308,9 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             sampling_report['no_fire_composite_key'].append(r.composite_key)
 
             # Add values to dictionary of values
-            dict_sampled_values['date'].extend(current_window)
+            dict_sampled_values['date'].extend(window_dict['date'])
             dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
+            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in window_dict['date'])
             # Add count 
             match_count += 1
 
@@ -322,8 +322,4 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             sampling_report['no_fire_composite_key'].append(None)
 
     df_out = pd.DataFrame(dict_sampled_values)
-    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
-    return {'no_fire_df': df_out,
-            'sampling_report': sampling_report}
-
-       
+    df_out = df_out.drop_duplicates(subset = ['grid_i
