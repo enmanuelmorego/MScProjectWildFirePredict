@@ -210,7 +210,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> p
         current_date     = r.date
         current_grid     = r.grid_id
         # Generate window of dates
-        window_dict = generate_date_window(current_grid, current_date, 7)
+        window_dict = generate_date_window(current_grid, current_date, window_size)
         # Append values to existing master dictionary
         dict_sampled_values['date'].extend(window_dict['date'])
         dict_sampled_values['grid_id'].extend(window_dict['grid_id'])
@@ -310,10 +310,13 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             # Add values to dictionary of values
             dict_sampled_values['date'].extend(current_window)
             dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
-            dict_sampled_values['composite_key'].extend(f"{current_grid}{d}" for d in current_window)
+            dict_sampled_values['composite_key'].extend(f"{current_grid}{d:%Y%m%d}" for d in current_window)
             # Add count 
             match_count += 1
-    
+
+            # Update Sample set with newly sampled values
+            sampled_set.update(current_window)
+
         if match_count == 0:
             sampling_report['fire_composite_key'].append(k)
             sampling_report['no_fire_composite_key'].append(None)
