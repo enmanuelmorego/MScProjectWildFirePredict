@@ -171,8 +171,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
     # Initialise dictionary to store results per iteration
     dict_sampled_values = {'composite_key': [],
                            'date'         : [],
-                           'grid_id'      : [],
-                           'fire_lbl'     : []}
+                           'grid_id'      : []}
 
     # Generate subset of fire labels
     df_fire                  = df_preprocessed[df_preprocessed['fire_lbl'] == True].copy()
@@ -189,7 +188,6 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
                                        end   =  current_date)
         n_repeat = len(current_window)
         dict_sampled_values['date'].extend(current_window)
-        dict_sampled_values['fire_lbl'].extend([True] * n_repeat)
         dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
         dict_sampled_values['composite_key'].extend([current_comp_key] * n_repeat)
 
