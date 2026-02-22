@@ -160,6 +160,7 @@ def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int):
     Function that extracts the fire label data points from the preprocessed data set
     It selects all rows where a fire was detected, and generates a window of the preceeding X number of days
     which will be used to fetch the satellite images
+    This window also includes the actual fire label value as well to avoid sampling this as a no fire observation by mistake
 
     Args:
         df_preprocessed (GeoDataframe): Preprocessed dataframe containing FWI, FireLabel per day/grid
