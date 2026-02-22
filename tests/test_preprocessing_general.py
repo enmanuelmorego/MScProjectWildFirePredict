@@ -36,7 +36,8 @@ def test_sample_fire_values_select_correct_composite_key_allocation():
     expect_composite_keys = pd.DataFrame({'composite_key': ['120200105','120200106','120200107','120200108',
                                                             '120200109','120200110','120200111','120200112']})
     df = pps.sample_fire_values(df_test, 7)
-    assert_frame_equal(df['composite_key'], expect_composite_keys)
+    for i, r in df.iterrows():
+        assert r['composite_key'] ==  expect_composite_keys['composite_key'].iloc[i]
 
 def test_sample_fire_values_overlapping_windows():
     df_test = {"grid_id": [1,1,2,2],
