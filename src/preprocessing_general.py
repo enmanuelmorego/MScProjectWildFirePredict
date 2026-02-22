@@ -322,4 +322,8 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             sampling_report['no_fire_composite_key'].append(None)
 
     df_out = pd.DataFrame(dict_sampled_values)
-    df_out = df_out.drop_duplicates(subset = ['grid_i
+    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
+    return {'no_fire_df': df_out,
+            'sampling_report': sampling_report}
+
+       
