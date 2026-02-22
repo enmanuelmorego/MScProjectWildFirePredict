@@ -230,4 +230,76 @@ def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window
 
     return nofire_candidates
 
+def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window_size: int, sampled_set: set):
+    """
+    Function that extracts the no fire label data points from the no fire candidate dictionary
+    It iterates thru each of the composite_key values (representing fire observations) and for each of the candidate values 
+    available, it generates the 7 days prior window. 
+
+    If: 
+        the candidate value + X prior dates do not intersects with the `sampled_set`:
+            - Add X values to a list of extracted values (to later convert to dataframe)
+            - Add the extracted value to the report list 
+            - Add the extracted value to the `sampled_set` (to avoid sampling the same object twice)
+    Else:
+        Skip to next iteration
+
+    For each `composite_key` count how many matches are found, and iterate when `no_fire_per_fire_obs` value is met 
+
+    Args:
+        no_fire_per_fire_obs (int): Number of no fire samples needed for every fire sample in the data set i.e, 1:3 ratio, 1:5 etc...
+        candidate_dict (dict): Dictionary containing as Key the `composite_key` of the fire label, and as values all the no fire candidate values 
+        window_size (int): How many days of data prior to the no fire datapoint
+        sampled_set (Set): Set of dates already sampled for fire label values
+    
+    Returns:
+        df_out (df): Dataframe containing `date`, `grid_id`, `fire_lbl`,`composite_key'
+    """
+    sampling_report = {'fire_composite_key'   : [],
+                       'no_fire_composite_key': []}
+    # Initialise dictionary to store results per iteration
+    dict_sampled_values = {'composite_key'    : [],
+                           'date'             : [],
+                           'grid_id'          : []}
+
+    
+    for k, v in candidate_dict.items():
+        match_count = 0
+
+        for r in v.itertuples():
+            if match_count > no_fire_per_fire_obs:
+                break
+            current_date     = r.date
+            current_grid     = r.grid_id
+            current_comp_key = r.composite_key
+            # Generate window of dates
+            current_window = pd.date_range(start = (current_date - pd.Timedelta(days = window_size)),
+                                           end   =  current_date)
+            # intersection check
+            if len(current_window.intersection(sampled_set)) > 0:
+                continue
+            # when matches are found:
+            n_repeat = len(current_window)
+
+            # Add value to sampling report dict
+            sampling_report['fire_composite_key']    = k
+            sampling_report['no_fire_composite_key'] = r.composite_key
+
+            # Add values to dictionary of values
+            dict_sampled_values['date'].extend(current_window)
+            dict_sampled_values['grid_id'].extend([current_grid] * n_repeat)
+            dict_sampled_values['composite_key'].extend([current_comp_key] * n_repeat)
+
+            # Add count 
+            match_count += 1
+    
+        if match_count == 0:
+            sampling_report[['fire_composite_key']]    = k
+            sampling_report[['no_fire_composite_key']] = None
+
+    df_out = pd.DataFrame(dict_sampled_values)
+    df_out = df_out.drop_duplicates(subset = ['grid_id','date'])
+    return {'no_fire_df': df_out,
+            'sampling_report': sampling_report}
+
        
