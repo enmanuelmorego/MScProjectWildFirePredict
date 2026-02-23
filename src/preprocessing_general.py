@@ -279,7 +279,7 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
         dict_out (dict): A dictionary containing the no fire data set and the sampling report 
 
     Example::
-    
+
         dict_out = {'no_fire_df': df_out,
                     'sampling_report': sampling_report}
 
@@ -332,4 +332,5 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
     return {'no_fire_df': df_out,
             'sampling_report': sampling_report}
 
-       
+
+## From HEERE    
