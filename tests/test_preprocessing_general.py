@@ -198,7 +198,7 @@ def test_sample_nofire_obs_modelcase():
                               'grid_id_dv': [1,1,2],
                               'fire_lbl_dv': [False]* 3 })
     
-    df_test = pps.sample_nofire_obs(df_main, df_fire, 5, 2)
+    df_test = pps.sample_nofire_obs(df_main, df_fire, 5, 2, 42)
     assert_frame_equal(df_expect, df_test)
 
 def test_sample_nofire_obs_nofire_total_samples():
@@ -210,8 +210,8 @@ def test_sample_nofire_obs_nofire_total_samples():
                                 'fire_lbl': [False]*9})
     df_main["composite_key"] = df_main["grid_id"].astype(str) + df_main["date"].dt.strftime("%Y%m%d")
     
-    df_test_small = pps.sample_nofire_obs(df_main, df_fire, 5, 2)
-    df_test_large = pps.sample_nofire_obs(df_main, df_fire, 5, 5)
+    df_test_small = pps.sample_nofire_obs(df_main, df_fire, 5, 2, 42)
+    df_test_large = pps.sample_nofire_obs(df_main, df_fire, 5, 5, 42)
 
     assert df_test_small.shape[0] == 2
     assert df_test_large.shape[0] == 5
@@ -229,5 +229,5 @@ def test_sample_nofire_obs_overlapping_date_expect1():
                               'grid_id_dv': [1],
                               'fire_lbl_dv': [False]})
     
-    df_test = pps.sample_nofire_obs(df_main, df_fire, 5, 2)
+    df_test = pps.sample_nofire_obs(df_main, df_fire, 5, 2, 42)
     assert_frame_equal(df_expect, df_test)
