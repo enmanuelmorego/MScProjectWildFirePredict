@@ -475,6 +475,5 @@ def hist_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) ->
     ax.set_ylabel("Number of Observations")
     ax.set_title(title)
     ax.legend()
-
     fig.tight_layout()
     return fig
