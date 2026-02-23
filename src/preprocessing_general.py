@@ -6,6 +6,7 @@ import geopandas as gpd
 import utils as u
 from datetime import datetime
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """
@@ -439,13 +440,14 @@ def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire
     df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(str) + (df["date_dv"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
     return df
 
-def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str) -> None:
+def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) -> Figure:
     """
     Function to plot and save a histogram containing the distribution of the sampled values 
 
     Args:
-        df_sampled (df): Dataframe containing both fire and nofire sampled values
-        run_id (str): The identifier of the particular coderun 
+       - df_sampled (df): Dataframe containing both fire and nofire sampled values
+       - run_id (str): The identifier of the particular coderun 
+       - title (str): Title to be used in the plot
 
     """
     df_toplot = df_sampled.copy()
@@ -468,8 +470,9 @@ def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str) -> None:
     plt.xticks(rotation=45)
     plt.xlabel("Month")
     plt.ylabel("Number of Observations")
-    plt.title("Monthly Observation Counts (Fire vs No Fire) [Predicted Values]")
+    plt.title(title)
     plt.legend()
 
     plt.tight_layout()
     plt.show()
+    return plt
