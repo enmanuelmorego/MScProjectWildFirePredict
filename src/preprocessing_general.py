@@ -449,6 +449,8 @@ def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) ->
        - run_id (str): The identifier of the particular coderun 
        - title (str): Title to be used in the plot
 
+    Returns:
+        Figure 
     """
     df_toplot = df_sampled.copy()
     # Create year-month column
@@ -463,16 +465,16 @@ def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) ->
     monthly_counts = monthly_counts.reindex(columns=[False, True], fill_value=0)
     # Convert PeriodIndex to string for plotting
     months = monthly_counts.index.astype(str)
-    plt.figure(figsize=(12,6))
-    plt.bar(months, monthly_counts[False], label='No Fire', color='#005580')
-    plt.bar(months, monthly_counts[True],  label='Fire',    color='#C9495E', bottom=monthly_counts[False])
+    # Create plot object
+    fig, ax = plt.subplots(figsize=(12,6))
+    ax.bar(months, monthly_counts[False], label='No Fire', color='#005580')
+    ax.bar(months, monthly_counts[True],  label='Fire',    color='#C9495E', bottom=monthly_counts[False])
 
-    plt.xticks(rotation=45)
-    plt.xlabel("Month")
-    plt.ylabel("Number of Observations")
-    plt.title(title)
-    plt.legend()
+    ax.xticks(rotation=45)
+    ax.xlabel("Month")
+    ax.ylabel("Number of Observations")
+    ax.title(title)
+    ax.legend()
 
-    plt.tight_layout()
-    plt.show()
-    return plt
+    fig.tight_layout()
+    return fig
