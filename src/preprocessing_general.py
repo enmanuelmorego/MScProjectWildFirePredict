@@ -406,4 +406,6 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
         sampled_set.update(df_nofire_sample['composite_key'])
 
     df_out = pd.DataFrame(pd.concat(list_nofire))
+    df_out = df_out[['date', 'grid_id', 'fire_lbl']]
+    df_out = df_out.add_suffix('_dv')
     return df_out

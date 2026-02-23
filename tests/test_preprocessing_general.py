@@ -179,3 +179,6 @@ def test_sample_nofire_values_limit_ratio():
     assert result["no_fire_df"]["date"].max() == pd.Timestamp('2020-01-25')
 
     assert result["sampling_report"]["no_fire_composite_key"] == ['120200101', '120200125']
+
+def test_sample_nofire_obs():
+    pass
