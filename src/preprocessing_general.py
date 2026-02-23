@@ -333,4 +333,4 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             'sampling_report': sampling_report}
 
 
-## From HEERE    
+## From HE
