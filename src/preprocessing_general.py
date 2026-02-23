@@ -358,7 +358,8 @@ def sample_fire_obs(df_preproc: gpd.GeoDataFrame) -> pd.DataFrame:
 def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame, 
                       df_fire                     : pd.DataFrame, 
                       nofire_proximity_window_days: int,
-                      nofire_total_samples        : int) -> pd.DataFrame:
+                      nofire_total_samples        : int,
+                      random_seed                 : int) -> pd.DataFrame:
     """
     Function that extracts the no fire observations from the pre processed data set
     
@@ -376,6 +377,7 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
         df_fire (df): Dataframe containing the fire observations to be used as the Y variables
         nofire_proximity_window_days (int): Number of allowed days (+/-) from anchor date (date of fire observation)
         nofire_total_samples (int): Total number of no fire values to sample 
+        random_seed (int): value to be used as the random seed in the sampling procedure
 
     Returns:
         df (DataFrame): Dataframe containing only `fire_lbl == False` and columns  `[date_dv, grid_id_dv, fire_lbl_dv]` 
@@ -403,7 +405,7 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
                                        ~df_grid['composite_key'].isin(sampled_set)
                                       )]
         # Randomly select from the nofire available datapoints
-        df_nofire_sample = df_nofire_sample.sample(n = min(nofire_total_samples, len(df_nofire_sample)),  random_state = 42)
+        df_nofire_sample = df_nofire_sample.sample(n = min(nofire_total_samples, len(df_nofire_sample)),  random_state = random_seed)
 
         # Add values to list, which is later transform to df
         list_nofire.append(df_nofire_sample)
