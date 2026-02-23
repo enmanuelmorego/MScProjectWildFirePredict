@@ -383,19 +383,24 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
     df_nofire = df_preproc[df_preproc['fire_lbl'] == False].copy()
     list_nofire = []
     sampled_set = set()
+    df_nofire_grouped = df_nofire.groupby('grid_id')
 
     for r in df_fire.itertuples():
         anchor_grid_id   = r.grid_id_dv
         anchor_date      = r.date_dv
 
+        if anchor_grid_id not in df_nofire_grouped.groups:
+            continue
+        # Reduce the size of the data frame to check for values
+        df_grid = df_nofire_grouped.get_group(anchor_grid_id)
         # Extract ALL potential no fire candidate values
-        df_nofire_sample = df_nofire[(
-                                      (df_nofire['grid_id'] == anchor_grid_id) &
+        df_nofire_sample = df_grid[(
+                                      #(df_grid['grid_id'] == anchor_grid_id) &
                                       # Find days within a 30 day range of current date 
-                                      ((df_nofire['date'] >= (anchor_date - pd.DateOffset(days=nofire_proximity_window_days))) &
-                                       (df_nofire['date'] <= (anchor_date + pd.DateOffset(days=nofire_proximity_window_days)))) &
+                                      ((df_grid['date'] >= (anchor_date - pd.DateOffset(days=nofire_proximity_window_days))) &
+                                       (df_grid['date'] <= (anchor_date + pd.DateOffset(days=nofire_proximity_window_days)))) &
                                       # Avoid sampling the same value if it was already sampled by another fire lbl
-                                       ~df_nofire['composite_key'].isin(sampled_set)
+                                       ~df_grid['composite_key'].isin(sampled_set)
                                       )]
         # Randomly select from the nofire available datapoints
         df_nofire_sample = df_nofire_sample.sample(n = min(nofire_total_samples, len(df_nofire_sample)),  random_state = 42)
@@ -409,3 +414,20 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
     df_out = df_out[['date', 'grid_id', 'fire_lbl']]
     df_out = df_out.add_suffix('_dv')
     return df_out
+
+def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire: pd.DataFrame) -> pd.DataFrame:
+    """
+    Function that combines the fire and no fire sampled data into a single data frame
+    It also generates the composite matching key to pull the previous day from the main dataset
+    This is computed by taking the observation_date - 1 day, and combining with grid_id
+
+    Args:
+        df_sampled_fire   (df): DF containing the sampled observed fires data points
+        df_sampled_nofire (df): DF containing the sampled observed no fires data points
+
+    Returns:
+        df (Df) Data frame containing all the fire and no fire observations with the following columns:
+                    `[date_dv, grid_id_dv, fire_lbl_dv, bridge_composite_key_dv]`
+    """
+    df = pd.concat([df_sampled_fire, df_sampled_nofire], ignore_index = True)
+    df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(
