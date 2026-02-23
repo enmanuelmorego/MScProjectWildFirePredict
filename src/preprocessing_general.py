@@ -441,7 +441,7 @@ def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire
     df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(str) + (df["date_dv"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
     return df
 
-def hist_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) -> Figure:
+def hist_sampled_variables(df_sampled: pd.DataFrame, title: str) -> Figure:
     """
     Function to plot and save a histogram containing the distribution of the sampled values 
 
