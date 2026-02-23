@@ -355,14 +355,14 @@ def sample_fire_obs(df_preproc: gpd.GeoDataFrame) -> pd.DataFrame:
     df = df.add_suffix('_dv')
     return df
 
-def sample_nofire_obs(df_preproc:gpd.GeoDataFrame, 
-                      df_fire: pd.DataFrame, 
+def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame, 
+                      df_fire                     : pd.DataFrame, 
                       nofire_proximity_window_days: int,
-                      nofire_total_samples: int) -> pd.DataFrame:
+                      nofire_total_samples        : int) -> pd.DataFrame:
     """
     Function that extracts the no fire observations from the pre processed data set
     
-    The function iterates thru `df_fire` (which all the fire observations) and for each `grid_id` finds all nofire observations that fall
+    The function iterates thru `df_fire` (which is all the fire observations) and for each `grid_id` finds all nofire observations that fall
     within +/- `nofire_proximity_window_days` 
 
     Then `nofire_total_samples` determines how many of these available nofire dates will be kept. This is the fire to nofire ratio controller
@@ -380,3 +380,30 @@ def sample_nofire_obs(df_preproc:gpd.GeoDataFrame,
     Returns:
         df (DataFrame): Dataframe containing only `fire_lbl == False` and columns  `[date_dv, grid_id_dv, fire_lbl_dv]` 
     """
+    df_nofire = df_preproc[df_preproc['fire_lbl'] == False].copy()
+    list_nofire = []
+    sampled_set = {}
+
+    for r in df_fire.itertuples():
+        anchor_grid_id   = r.grid_id
+        anchor_date      = r.date
+
+        # Extract ALL potential no fire candidate values
+        df_nofire_sample = df_nofire[(
+                                      (df_nofire['grid_id'] == anchor_grid_id) &
+                                      # Find days within a 30 day range of current date 
+                                      ((df_nofire['date'] >= (anchor_date - pd.DateOffset(days=nofire_proximity_window_days))) &
+                                       (df_nofire['date'] <= (anchor_date + pd.DateOffset(days=nofire_proximity_window_days)))) &
+                                      # Avoid sampling the same value if it was already sampled by another fire lbl
+                                       ~df_nofire['composite_id'].isin(sampled_set)
+                                      )]
+        # Randomly select from the nofire available datapoints
+        df_nofire_sample = df_nofire_sample.sample(n = min(nofire_total_samples, len(df_nofire_sample)),  random_state = 42)
+
+        # Add values to list, which is later transform to df
+        list_nofire.append(df_nofire_sample)
+        # Append selected values to set to avoid double sampling
+        sampled_set.update(df_nofire_sample['composite_key'])
+
+    df_out = pd.DataFrame(pd.concat(list_nofire))
+    return df_out
