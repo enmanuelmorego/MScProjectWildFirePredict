@@ -440,7 +440,7 @@ def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire
     df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(str) + (df["date_dv"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
     return df
 
-def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) -> Figure:
+def hist_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) -> Figure:
     """
     Function to plot and save a histogram containing the distribution of the sampled values 
 
@@ -470,10 +470,10 @@ def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) ->
     ax.bar(months, monthly_counts[False], label='No Fire', color='#005580')
     ax.bar(months, monthly_counts[True],  label='Fire',    color='#C9495E', bottom=monthly_counts[False])
 
-    ax.xticks(rotation=45)
-    ax.xlabel("Month")
-    ax.ylabel("Number of Observations")
-    ax.title(title)
+    ax.set_xticklabels(months, rotation=45)
+    ax.set_xlabel("Month")
+    ax.set_ylabel("Number of Observations")
+    ax.set_title(title)
     ax.legend()
 
     fig.tight_layout()
