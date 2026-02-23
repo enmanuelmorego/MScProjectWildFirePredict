@@ -382,11 +382,11 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
     """
     df_nofire = df_preproc[df_preproc['fire_lbl'] == False].copy()
     list_nofire = []
-    sampled_set = {}
+    sampled_set = set()
 
     for r in df_fire.itertuples():
-        anchor_grid_id   = r.grid_id
-        anchor_date      = r.date
+        anchor_grid_id   = r.grid_id_dv
+        anchor_date      = r.date_dv
 
         # Extract ALL potential no fire candidate values
         df_nofire_sample = df_nofire[(
@@ -395,7 +395,7 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
                                       ((df_nofire['date'] >= (anchor_date - pd.DateOffset(days=nofire_proximity_window_days))) &
                                        (df_nofire['date'] <= (anchor_date + pd.DateOffset(days=nofire_proximity_window_days)))) &
                                       # Avoid sampling the same value if it was already sampled by another fire lbl
-                                       ~df_nofire['composite_id'].isin(sampled_set)
+                                       ~df_nofire['composite_key'].isin(sampled_set)
                                       )]
         # Randomly select from the nofire available datapoints
         df_nofire_sample = df_nofire_sample.sample(n = min(nofire_total_samples, len(df_nofire_sample)),  random_state = 42)
