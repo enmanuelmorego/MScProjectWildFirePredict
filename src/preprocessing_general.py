@@ -7,6 +7,7 @@ import utils as u
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+import matplotlib.colors as colors
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """
@@ -476,4 +477,54 @@ def hist_sampled_variables(df_sampled: pd.DataFrame, run_id: str, title: str) ->
     ax.set_title(title)
     ax.legend()
     fig.tight_layout()
+    return fig
+
+def heatmap_grid_sampling(df_sampled: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame, uk_shp, title: str):
+    """
+    Function to produce a heatmap of the count of grid sampling across the UK
+    It allows to see if any particular regions are oversampled, and if any regions were ignored
+
+    It takes the sampled data, groups by `grid_id_dv` and gets the count of how many times each grid has been sampled in the whole df
+    It joins with the complete UK grid df, and fills any missing `grid_ids` with `0`
+
+    Args:
+        - df_sampled (df): Dataframe containing all the sampled (fire/nofire) values 
+        - df_uk_grid (GeoDF): GeoPandas dataframe containing grid_id + geometry for UK
+        - uk_shp (shp): Shape file of the UK
+        - title (str): Title of the plot 
+
+    Returns:
+        Figure
+
+    """
+    df_count = (df_sampled
+                .groupby('grid_id_dv')
+                .size()
+                .reset_index(name="sample_count"))
+
+    gdf_plot = df_uk_grid.merge(df_count, 
+                                left_on  = 'grid_id', 
+                                right_on = 'grid_id_dv', 
+                                how      = 'left')
+    gdf_plot['sample_count'] = gdf_plot['sample_count'].fillna(0)
+
+    # Image
+    fig, ax = plt.subplots(figsize=(8, 10))
+    # UK background
+    uk_shp.plot(ax=ax, color="white", edgecolor="black", linewidth = 0.2)
+
+    # Grid overlay
+    gdf_plot.plot(column="sample_count",
+                ax=ax,
+                cmap="YlOrRd",
+                norm=colors.LogNorm(vmin=1, vmax=gdf_plot['sample_count'].max()),
+                legend=True,)
+
+    ax.set_title(title)
+    # subtitle
+    fig.suptitle("Aggregate Log-scaled sample counts per grid for the whole time period",
+                fontsize=8,
+                y=0.92)
+    ax.set_axis_off()
+    plt.tight_layout()
     return fig
