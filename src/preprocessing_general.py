@@ -5,6 +5,7 @@ import pandas as pd
 import geopandas as gpd
 import utils as u
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """
@@ -428,9 +429,47 @@ def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire
         df_sampled_nofire (df): DF containing the sampled observed no fires data points
 
     Returns:
-        df (Df) Data frame containing all the fire and no fire observations with the following columns:
-                    `[date_dv, grid_id_dv, fire_lbl_dv, bridge_composite_key_dv]`
+        df (Df) Data frame containing all the fire and no fire observations
+
+    Note:
+        Included columns are:
+            `[date_dv, grid_id_dv, fire_lbl_dv, bridge_composite_key_dv]`
     """
     df = pd.concat([df_sampled_fire, df_sampled_nofire], ignore_index = True)
     df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(str) + (df["date_dv"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
     return df
+
+def plot_sampled_variables(df_sampled: pd.DataFrame, run_id: str) -> None:
+    """
+    Function to plot and save a histogram containing the distribution of the sampled values 
+
+    Args:
+        df_sampled (df): Dataframe containing both fire and nofire sampled values
+        run_id (str): The identifier of the particular coderun 
+
+    """
+    df_toplot = df_sampled.copy()
+    # Create year-month column
+    df_toplot['year_month'] = df_toplot['date_dv'].dt.to_period('M')
+    # Count observations per month split by fire label
+    monthly_counts = (df_toplot
+                      .groupby(['year_month', 'fire_lbl_dv'])
+                      .size()
+                      .unstack(fill_value=0)
+                      .sort_index())
+    # Make sure both columns exist
+    monthly_counts = monthly_counts.reindex(columns=[False, True], fill_value=0)
+    # Convert PeriodIndex to string for plotting
+    months = monthly_counts.index.astype(str)
+    plt.figure(figsize=(12,6))
+    plt.bar(months, monthly_counts[False], label='No Fire', color='#005580')
+    plt.bar(months, monthly_counts[True],  label='Fire',    color='#C9495E', bottom=monthly_counts[False])
+
+    plt.xticks(rotation=45)
+    plt.xlabel("Month")
+    plt.ylabel("Number of Observations")
+    plt.title("Monthly Observation Counts (Fire vs No Fire) [Predicted Values]")
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
