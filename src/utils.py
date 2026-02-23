@@ -6,6 +6,7 @@ from typing import List
 import geopandas as gpd
 import json
 from matplotlib.figure import Figure
+import re
 
 # -------------------------
 # GENERAL FUNCTIONS
@@ -128,6 +129,7 @@ def save_plots(plot_obj: Figure, plot_title: str, run_id: str) -> None:
   """
   path = f"outputs/{run_id}"
   os.makedirs(path, exist_ok = True)
+  plot_title = re.sub("\\[a-z]","", plot_title)
   fout = f"{path}/{run_id}_{plot_title}.pdf"
   try:
     plot_obj.savefig(fout, bbox_inches = "tight")
