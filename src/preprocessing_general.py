@@ -430,4 +430,5 @@ def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire
                     `[date_dv, grid_id_dv, fire_lbl_dv, bridge_composite_key_dv]`
     """
     df = pd.concat([df_sampled_fire, df_sampled_nofire], ignore_index = True)
-    df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(
+    df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(str) + (df["date_dv"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
+    return df
