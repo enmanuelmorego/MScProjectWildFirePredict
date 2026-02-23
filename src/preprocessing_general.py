@@ -333,4 +333,50 @@ def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window
             'sampling_report': sampling_report}
 
 
-## From HE
+## From HEERE    
+def sample_fire_obs(df_preproc: gpd.GeoDataFrame) -> pd.DataFrame:
+    """
+    Function that extracts the fire observations from the pre processed data set
+    These are the observations that are to be used as `Y variable` in the analysis
+
+    It filters only those values where the `fire_lbl == True` and select relevant columns only
+    `[date, grid_id, fire_lbl]` 
+
+    Suffix `dv` is added at the end of the column name to indicate these values relate to the `Dependent Variable` or Response values
+
+    Args:
+        df_preproc (GeoDataFrame): Preprocessed data frame containing all the grid+date combinations along with variables
+
+    Returns:
+        df (DataFrame): Dataframe containing only `fire_lbl == True` and columns  `[date_dv, grid_id_dv, fire_lbl_dv]` 
+    """
+    df = df_preproc[df_preproc['fire_lbl'] == True].copy()
+    df = df[['date', 'grid_id', 'fire_lbl']]
+    df = df.add_suffix('_dv')
+    return df
+
+def sample_nofire_obs(df_preproc:gpd.GeoDataFrame, 
+                      df_fire: pd.DataFrame, 
+                      nofire_proximity_window_days: int,
+                      nofire_total_samples: int) -> pd.DataFrame:
+    """
+    Function that extracts the no fire observations from the pre processed data set
+    
+    The function iterates thru `df_fire` (which all the fire observations) and for each `grid_id` finds all nofire observations that fall
+    within +/- `nofire_proximity_window_days` 
+
+    Then `nofire_total_samples` determines how many of these available nofire dates will be kept. This is the fire to nofire ratio controller
+
+    Final dataframe also contained the renamed columns below, with the suffix `dv` to indicate that this data is the dependent variable
+    `[date, grid_id, fire_lbl]` 
+
+
+    Args:
+        df_preproc (GeoDataFrame): Preprocessed data frame containing all the grid+date combinations along with variables
+        df_fire (df): Dataframe containing the fire observations to be used as the Y variables
+        nofire_proximity_window_days (int): Number of allowed days (+/-) from anchor date (date of fire observation)
+        nofire_total_samples (int): Total number of no fire values to sample 
+
+    Returns:
+        df (DataFrame): Dataframe containing only `fire_lbl == False` and columns  `[date_dv, grid_id_dv, fire_lbl_dv]` 
+    """
