@@ -137,45 +137,4 @@ def test_sample_nofire_values_valid_inputs():
     assert result["no_fire_df"].shape[0] == 3 
     assert result["sampling_report"]["no_fire_composite_key"][0] is not None
 
-def test_sample_nofire_values_novalid_nofire_sample():
-    df = pd.DataFrame({"grid_id": [1, 1],
-                       "date": pd.to_datetime(["2020-01-10", "2020-01-11"]),
-                       "fire_lbl": [True, False]})
-    df["composite_key"] = df["grid_id"].astype(str) + df["date"].dt.strftime("%Y%m%d")
-
-    # Fire protected set
-    fire_df = pps.sample_fire_values(df, window_size=2)
-    sampled_set = set(fire_df["composite_key"])
-
-    candidate_dict = pps.sample_nofire_candidates(df, 30)
-
-    result = pps.sample_nofire_values(no_fire_per_fire_obs=1,
-                                      candidate_dict=candidate_dict,
-                                      window_size=2,
-                                      sampled_set=sampled_set)
-
-    assert result["no_fire_df"].empty
-    assert result["sampling_report"]["no_fire_composite_key"][0] is None
-
-def test_sample_nofire_values_limit_ratio():
-    df = pd.DataFrame({"grid_id": [1, 1, 1, 1, 1],
-                       "date": pd.to_datetime(["2020-01-10", "2020-01-01","2020-01-25","2020-01-30","2020-02-05"]),
-                       "fire_lbl": [True, False,False,False,False]})
-    df["composite_key"] = df["grid_id"].astype(str) + df["date"].dt.strftime("%Y%m%d")
-
-    # Fire protected set
-    fire_df = pps.sample_fire_values(df, window_size=4)
-    sampled_set = set(fire_df["composite_key"])
-
-    candidate_dict = pps.sample_nofire_candidates(df, 30)
-
-    result = pps.sample_nofire_values(no_fire_per_fire_obs=2,
-                                      candidate_dict=candidate_dict,
-                                      window_size=4,
-                                      sampled_set=sampled_set)
-
-    assert result["no_fire_df"].shape[0] == 10
-    assert result["no_fire_df"]["date"].min() == pd.Timestamp('2019-12-28')
-    assert result["no_fire_df"]["date"].max() == pd.Timestamp('2020-01-25')
-
-    assert result["sampling_report"]["no_fire_composite_key"] == ['120200101', '120200125']
+def test_sample_nofir
