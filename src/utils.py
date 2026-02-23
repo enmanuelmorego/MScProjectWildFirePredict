@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List 
 import geopandas as gpd
 import json
+from matplotlib.figure import Figure
 
 # -------------------------
 # GENERAL FUNCTIONS
@@ -113,3 +114,24 @@ def save_json(dict_save: dict, obj_name:str, run_id: str) -> None:
   except IOError as e:
     print(f"❌ ERROR {e}")
 
+def save_plots(plot_obj: Figure, plot_title: str, run_id: str) -> None:
+  """
+  Helper function that takes a plot and saves them in the outputs folder
+
+  Args:
+    - plot_obj (Figure): Figure/Plot to save
+    - plot_title (str): Title of the plot to be used as file name as well
+    - run_id (str): ID for specific run of project, set at the start of the script
+
+  Returns 
+    None
+  """
+  path = f"outputs/{run_id}"
+  os.makedirs(path, exist_ok = True)
+  fout = f"{path}/{run_id}_{plot_title}.pdf"
+  try:
+    plot_obj.savefig(fout, bbox_inches = "tight")
+    print(f"\t✅ Succesfully saved {fout}")
+  except IOError as e: 
+    print(f"❌ ERROR {e}")
+  
