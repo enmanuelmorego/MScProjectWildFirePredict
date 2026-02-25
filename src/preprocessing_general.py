@@ -441,6 +441,44 @@ def sample_fire_nofire_combined(df_sampled_fire: pd.DataFrame, df_sampled_nofire
     df["bridge_composite_key_dv"] = df["grid_id_dv"].astype(str) + (df["date_dv"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
     return df
 
+def sampling_pipeline(df_preprocessed: gpd.GeoDataFrame, 
+                      nofire_proximity_window_days: int, 
+                      nofire_total_samples: int,
+                      random_seed: int):
+    """
+    Pipeline function to sample the data. For every fire label in the input data set, it selects integer `nofire_total_samples` of corresponding no fire values. Generates the `Y` values or `predicted` values 
+    
+    Generates a `bridge_composite_key_dv` which is based on the `grid_id` + `observation date` - `1 day` to then join with the `preprocessed` dataframe for the `predictor` values
+
+    The pipeline also generates the following reporting objects:
+        - A histogram showing how many observations per `year-month` with each bar showing `fire`/`nofire` by color for the `Y` variable
+        - A heatmap showing which grids are included in the `Y` variable, where color intensity represents how many times a grid was sampled. The plots is an temporal aggregation of the data
+        - Basic descriptive stats of the sampled values
+
+    Args:
+        df_preprocessed (df): GeoDataFrame containing all the preprocesed data with fire/nofire labels along with all the supporting data and variables
+        nofire_proximity_window_days (int): Number of allowed days (+/-) from anchor date (date of fire observation)
+        nofire_total_samples (int): Total number of no fire values to sample 
+        random_seed (int): value to be used as the random seed in the sampling procedure
+
+    Returns:
+        df_out (df): Data frame where each row contains the predictor (X) variables at `t` time and on the same row, the predicted variables at `t+1`  
+
+    """
+    df_fire    = sample_fire_obs(df_preprocessed)
+    df_nofire  = sample_nofire_obs(df_preproc                   = df_preprocessed,
+                                   df_fire                      = df_fire,
+                                   nofire_proximity_window_days = nofire_proximity_window_days,
+                                   nofire_total_samples         = nofire_total_samples,
+                                   random_seed                  = random_seed)
+    df_sampled = sample_fire_nofire_combined(df_fire, df_nofire)
+    df_out     = df_sampled.merge(df_preprocessed, 
+                                  left_on  = 'bridge_composite_key_dv',
+                                  right_on = 'composite_key', 
+                                  how      = 'left')
+    df_out     = df_out.dropna(subset=["fwi"])
+    return df_out
+
 def hist_sampled_variables(df_sampled: pd.DataFrame, title: str) -> Figure:
     """
     Function to plot and save a histogram containing the distribution of the sampled values 
