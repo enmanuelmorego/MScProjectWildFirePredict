@@ -465,6 +465,7 @@ def sampling_pipeline(df_preprocessed: gpd.GeoDataFrame,
 
     """
     df_fire    = sample_fire_obs(df_preprocessed)
+    
     df_nofire  = sample_nofire_obs(df_preproc                   = df_preprocessed,
                                    df_fire                      = df_fire,
                                    nofire_proximity_window_days = nofire_proximity_window_days,
@@ -589,7 +590,7 @@ def sampling_reporting_pipeline(df_plot: pd.DataFrame, df_uk_grid: gpd.GeoDataFr
     # Generate reporting objects & titles
     title_hist      = "Monthly Observation Counts (Fire vs No Fire) [Predicted Values]"
     date_min        = df_plot['date_dv'].min()
-    date_max        = df_plot['date_dv'].max()
+    date_max        = df_plot['date_dv'].max()    
     title_heatmap   = f"HeatMap of Sampled Grids [Predicted Values]\n[{date_min.strftime('%Y-%m-%d')} {date_max.strftime('%Y-%m-%d')}]\n"
     # Create images
     sampled_hist    = hist_sampled_variables(df_sampled = df_plot, title = title_hist)
