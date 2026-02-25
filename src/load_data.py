@@ -560,6 +560,12 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
     i += 1
   
   df_fwi = pd.concat(list_fwi, ignore_index = True)
+  df_fwi["date"] = pd.to_datetime(df_fwi["date"]).dt.normalize()
+  # Aggregate to daily grid level and compute mean and max
+  df_fwi = (df_fwi
+            .groupby(["grid_id", "date"], as_index=False)
+            .agg(fwi_max=("fwi", "max"),
+                 fwi_mean=("fwi", "mean")))
   fname_out = Path(fwi_path)/grib_fname.replace(".grib", ".csv")
   df_fwi.to_csv(fname_out, index = False)
   print(f"\n\t...✅  Succesfully processed {grib_fname}")
