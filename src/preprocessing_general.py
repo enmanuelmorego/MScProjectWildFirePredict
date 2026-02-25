@@ -130,7 +130,6 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
 
     df_model_pre_raw = combined_dfs(df_dict)
     df_model_pre     = remove_na_fwi_grid1(df_model_pre_raw)
-  #  df_model_sampled = sample_by_fire_lbl(df_model_pre)
 
     df_model_pre['composite_key'] = (df_model_pre['grid_id'].astype(str) + 
                                      df_model_pre['date'].dt.strftime("%Y%m%d"))

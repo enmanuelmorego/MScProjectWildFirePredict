@@ -17,7 +17,7 @@ from datetime import datetime
 # --------------------------
 # VARIABLES
 # --------------------------
-YEAR_FILTER     = [2018]
+YEAR_FILTER     = [2019]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
@@ -111,7 +111,7 @@ df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
 # --------------------------
 #region
 print(f"{'='*80}")
-print(f"🧑‍🔬 SAMPLING FIRE/NOFIRE")  
+print(f"🔬 SAMPLING FIRE/NOFIRE")  
 df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre, 
                                    nofire_proximity_window_days = 30, 
                                    nofire_total_samples         = 3,
@@ -119,7 +119,7 @@ df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre,
 pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
                                 df_uk_grid      = df_uk_grid, 
                                 uk_sp_file_name = 'ukcp18-uk-land-12km.shp',
-                                 crs            = CRS, 
-                                 run_id         = RUN_ID)
+                                crs             = CRS, 
+                                run_id          = RUN_ID)
 #endregion
 
