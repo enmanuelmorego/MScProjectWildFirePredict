@@ -96,7 +96,7 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
             Dataset excluding grid_id = 1.
     """
     remove = ((df['grid_id'] == 1) &
-              (df['fwi'].isna())
+              (df['fwi_max'].isna())
               )
   
     rr = remove.sum()
@@ -145,7 +145,7 @@ def preprocessing_pipeline(df_dict: dict, run_id: str) -> gpd.GeoDataFrame:
                         'viirs_true_obs'     : int(df_model_pre[df_model_pre['fire_lbl'] == True].shape[0]),
                         'fire_lbl_proportion': int(df_model_pre[df_model_pre['fire_lbl'] == True].shape[0]) / int(df_model_pre.shape[0]),
                         'unique_viirs_grids' : int(df_model_pre[df_model_pre['fire_lbl'] == True]['grid_id'].nunique()),
-                        'fwi_notna'          : int(df_model_pre[df_model_pre['fwi'].notna()].shape[0])
+                        'fwi_notna'          : int(df_model_pre[df_model_pre['fwi_max'].notna()].shape[0])
                         }
                         
     u.save_json(df_model_summary,"PREPROCESSING_METADATA", run_id)
@@ -475,7 +475,7 @@ def sampling_pipeline(df_preprocessed: gpd.GeoDataFrame,
                                   left_on  = 'bridge_composite_key_dv',
                                   right_on = 'composite_key', 
                                   how      = 'left')
-    df_out     = df_out.dropna(subset=["fwi"])
+    df_out     = df_out.dropna(subset=["fwi_max"])
     return df_out
 
 def hist_sampled_variables(df_sampled: pd.DataFrame, title: str) -> Figure:

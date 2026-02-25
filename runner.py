@@ -17,7 +17,7 @@ from datetime import datetime
 # --------------------------
 # VARIABLES
 # --------------------------
-YEAR_FILTER     = [2019]
+YEAR_FILTER     = [2018,2019]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
 DATA_DIR        = os.environ.get("DATA_DIR")
