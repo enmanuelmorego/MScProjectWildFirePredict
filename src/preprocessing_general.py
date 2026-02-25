@@ -566,3 +566,37 @@ def heatmap_grid_sampling(df_sampled: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame
     ax.set_axis_off()
     plt.tight_layout()
     return fig
+
+def sampling_reporting_pipeline(df_plot: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame, uk_sp_file_name: str, crs: str, run_id: str):
+    """
+    Function pipeline to generate some basic graphs and stats on the sampling procedure to show basic information on sampled data
+    Saves the plots into outputs folder, user is notified via the console of specific save location
+    and prints basic proportion of Y values sample
+
+    Args:
+       - df_plot (df): Dataframe containing both fire and nofire sampled values
+       - df_uk_grid (GeoDF): GeoPandas dataframe containing grid_id + geometry for UK
+       - uk_sp_file_name (str): Name of shapefile for the plot
+       - run_id (str): The identifier of the particular coderun 
+       - crs (str): A string containing the EPSG value to set the CRS
+
+    Returns:
+        None
+    """
+    # ShapeFile
+    uk_sp_file      = f'data/UKGrid/{uk_sp_file_name}'
+    uk              = gpd.read_file(uk_sp_file)
+    uk              = uk.to_crs(crs=crs)
+    # Generate reporting objects & titles
+    title_hist      = "Monthly Observation Counts (Fire vs No Fire) [Predicted Values]"
+    date_min        = df_plot['date_dv'].min()
+    date_max        = df_plot['date_dv'].max()
+    title_heatmap   = f"HeatMap of Sampled Grids [Predicted Values]\n[{date_min.strftime('%Y-%m-%d')} {date_max.strftime('%Y-%m-%d')}]\n"
+    # Create images
+    sampled_hist    = hist_sampled_variables(df_sampled = df_plot, title = title_hist)
+    sampled_heatmap = heatmap_grid_sampling(df_plot, df_uk_grid, uk, title_heatmap)
+    # Save images
+    u.save_plots(sampled_hist,    title_hist,    run_id)
+    u.save_plots(sampled_heatmap, title_heatmap, run_id)
+    print(f"Proportion of Sampled values:")
+    print(df_plot['fire_lbl_dv'].value_counts(normalize=True))
