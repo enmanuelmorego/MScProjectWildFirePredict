@@ -10,7 +10,6 @@ import src.preprocessing_general as pps
 import geopandas as gpd
 from pathlib import Path
 import pandas as pd
-import matplotlib.pyplot as plt
 import utils as u
 from datetime import datetime
 
@@ -97,9 +96,6 @@ print(df_fwi.head())
 # PRE PROCESSING
 # --------------------------
 #region
-
-import numpy as np
-import webbrowser
 print(f"{'='*80}")
 print(f"🏗️ PRE PROCESSING")  
 
@@ -107,8 +103,25 @@ dfs_loaded = {'df_viirs'     : df_viirs,
               'df_uk_grid'   : df_uk_grid,
               'df_daily_grid': df_daily_grid,
               'df_fwi'       : df_fwi}
-
 df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
+#endregion
+
+# --------------------------
+# SAMPLING FIRE/NOFIRE
+# --------------------------
+#region
+print(f"{'='*80}")
+print(f"🧑‍🔬 SAMPLING FIRE/NOFIRE")  
+df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre, 
+                                   nofire_proximity_window_days = 30, 
+                                   nofire_total_samples         = 3,
+                                   random_seed                  = RANDOM_SEED)
+pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
+                                df_uk_grid      = df_uk_grid, 
+                                uk_sp_file_name = 'ukcp18-uk-land-12km.shp',
+                                 crs            = CRS, 
+                                 run_id         = RUN_ID)
+#endregion
 
 
 
