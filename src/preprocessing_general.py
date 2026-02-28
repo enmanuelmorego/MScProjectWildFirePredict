@@ -183,8 +183,6 @@ The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ra
 #     return {'date'         : list(current_window),
 #             'grid_id'      : [grid_id] * len(current_window),
 #             'composite_key': [f"{grid_id}{d:%Y%m%d}" for d in current_window] }
-
-
 # def sample_fire_values(df_preprocessed: gpd.GeoDataFrame, window_size: int) -> pd.DataFrame:
 #     """
 #     Function that extracts the fire label data points from the preprocessed data set
@@ -223,6 +221,7 @@ The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ra
 #     return df_out
 
 # def sample_nofire_candidates(df_preprocessed: gpd.GeoDataFrame, candidate_window: int) -> dict:
+#region
 #     """
 #     Function to sample the possible non-fire candidate observations for the sampling ratio process
 #     For each fire label value, finds all possible non fire labels for the same grid that are +/- X days (defaults to 30) from
@@ -254,7 +253,7 @@ The chosen ratio is 1:3 but the suite of functions is flexible to adjust this ra
 #         # Save in dictionary
 #         nofire_candidates[fire_composite_key] = nofire_sample
 #     return nofire_candidates
-
+# endregion
 # def sample_nofire_values(no_fire_per_fire_obs: int, candidate_dict: dict, window_size: int, sampled_set: set):
 #     """
 #     Function that extracts the no fire label data points from the no fire candidate dictionary
