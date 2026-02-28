@@ -38,7 +38,7 @@ def sampled_to_batch():
     """
     pass
 
-def fetch_sentinel_data(): 
+def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 
     """
     Fetches raw pixels from Google Earth Engine (GEE) into RAM.
 
@@ -51,7 +51,7 @@ def fetch_sentinel_data():
         date_str (str): The target date (YYYY-MM-DD) for the satellite observation.
 
     Returns:
-        numpy.ndarray: A raw 3D array of reflectance values. 
+        numpy.ndarray: A raw 3D array  
         Note: The band order is [B2, B3, B4, B8] (Blue, Green, Red, NIR).
 
     Raises:
@@ -60,3 +60,15 @@ def fetch_sentinel_data():
     """
     pass
 
+def transform_sentinel_data(sentinel_npyarray: np.ndarray):
+    """
+    Transforms the downloaded raw pixels array into a format that is suitable for CNN processing
+    The function replaces all `nan` with `0` values, it organises the order of the bands to `(H, W, 4)`, and resizes the data to 128 x 128
+
+    Args:
+        sentinel_npyarray (np.ndarray): Raw 3D pixel array 
+
+    Returns:
+        sentinel_npyarray (np.ndarray): resized and transformed numpy array
+    """
+    pass
