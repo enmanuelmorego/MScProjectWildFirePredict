@@ -22,6 +22,8 @@ xarray = "*"
 cdsapi = "*"
 tensorflow = "*"
 opencv-python = "*"
+tifffile = "*"
+scikit-image = "*"
 
 [dev-packages]
 pandas-stubs = "*"
