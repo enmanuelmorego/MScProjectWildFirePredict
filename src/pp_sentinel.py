@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import tensorflow as tf
 import pandas as pd
+import math
 
 def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
@@ -39,8 +40,32 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
     df_batches = df_sampled.copy()
     # Generate counts for each date object 
-    df_batches = (df_batches.groupby('date')
-                  .agg({"date_count": ['count']}))
+    df_batches = df_batches.groupby('date')['date'].count().reset_index(name = "count")
+
+
+    dates_list  = []
+    batch_num   = 0
+    groups_dict = dict()
+    prev_date = "0"
+    groups = []
+
+    for row in df_batches.itertuples():
+        current_group_size = row.count
+        current_year       = row.date.year
+        date_str           = row.date.strftime("%Y%m%d")
+        if current_group_size > batch_size:
+            while current_group_size > 0: 
+                group_name = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
+                group_size = min(current_group_size, batch_size)
+                groups_dict[group_name] = [date_str, group_size]
+                current_group_size -= group_size
+                batch_num += 1
+            continue
+        print("This piece of code is not hapening...")
+
+
+
+    return groups_dict
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 
     """
