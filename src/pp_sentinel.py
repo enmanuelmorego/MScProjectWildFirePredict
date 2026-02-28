@@ -57,6 +57,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         current_year       = row.date.year
         date               = row.date            
         date_str           = row.date.strftime("%Y%m%d")
+        i += 1
         if current_group_size > batch_size:
             while current_group_size > 0: 
                 group_name = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
@@ -64,12 +65,12 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
                 groups_dict[group_name] = [date, group_size]
                 current_group_size -= group_size
                 batch_num += 1
+           
             continue
         group_size = current_group_size + prev_group_size
         if group_size <= batch_size:
             groups.append(date)
             prev_group_size = group_size
-            i +=1
         else:
             # Close running group
             min_date_str = groups[0].strftime("%Y%m%d")
@@ -83,7 +84,6 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
             # Start new group
             groups.append(date)
             prev_group_size = current_group_size
-            i +=1
         if i >= n:
             min_date_str = groups[0].strftime("%Y%m%d")
             max_date_str = groups[len(groups) - 1].strftime("%Y%m%d")
