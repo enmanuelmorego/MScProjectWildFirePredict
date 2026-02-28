@@ -4,8 +4,9 @@ import numpy as np
 import os
 from pathlib import Path
 import tensorflow as tf
+import pandas as pd
 
-def sampled_to_batch():
+def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
 
@@ -36,7 +37,10 @@ def sampled_to_batch():
     Returns:
         - dictionary (dict): The date period covered by each batch as key, and the actual data covering the period as value
     """
-    pass
+    df_batches = df_sampled.copy()
+    # Generate counts for each date object 
+    df_batches = (df_batches.groupby('date')
+                  .agg({"date_count": ['count']}))
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 
     """
