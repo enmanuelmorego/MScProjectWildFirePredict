@@ -37,3 +37,26 @@ def sampled_to_batch():
         - dictionary (dict): The date period covered by each batch as key, and the actual data covering the period as value
     """
     pass
+
+def fetch_sentinel_data(): 
+    """
+    Fetches raw pixels from Google Earth Engine (GEE) into RAM.
+
+    This function does a cloud to RAM rather than to Disk process. It creates a 5-day 
+    median composite to mitigate cloud cover and requests a GeoTIFF 
+    download URL for a specific 12km grid.
+
+    Args:
+        geom_ee (ee.Geometry): The GEE geometry object defining the clip area.
+        date_str (str): The target date (YYYY-MM-DD) for the satellite observation.
+
+    Returns:
+        numpy.ndarray: A raw 3D array of reflectance values. 
+        Note: The band order is [B2, B3, B4, B8] (Blue, Green, Red, NIR).
+
+    Raises:
+        requests.exceptions.RequestException: If the GEE download URL fails to resolve.
+        tifffile.TiffFileError: If the downloaded bytes cannot be parsed as a TIFF.
+    """
+    pass
+
