@@ -169,15 +169,20 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame):
         - dict: Dictionary cotaining file names as keys and filtered data frames as values 
     """
     pass
-    # dict_df = dict()
-    # for k, v in batch_dict:
-    #     split       = v.get('split_group', None)
-    #     group_dates = v.get('date',        None)
-    #     df_filtered = df_sampled[df_sampled['date'].isin(group_dates)].copy()
-    #     if split is None:
-    #         dict_df[k] = df_filtered
-    #     else:
+    dict_df = dict()
+    for k, v in batch_dict.items():
+        split_indeces = v.get('split_group', None)
+        group_dates   = v.get('date',        None)
+        df_filtered   = df_sampled[df_sampled['date'].isin(group_dates)].copy()
 
+        if split_indeces is not None:
+            start_i     = split_indeces[0]
+            end_i       = split_indeces[1] 
+            df_filtered = df_filtered.iloc[[start_i, end_i]].drop_duplicates()
+
+        dict_df[k] = df_filtered
+
+    return dict_df 
 
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 
