@@ -105,13 +105,13 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         Example::
 
                 out_dict = {'2023_B000_20230101_20230101_sentinel_batch': {'date': [Timestamp('2023-01-01 00:00:00')], 
-                                                                            'split_group': []}, 
+                                                                            'split_group': None}, 
                             '2023_B001_20230102_20230102_sentinel_batch': {'date': [Timestamp('2023-01-02 00:00:00')], 
-                                                                            'split_group': []}, 
+                                                                            'split_group': None}, 
                             '2023_B002_20230103_20230103_sentinel_batch': {'date': [Timestamp('2023-01-03 00:00:00')], 
-                                                                            'split_group': 3}, 
+                                                                            'split_group': [x_start, x_end]}, 
                             '2023_B003_20230103_20230103_sentinel_batch': {'date': [Timestamp('2023-01-03 00:00:00')], 
-                                                                            'split_group': 1}}
+                                                                            'split_group': [x_start, x_end]}}
 
     """
     if not isinstance(batch_size, int) or batch_size > 800:
@@ -168,7 +168,7 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame):
     Retuns:
         - dict: Dictionary cotaining file names as keys and filtered data frames as values 
     """
-    pass
+    df_sampled = df_sampled.sort_values('date').reset_index(drop = True)
     dict_df = dict()
     for k, v in batch_dict.items():
         split_indeces = v.get('split_group', None)
