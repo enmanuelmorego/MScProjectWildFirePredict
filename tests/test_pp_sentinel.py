@@ -109,7 +109,7 @@ def test_sampled_to_batch_dfs_small_days():
                        'id': [1, 2, 3]})
     batch_dict = {"batch_1": {'date': [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')], 'split_group': None}}
     
-    test = psent.sampled_to_batch_dfs(batch_dict, df)
+    test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
     
     assert len(test["batch_1"]) == 3
     assert list(test["batch_1"]['id']) == [1, 2, 3]
@@ -122,7 +122,7 @@ def test_sampled_to_batch_dfs_large_day_split():
     batch_dict = {"batch_0": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
                   "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]}}
     
-    test = psent.sampled_to_batch_dfs(batch_dict, df)
+    test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
     assert len( test["batch_0"]) == 2
     assert list(test["batch_0"]['id']) == [10, 20] 
@@ -142,7 +142,7 @@ def test_sampled_to_batch_dfs_combined():
                     "batch_2": {'date': [pd.Timestamp('2023-06-01'),pd.Timestamp('2023-06-02')],  'split_group': None},
                     "batch_3": {'date': [pd.Timestamp('2023-08-01')], 'split_group': None}}
     
-    test = psent.sampled_to_batch_dfs(batch_dict, df)
+    test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
     assert len( test["batch_0"])           == 2
     assert list(test["batch_0"]['id'])     == [5, 6] 
@@ -163,7 +163,7 @@ def test_sampled_to_batch_pipeline_large_group():
                        'id':                  [1, 2, 3, 4, 5]})
 
     batch_dict = psent.sampled_to_batch(df, 2)
-    test_dict  = psent.sampled_to_batch_dfs(batch_dict, df)
+    test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
     assert len(test_dict["2023_B000_20230505_20230505_sentinel_batch"])        == 2
     assert list(test_dict["2023_B000_20230505_20230505_sentinel_batch"]['id']) == [1,2]
@@ -181,7 +181,7 @@ def test_sampled_to_batch_pipeline_small_group_poly():
                                                'c','d','e','f']})
 
     batch_dict = psent.sampled_to_batch(df, 4)
-    test_dict  = psent.sampled_to_batch_dfs(batch_dict, df)
+    test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
     assert len( test_dict["2023_B000_20230505_20230506_sentinel_batch"])         == 4
     assert list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['id'])   == ['c','d','e','f']

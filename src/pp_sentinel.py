@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import tensorflow as tf
 import pandas as pd
-import math
+from typing import Generator
 
 def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """"
@@ -157,7 +157,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
 
     return groups_dict
 
-def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame):
+def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generator[tuple[str, pd.DataFrame], None, None]:
     """
     The function takes the batch_dict containing the batch name and the dates corresponding to each batch
     It iterates thru the values of the dictionary and filters the data frame to only contain the rows relevant to the batch
@@ -166,23 +166,25 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame):
         - batch_dict (dict): Dictionary containing batch name and the dates correspoding to each batch
         - df_sampled (df): Data frame containing the sampled data, preprocessed
 
-    Retuns:
-        - dict: Dictionary cotaining file names as keys and filtered data frames as values 
+    Yields:
+        - batch_name (str): The name of the processed batch
+        - df_filtered (df): Filtered data frame meeting the batch requirements
+
+    Note:
+        This function yields the results rather tahn returning a dataframe to save memory and keeping computer from freezing
     """
     df_sampled = df_sampled.sort_values('date').reset_index(drop = True)
     dict_df = dict()
-    for k, v in batch_dict.items():
-        split_indeces = v.get('split_group', None)
-        group_dates   = v.get('date',        None)
+    for batch_name, batch_df in batch_dict.items():
+        split_indeces = batch_df.get('split_group', None)
+        group_dates   = batch_df.get('date',        None)
         df_filtered   = df_sampled[df_sampled['date'].isin(group_dates)].copy()
 
         if split_indeces is not None:
             start_i, end_i = split_indeces 
             df_filtered = df_filtered.iloc[start_i:end_i]
 
-        dict_df[k] = df_filtered
-
-    return dict_df 
+        yield batch_name, df_filtered
 
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 

@@ -6,9 +6,18 @@ df = pd.DataFrame({'date': pd.to_datetime(['2023-05-15','2023-05-15',
                     'id':                  ['a','b',
                                             'c','d','e','f']})
 
-batch_dict = psent.sampled_to_batch(df, 4)
-test_dict  = psent.sampled_to_batch_dfs(batch_dict, df)
-print(list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['date']) )
+batch_dict = psent.sampled_to_batch(df, 3)
+
+for b_name, b_df in psent.sampled_to_batch_dfs(batch_dict, df):
+    print(":" * 80)
+    print(f"==== {b_name} ===")
+    print(b_df)
+        # 1. Download images for these specific rows
+    # 2. Transform to NumPy
+    # 3. Save as .npz
+    
+    # After the loop finishes one 'name', Python clears 'df_batch' 
+    # from RAM and moves to the next one.
 #             - `2020_B002_20200101_20200101_sentinel_batch`
 
 # df = pd.DataFrame({'date': ['2023-01-01','2023-01-01','2023-01-01',
