@@ -7,7 +7,7 @@ import tensorflow as tf
 import pandas as pd
 import math
 
-def split_batch_greater_than_limit(current_group_size: int, batch_size: int, date_str: str, current_year: str):
+def split_batch_greater_than_limit(date_obj, current_group_size: int, batch_size: int, start_batch_num: int):
     """"
     Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
 
@@ -15,7 +15,19 @@ def split_batch_greater_than_limit(current_group_size: int, batch_size: int, dat
         - current_group_size (int): The size of the current group (which is larger than batch_size)
         - batch_size (int): The max size allowed for each batch
     """
-    pass
+    results      = dict()
+    current_year = date_obj.year
+    date_str     = date_obj.strftime("%Y%m%d")
+    batch_num    = start_batch_num
+
+    while current_group_size > 0: 
+        group_name          = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
+        group_size          = min(current_group_size, batch_size)
+        results[group_name] = [date_obj]* group_size
+        current_group_size -= group_size
+        batch_num          += 1
+
+    return results, batch_num
 
 def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
@@ -71,17 +83,13 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
             # if groups:
             #       close_current_batch()
             #       groups = [], prev_group_size = 0
-            # Call split_batch_greater_than_limit() (returns dict w split groups, batch_num [updated])
-            while current_group_size > 0: 
-                group_name = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
-                group_size = min(current_group_size, batch_size)
-                groups_dict[group_name] = [date]* group_size
-                current_group_size -= group_size
-                batch_num += 1
-            
-            #groups = [] 
-            #prev_group_size = 0
-            #continue
+            large_groups_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
+            groups_dict.update(large_groups_dict)
+
+            groups = [] 
+            prev_group_size = 0
+            continue
+
         group_size = current_group_size + prev_group_size
         if group_size <= batch_size:
             groups.append(date)
