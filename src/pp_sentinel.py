@@ -176,9 +176,8 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame):
         df_filtered   = df_sampled[df_sampled['date'].isin(group_dates)].copy()
 
         if split_indeces is not None:
-            start_i     = split_indeces[0]
-            end_i       = split_indeces[1] 
-            df_filtered = df_filtered.iloc[[start_i, end_i]].drop_duplicates()
+            start_i, end_i = split_indeces 
+            df_filtered = df_filtered.iloc[start_i:end_i]
 
         dict_df[k] = df_filtered
 

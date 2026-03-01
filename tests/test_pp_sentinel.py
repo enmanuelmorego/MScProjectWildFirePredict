@@ -98,3 +98,29 @@ def test_sampled_to_batch_raise_valuerror():
 # -------------------------------------
 # TEST sampled_to_batch_dfs
 # -------------------------------------
+def test_sampled_to_batch_dfs_small_days():
+
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-01-01', '2023-01-01', '2023-01-02']),
+                       'id': [1, 2, 3]})
+    batch_dict = {"batch_1": {'date': [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')], 'split_group': None}}
+    
+    test = psent.sampled_to_batch_dfs(batch_dict, df)
+    
+    assert len(test["batch_1"]) == 3
+    assert list(test["batch_1"]['id']) == [1, 2, 3]
+
+def test_sampled_to_batch_dfs_large_day_split():
+
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05']*4),
+                       'id': [10, 20, 30, 40]})
+    
+    batch_dict = {"batch_0": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
+                  "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]}}
+    
+    test = psent.sampled_to_batch_dfs(batch_dict, df)
+
+    assert len( test["batch_0"]) == 2
+    assert list(test["batch_0"]['id']) == [10, 20] 
+
+    assert len( test["batch_1"]) == 2
+    assert list(test["batch_1"]['id']) == [30, 40] 
