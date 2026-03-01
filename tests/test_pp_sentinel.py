@@ -158,11 +158,19 @@ def test_sampled_to_batch_dfs_combined():
     assert len(test["batch_3"])            == 2
     assert list(test["batch_3"]['id'])     == [3, 4] 
 
-# def test_sampled_to_batch_pipeline_large_group():
-#     df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05','2023-05-05','2023-05-05','2023-05-05', '2023-05-05']),
-#                        'id':                  [1, 2, 3, 4, 5]})
+def test_sampled_to_batch_pipeline_large_group():
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05','2023-05-05','2023-05-05','2023-05-05', '2023-05-05']),
+                       'id':                  [1, 2, 3, 4, 5]})
 
-#     batch_dict = psent.sampled_to_batch(df, 2)
-#     test_dict  = psent.sampled_to_batch_dfs(batch_dict, df)
+    batch_dict = psent.sampled_to_batch(df, 2)
+    test_dict  = psent.sampled_to_batch_dfs(batch_dict, df)
 
-#     assert len(test_dict["2023_B000_20230505_20230505_sentinel_batch"]) == 2
+    assert len(test_dict["2023_B000_20230505_20230505_sentinel_batch"])        == 2
+    assert list(test_dict["2023_B000_20230505_20230505_sentinel_batch"]['id']) == [1,2]
+
+    assert len(test_dict["2023_B001_20230505_20230505_sentinel_batch"])        == 2
+    assert list(test_dict["2023_B001_20230505_20230505_sentinel_batch"]['id']) == [3,4]
+
+    assert len(test_dict["2023_B002_20230505_20230505_sentinel_batch"])        == 1
+    assert list(test_dict["2023_B002_20230505_20230505_sentinel_batch"]['id']) == [5]
+
