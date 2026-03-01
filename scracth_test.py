@@ -1,12 +1,14 @@
 import pp_sentinel as psent
 import pandas as pd
 
-df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05','2023-05-05','2023-05-05','2023-05-05', '2023-05-05']),
-                    'id':                  [1, 2, 3, 4, 5]})
+df = pd.DataFrame({'date': pd.to_datetime(['2023-05-15','2023-05-15',
+                                            '2023-05-05','2023-05-05','2023-05-06','2023-05-06']),
+                    'id':                  ['a','b',
+                                            'c','d','e','f']})
 
-batch_dict = psent.sampled_to_batch(df, 2)
+batch_dict = psent.sampled_to_batch(df, 4)
 test_dict  = psent.sampled_to_batch_dfs(batch_dict, df)
-print(list(test_dict["2023_B000_20230505_20230505_sentinel_batch"]['id']))
+print(list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['date']) )
 #             - `2020_B002_20200101_20200101_sentinel_batch`
 
 # df = pd.DataFrame({'date': ['2023-01-01','2023-01-01','2023-01-01',
