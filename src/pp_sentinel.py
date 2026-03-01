@@ -59,7 +59,7 @@ def close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
     current_year = group_list[0].year
 
     group_name          = f"{current_year}_B{batch_num:03}_{min_date}_{max_date}_sentinel_batch"
-    results[group_name] = {'date'       : list(set(group_list)),
+    results[group_name] = {'date'       : sorted(list(set(group_list))),
                            'split_group': None}
     batch_num          +=1
 
