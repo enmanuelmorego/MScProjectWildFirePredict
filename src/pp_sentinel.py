@@ -28,13 +28,14 @@ def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: i
     while current_group_size > 0: 
         group_name          = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
         group_size          = min(current_group_size, batch_size)
-        results[group_name] = [date_obj]* group_size
+        results[group_name] = {'date'       : [date_obj],
+                               'split_group': len([date_obj]* group_size)}
         current_group_size -= group_size
         batch_num          += 1
 
     return results, batch_num
 
-def close_current_batch(group_list: list, start_batch_num: int) -> tuple[dict, int]:
+def close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
     """
     Function to close the current working batches. This is applicable when the sum of concurrent group batches hits the 
     batch size limit.
@@ -58,7 +59,8 @@ def close_current_batch(group_list: list, start_batch_num: int) -> tuple[dict, i
     current_year = group_list[0].year
 
     group_name          = f"{current_year}_B{batch_num:03}_{min_date}_{max_date}_sentinel_batch"
-    results[group_name] = group_list
+    results[group_name] = {'date'       : list(set(group_list)),
+                           'split_group': []}
     batch_num          +=1
 
     return results, batch_num
@@ -93,14 +95,29 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         - ValueError: if user passes a `batch_size` > 800
 
     Returns:
-        - dictionary (dict): The date period covered by each batch as key, and the actual data covering the period as value
+        - dictionary (dict): The date period covered by each batch as key, and the actual data covering the period as value. The dictionary also contains a `split_group`
+                             list. 
+                             When emtpy, then the batch is extracted by filtering all rows with the dates in the `date` key
+                             When populated, limit the number of rows of the corresponding date to the value in `split_group`
+        
+        Example::
+
+                out_dict = {'2023_B000_20230101_20230101_sentinel_batch': {'date': [Timestamp('2023-01-01 00:00:00')], 
+                                                                            'split_group': []}, 
+                            '2023_B001_20230102_20230102_sentinel_batch': {'date': [Timestamp('2023-01-02 00:00:00')], 
+                                                                            'split_group': []}, 
+                            '2023_B002_20230103_20230103_sentinel_batch': {'date': [Timestamp('2023-01-03 00:00:00')], 
+                                                                            'split_group': 3}, 
+                            '2023_B003_20230103_20230103_sentinel_batch': {'date': [Timestamp('2023-01-03 00:00:00')], 
+                                                                            'split_group': 1}}
+
     """
     if not isinstance(batch_size, int) or batch_size > 800:
         raise ValueError("Batch size must be an integer <= 800")
+    
     df_batches = df_sampled.copy()
     # Generate counts for each date object 
-    df_batches = df_batches.groupby('date')['date'].count().reset_index(name = "count")
-
+    df_batches   = df_batches.groupby('date')['date'].count().reset_index(name = "count")
     batch_num    = 0
     groups_dict  = dict()
     group_buffer = []
@@ -115,7 +132,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
             if group_buffer:
                   batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
                   groups_dict.update(batch_dict)
-                  batch_dict = []
+                  group_buffer = []
             # Split large group into smaller batches
             large_batch_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
             groups_dict.update(large_batch_dict)
@@ -125,10 +142,10 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         if len(group_buffer) + current_group_size > batch_size:
             batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
             groups_dict.update(batch_dict)
-            batch_dict = []
+            group_buffer = []
         
         # Add new date value
-        group_buffer.append(date)
+        group_buffer.extend([date]*current_group_size)
 
     # Cases where the last group was not added to the dict inside the loop
     if group_buffer:

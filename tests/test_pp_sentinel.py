@@ -33,3 +33,12 @@ def test_split_batch_greater_than_limit_odd_number_split():
     dict_out, new_batch = psent.split_batch_greater_than_limit(date, group_size, batch_size, batch_num)
     assert new_batch    == batch_num_expect
     assert dict_out     == dict_expect
+
+def test_sampled_to_batch_within_limit_batches():
+    df = pd.DataFrame({'date': ['2023-01-01','2023-01-01','2023-01-01',
+                                '2023-01-02','2023-01-02','2023-01-02']})
+    df['date']  = pd.to_datetime(df['date'])
+    dict_expect = {"2023_B000_20250101_20250101_sentinel_batch": [pd.Timestamp('2023-01-01')],
+                   "2023_B001_20250102_20250102_sentinel_batch": [pd.Timestamp('2023-01-02')]}
+    dict_test = psent.sampled_to_batch(df, 3)
+    assert dict_expect == dict_test
