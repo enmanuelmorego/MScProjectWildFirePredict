@@ -24,14 +24,17 @@ def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: i
     current_year = date_obj.year
     date_str     = date_obj.strftime("%Y%m%d")
     batch_num    = start_batch_num
+    start_i      = 0
 
     while current_group_size > 0: 
         group_name          = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
         group_size          = min(current_group_size, batch_size)
+        end_i               = start_i + group_size
         results[group_name] = {'date'       : [date_obj],
-                               'split_group': len([date_obj]* group_size)}
+                               'split_group': [start_i, (end_i-1)]}
         current_group_size -= group_size
         batch_num          += 1
+        start_i             = end_i 
 
     return results, batch_num
 
