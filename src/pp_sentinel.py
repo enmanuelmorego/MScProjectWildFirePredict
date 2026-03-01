@@ -34,7 +34,7 @@ def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: i
 
     return results, batch_num
 
-def close_current_batch(date_obj: pd.Timestamp, group_list: list, start_batch_num: int) -> tuple[dict, int]:
+def close_current_batch(group_list: list, start_batch_num: int) -> tuple[dict, int]:
     """
     Function to close the current working batches. This is applicable when the sum of concurrent group batches hits the 
     batch size limit.
@@ -45,7 +45,6 @@ def close_current_batch(date_obj: pd.Timestamp, group_list: list, start_batch_nu
     - Updates the batch number
 
     Args:
-    - date_obj (pd.Timestamp): The current date object from the main dataframe
     - group_list (list): A list of pd.Timestamp object representing the dates of the groups that fit into batch 
     - start_batch_num (int): The current working batch number
 
@@ -56,7 +55,7 @@ def close_current_batch(date_obj: pd.Timestamp, group_list: list, start_batch_nu
     # Extract values 
     min_date     = group_list[0].strftime("%Y%m%d")
     max_date     = group_list[-1].strftime("%Y%m%d")
-    current_year = date_obj.year
+    current_year = group_list[0].year
 
     group_name          = f"{current_year}_B{batch_num:03}_{min_date}_{max_date}_sentinel_batch"
     results[group_name] = group_list
@@ -96,55 +95,45 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     Returns:
         - dictionary (dict): The date period covered by each batch as key, and the actual data covering the period as value
     """
+    if not isinstance(batch_size, int) or batch_size > 800:
+        raise ValueError("Batch size must be an integer <= 800")
     df_batches = df_sampled.copy()
     # Generate counts for each date object 
     df_batches = df_batches.groupby('date')['date'].count().reset_index(name = "count")
 
-
-    dates_list  = []
-    batch_num   = 0
-    groups_dict = dict()
-    prev_group_size = 0
-    groups = []
-    i = 0
-    n = len(df_batches)
+    batch_num    = 0
+    groups_dict  = dict()
+    group_buffer = []
 
     for row in df_batches.itertuples():
         current_group_size = row.count
-        current_year       = row.date.year
-        date               = row.date            
-        date_str           = row.date.strftime("%Y%m%d")
-        i += 1
+        date               = row.date   
+
+        # Single group is larger than size limit         
         if current_group_size > batch_size:
-            if groups:
-                  current_group_dict, batch_num = close_current_batch(date, groups, batch_num)
-                  groups_dict.update(current_group_dict)
-                  groups          = []
-                  prev_group_size = 0
-
-            large_groups_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
-            groups_dict.update(large_groups_dict)
-
-            groups          = [] 
-            prev_group_size = 0
+            # If there is a batch that had been building, finalise/close that batch
+            if group_buffer:
+                  batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
+                  groups_dict.update(batch_dict)
+                  batch_dict = []
+            # Split large group into smaller batches
+            large_batch_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
+            groups_dict.update(large_batch_dict)
             continue
 
-        group_size = current_group_size + prev_group_size
-        if group_size <= batch_size:
-            groups.append(date)
-            prev_group_size = group_size
-        else:
-            current_group_dict, batch_num = close_current_batch(date, groups, batch_num)
-            groups_dict.update(current_group_dict)
-            groups          = []
-            prev_group_size = 0
+        # When the group_buffer surpasses size limit
+        if len(group_buffer) + current_group_size > batch_size:
+            batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
+            groups_dict.update(batch_dict)
+            batch_dict = []
+        
+        # Add new date value
+        group_buffer.append(date)
 
-            # Start new group
-            groups.append(date)
-            prev_group_size = current_group_size
-        if i >= n:
-            current_group_dict, batch_num = close_current_batch(date, groups, batch_num)
-            groups_dict.update(current_group_dict)
+    # Cases where the last group was not added to the dict inside the loop
+    if group_buffer:
+        batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
+        groups_dict.update(batch_dict)
 
     return groups_dict
 
