@@ -34,6 +34,37 @@ def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: i
 
     return results, batch_num
 
+def close_current_batch(date_obj: pd.Timestamp, group_list: list, start_batch_num: int) -> tuple[dict, int]:
+    """
+    Function to close the current working batches. This is applicable when the sum of concurrent group batches hits the 
+    batch size limit.
+    The funcion performs the following actions:
+    - Extracts the earliest date and latest date from the working list (`group_list`) and format the values as strings
+    - Generates the batch name
+    - Creates a dictionary with the key value pairs where key is file name, and value are all the dates per batch
+    - Updates the batch number
+
+    Args:
+    - date_obj (pd.Timestamp): The current date object from the main dataframe
+    - group_list (list): A list of pd.Timestamp object representing the dates of the groups that fit into batch 
+    - start_batch_num (int): The current working batch number
+
+    Returns
+        - tuple(dict, int): A tuple containing the updated dictionary and the update batch number 
+    """
+    results = dict()
+    # Extract values 
+    min_date     = group_list[0].strftime("%Y%m%d")
+    max_date     = group_list[-1].strftime("%Y%m%d")
+    current_year = date_obj.year
+
+    group_name          = f"{current_year}_B{batch_num:03}_{min_date}_{max_date}_sentinel_batch"
+    results[group_name] = group_list
+    batch_num          +=1
+
+    return results, batch_num
+
+
 def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
@@ -86,12 +117,15 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         i += 1
         if current_group_size > batch_size:
             if groups:
-                  close_current_batch()
-                  groups = [], prev_group_size = 0
+                  current_group_dict, batch_num = close_current_batch(date, groups, batch_num)
+                  groups_dict.update(current_group_dict)
+                  groups          = []
+                  prev_group_size = 0
+
             large_groups_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
             groups_dict.update(large_groups_dict)
 
-            groups = [] 
+            groups          = [] 
             prev_group_size = 0
             continue
 
@@ -100,31 +134,17 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
             groups.append(date)
             prev_group_size = group_size
         else:
-            # Start
-            # Replace block with close_current_batch()
-            # Close running group
-            min_date_str = groups[0].strftime("%Y%m%d")
-            max_date_str = groups[len(groups) - 1].strftime("%Y%m%d")
-            group_name = f"{current_year}_B{batch_num:03}_{min_date_str}_{max_date_str}_sentinel_batch"
-            groups_dict[group_name] = groups
-            # Update/refresh values
-            batch_num +=1
-            # return dict and update batch_num
-            # end of replacement
-            groups = []
+            current_group_dict, batch_num = close_current_batch(date, groups, batch_num)
+            groups_dict.update(current_group_dict)
+            groups          = []
             prev_group_size = 0
+
             # Start new group
             groups.append(date)
             prev_group_size = current_group_size
         if i >= n:
-            # Replace block with close_current_batch()
-            # Close running group
-            min_date_str = groups[0].strftime("%Y%m%d")
-            max_date_str = groups[-1].strftime("%Y%m%d")
-            group_name = f"{current_year}_B{batch_num:03}_{min_date_str}_{max_date_str}_sentinel_batch"
-            groups_dict[group_name] = groups
-            # return dict and update batch_num
-            # end of replacement
+            current_group_dict, batch_num = close_current_batch(date, groups, batch_num)
+            groups_dict.update(current_group_dict)
 
     return groups_dict
 
