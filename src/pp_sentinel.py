@@ -65,7 +65,6 @@ def close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
 
     return results, batch_num
 
-
 def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
@@ -153,6 +152,30 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         groups_dict.update(batch_dict)
 
     return groups_dict
+
+def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame):
+    """
+    The function takes the batch_dict containing the batch name and the dates corresponding to each batch
+    It iterates thru the values of the dictionary and filters the data frame to only contain the rows relevant to the batch
+
+    Args:
+        - batch_dict (dict): Dictionary containing batch name and the dates correspoding to each batch
+        - df_sampled (df): Data frame containing the sampled data, preprocessed
+
+    Retuns:
+        - dict: Dictionary cotaining file names as keys and filtered data frames as values 
+    """
+    pass
+    # dict_df = dict()
+    # for k, v in batch_dict:
+    #     split       = v.get('split_group', None)
+    #     group_dates = v.get('date',        None)
+    #     df_filtered = df_sampled[df_sampled['date'].isin(group_dates)].copy()
+    #     if split is None:
+    #         dict_df[k] = df_filtered
+    #     else:
+
+
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 
     """
