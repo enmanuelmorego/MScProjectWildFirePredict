@@ -5,16 +5,20 @@ import os
 from pathlib import Path
 import tensorflow as tf
 import pandas as pd
-from datetime import date 
 import math
 
-def split_batch_greater_than_limit(date_obj: date, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
+def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """"
     Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
 
     Args:
+        - date_obj (pd.Timestamp): The current date object from the main dataframe
         - current_group_size (int): The size of the current group (which is larger than batch_size)
         - batch_size (int): The max size allowed for each batch
+        - start_batch_num (int): The current working batch number
+
+    Returns
+        - tuple(dict, int): A tuple containing the updated dictionary and the update batch number 
     """
     results      = dict()
     current_year = date_obj.year
@@ -81,9 +85,9 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         date_str           = row.date.strftime("%Y%m%d")
         i += 1
         if current_group_size > batch_size:
-            # if groups:
-            #       close_current_batch()
-            #       groups = [], prev_group_size = 0
+            if groups:
+                  close_current_batch()
+                  groups = [], prev_group_size = 0
             large_groups_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
             groups_dict.update(large_groups_dict)
 
