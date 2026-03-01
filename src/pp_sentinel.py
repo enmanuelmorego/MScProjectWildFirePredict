@@ -7,6 +7,16 @@ import tensorflow as tf
 import pandas as pd
 import math
 
+def split_batch_greater_than_limit(current_group_size: int, batch_size: int, date_str: str, current_year: str):
+    """"
+    Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
+
+    Args:
+        - current_group_size (int): The size of the current group (which is larger than batch_size)
+        - batch_size (int): The max size allowed for each batch
+    """
+    pass
+
 def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
@@ -58,21 +68,27 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         date_str           = row.date.strftime("%Y%m%d")
         i += 1
         if current_group_size > batch_size:
+            # if groups:
+            #       close_current_batch()
+            #       groups = [], prev_group_size = 0
+            # Call split_batch_greater_than_limit() (returns dict w split groups, batch_num [updated])
             while current_group_size > 0: 
                 group_name = f"{current_year}_B{batch_num:03}_{date_str}_{date_str}_sentinel_batch"
                 group_size = min(current_group_size, batch_size)
                 groups_dict[group_name] = [date]* group_size
                 current_group_size -= group_size
                 batch_num += 1
-                groups = [] 
-                prev_group_size = 0
-           
-            continue
+            
+            #groups = [] 
+            #prev_group_size = 0
+            #continue
         group_size = current_group_size + prev_group_size
         if group_size <= batch_size:
             groups.append(date)
             prev_group_size = group_size
         else:
+            # Start
+            # Replace block with close_current_batch()
             # Close running group
             min_date_str = groups[0].strftime("%Y%m%d")
             max_date_str = groups[len(groups) - 1].strftime("%Y%m%d")
@@ -80,16 +96,22 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
             groups_dict[group_name] = groups
             # Update/refresh values
             batch_num +=1
+            # return dict and update batch_num
+            # end of replacement
             groups = []
             prev_group_size = 0
             # Start new group
             groups.append(date)
             prev_group_size = current_group_size
         if i >= n:
+            # Replace block with close_current_batch()
+            # Close running group
             min_date_str = groups[0].strftime("%Y%m%d")
             max_date_str = groups[-1].strftime("%Y%m%d")
             group_name = f"{current_year}_B{batch_num:03}_{min_date_str}_{max_date_str}_sentinel_batch"
             groups_dict[group_name] = groups
+            # return dict and update batch_num
+            # end of replacement
 
     return groups_dict
 
