@@ -5,9 +5,10 @@ import os
 from pathlib import Path
 import tensorflow as tf
 import pandas as pd
+from datetime import date 
 import math
 
-def split_batch_greater_than_limit(date_obj, current_group_size: int, batch_size: int, start_batch_num: int):
+def split_batch_greater_than_limit(date_obj: date, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """"
     Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
 

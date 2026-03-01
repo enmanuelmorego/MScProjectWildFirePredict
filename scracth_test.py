@@ -1,4 +1,4 @@
-import src.pp_sentinel as pse
+import pp_sentinel as pse
 import pandas as pd
 
 
