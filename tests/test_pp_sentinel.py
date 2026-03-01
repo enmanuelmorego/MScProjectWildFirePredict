@@ -124,3 +124,31 @@ def test_sampled_to_batch_dfs_large_day_split():
 
     assert len( test["batch_1"]) == 2
     assert list(test["batch_1"]['id']) == [30, 40] 
+
+def test_sampled_to_batch_dfs_combined():
+
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-06-01', '2023-06-02', '2023-08-01', '2023-08-01',
+                                               '2023-05-05','2023-05-05','2023-05-05','2023-05-05',
+                                               ]),
+                       'id':                  [1, 2, 3, 4, 5, 6, 7, 8]})
+    
+    batch_dict = {"batch_0": {'date':   [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
+                    "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]},
+                    "batch_2": {'date': [pd.Timestamp('2023-06-01'),pd.Timestamp('2023-06-02')],  'split_group': None},
+                    "batch_3": {'date': [pd.Timestamp('2023-08-01')], 'split_group': None}}
+    
+    test = psent.sampled_to_batch_dfs(batch_dict, df)
+
+    assert len( test["batch_0"])           == 2
+    assert list(test["batch_0"]['id'])     == [5, 6] 
+
+    assert len( test["batch_1"])           == 2
+    assert list(test["batch_1"]['id'])     == [7, 8] 
+
+    assert len(test["batch_2"])            == 2
+    assert list(test["batch_2"]['id'])     == [1, 2]
+    assert test["batch_2"]['date'].iloc[0] == pd.Timestamp('2023-06-01')
+    assert test["batch_2"]['date'].iloc[1] == pd.Timestamp('2023-06-02')
+
+    assert len(test["batch_3"])            == 2
+    assert list(test["batch_3"]['id'])     == [3, 4] 
