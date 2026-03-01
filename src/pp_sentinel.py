@@ -118,6 +118,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
         raise ValueError("Batch size must be an integer <= 800")
     
     df_batches = df_sampled.copy()
+    df_batches = df_batches.sort_values('date').reset_index(drop = True)
     # Generate counts for each date object 
     df_batches   = df_batches.groupby('date')['date'].count().reset_index(name = "count")
     batch_num    = 0
