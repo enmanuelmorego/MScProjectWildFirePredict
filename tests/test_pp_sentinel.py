@@ -2,6 +2,9 @@ import pandas as pd
 import pp_sentinel as psent
 import pytest
 
+# -------------------------------------
+# TEST split_batch_greater_than_limit
+# -------------------------------------
 def test_split_batch_greater_than_limit_even_number_split():
 
     group_size = 20
@@ -34,6 +37,9 @@ def test_split_batch_greater_than_limit_odd_number_split():
     assert new_batch    == batch_num_expect
     assert dict_out     == dict_expect
 
+# -------------------------------------
+# TEST sampled_to_batch
+# -------------------------------------
 def test_sampled_to_batch_within_limit_batches_singledate():
     df = pd.DataFrame({'date': ['2023-01-01','2023-01-01','2023-01-01',
                                 '2023-01-02','2023-01-02','2023-01-02']})
@@ -88,3 +94,7 @@ def test_sampled_to_batch_raise_valuerror():
     df['date']  = pd.to_datetime(df['date'])
     with pytest.raises(ValueError):  
         dict_test = psent.sampled_to_batch(df, 900)
+
+# -------------------------------------
+# TEST sampled_to_batch_dfs
+# -------------------------------------
