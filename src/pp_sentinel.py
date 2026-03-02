@@ -6,6 +6,9 @@ from pathlib import Path
 import tensorflow as tf
 import pandas as pd
 from typing import Generator
+import requests
+import tifffile
+import io
 
 def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """"
@@ -174,7 +177,6 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generato
         This function yields the results rather tahn returning a dataframe to save memory and keeping computer from freezing
     """
     df_sampled = df_sampled.sort_values('date').reset_index(drop = True)
-    dict_df = dict()
     for batch_name, batch_df in batch_dict.items():
         split_indeces = batch_df.get('split_group', None)
         group_dates   = batch_df.get('date',        None)
@@ -187,27 +189,55 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generato
         yield batch_name, df_filtered
 
 
-def fetch_sentinel_data(geom: ee.Geometry, date_str: str) -> np.ndarray: 
+def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict ) -> np.ndarray: 
     """
     Fetches raw pixels from Google Earth Engine (GEE) into RAM.
 
     This function does a cloud to RAM rather than to Disk process. It creates a 5-day 
     median composite to mitigate cloud cover and requests a GeoTIFF 
-    download URL for a specific 12km grid.
-
+    download URL for a specific 12km grid
+ 
     Args:
-        geom_ee (ee.Geometry): The GEE geometry object defining the clip area.
-        date_str (str): The target date (YYYY-MM-DD) for the satellite observation.
+        geom (ee.Geometry): The GEE geometry object defining the clip area
+        date_str (str): The target date (YYYY-MM-DD) for the satellite observation
+        satelite_params (dict): Dictionary containingthe various parameters specifying the specific values for fetching the correct satelite images
+                                
+                                Note:
+                                   All the parameters specifying the details of the satelite images are passed via a dictionary. However, if any of these parameters are emtpy, 
+                                   the function will provide the default values instead 
 
     Returns:
         numpy.ndarray: A raw 3D array  
-        Note: The band order is [B2, B3, B4, B8] (Blue, Green, Red, NIR).
+        Note: The band order is [B2, B3, B4, B8] (Blue, Green, Red, NIR)
 
     Raises:
-        requests.exceptions.RequestException: If the GEE download URL fails to resolve.
-        tifffile.TiffFileError: If the downloaded bytes cannot be parsed as a TIFF.
+        requests.exceptions.RequestException: If the GEE download URL fails to resolve
+        tifffile.TiffFileError: If the downloaded bytes cannot be parsed as a TIFF
     """
-    pass
+    # Extract satelite objects
+    satelite_img    = satelite_params.get('satelite_img',    "COPERNICUS/S2_SR_HARMONIZED")
+    satelite_bands  = satelite_params.get('satelite_bands',  ["B2","B3","B4","B8"])
+    satelite_scale  = satelite_params.get('satelite_scale',  80)
+    satelite_format = satelite_params.get('satelite_format', 'GEO_TIFF')
+    crs             = satelite_params.get('crs',             'EPSG:4326').replace(" ", "")
+
+    # Get satelite img object
+    img = (ee.ImageCollection(satelite_img)
+           .filterBounds(geom)
+           .filterDate(ee.Date(date_str).advance(-5, 'day'),
+                       ee.Date(date_str).advance( 1, 'day'))
+                       .select(satelite_bands)
+                       .median()
+                       .clip(geom)) 
+    url = img.getDownloadURL({'scale' : satelite_scale,
+                              'crs'   : crs.replace(" ",""),
+                              'region': geom,
+                              'format': satelite_format})
+    response = requests.get(url, timeput = 30)
+    response.raise_for_status()
+
+    with io.BytesIO(response.content) as f:
+        return tifffile.imread(f)
 
 def transform_sentinel_data(sentinel_npyarray: np.ndarray):
     """
