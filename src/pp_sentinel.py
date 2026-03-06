@@ -9,6 +9,7 @@ from typing import Generator
 import requests
 import tifffile
 import io
+from skimage.transform import resize
 
 def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """"
@@ -222,24 +223,24 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
     crs             = satelite_params.get('crs',             'EPSG:4326').replace(" ", "")
 
     # Get satelite img object
-    img = (ee.ImageCollection(satelite_img)
-           .filterBounds(geom)
-           .filterDate(ee.Date(date_str).advance(-5, 'day'),
-                       ee.Date(date_str).advance( 1, 'day'))
-                       .select(satelite_bands)
-                       .median()
-                       .clip(geom)) 
-    url = img.getDownloadURL({'scale' : satelite_scale,
-                              'crs'   : crs.replace(" ",""),
-                              'region': geom,
-                              'format': satelite_format})
-    response = requests.get(url, timeput = 30)
+    img      = (ee.ImageCollection(satelite_img)
+                .filterBounds(geom)
+                .filterDate(ee.Date(date_str).advance(-5, 'day'),
+                            ee.Date(date_str).advance( 1, 'day'))
+                            .select(satelite_bands)
+                            .median()
+                            .clip(geom)) 
+    url      = img.getDownloadURL({'scale' : satelite_scale,
+                                   'crs'   : crs.replace(" ",""),
+                                   'region': geom,
+                                   'format': satelite_format})
+    response = requests.get(url, timeout = 30)
     response.raise_for_status()
 
     with io.BytesIO(response.content) as f:
         return tifffile.imread(f)
 
-def transform_sentinel_data(sentinel_npyarray: np.ndarray):
+def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
     """
     Transforms the downloaded raw pixels array into a format that is suitable for CNN processing
     The function replaces all `nan` with `0` values, it organises the order of the bands to `(H, W, 4)`, and resizes the data to 128 x 128
@@ -250,4 +251,59 @@ def transform_sentinel_data(sentinel_npyarray: np.ndarray):
     Returns:
         sentinel_npyarray (np.ndarray): resized and transformed numpy array
     """
-    pass
+    pixel_data = np.nan_to_num(sentinel_npyarray, nan = 0.0)
+    # Adjust axis: Expected format (H, W, 4)
+    if pixel_data.shape[0] == 4:
+        pixel_data = np.moveaxis(pixel_data, 0, -1)
+    elif pixel_data.shape[1] == 4:
+        pixel_data = np.moveaxis(pixel_data, 1, -1)
+    # Resize data
+    pixel_data_resized = resize(pixel_data, (128,128), anti_aliasing = True).astype('float32')
+    return pixel_data_resized
+
+def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str) -> None:
+
+    x = np.array(image_list)
+    y = np.array(label_list)
+    ids = np.array(composite_key_list)
+    fname = f"{batch_name}.npz"
+    fout = Path(os.environ.get('DATA_DIR'))/ 'Sentinel2'/fname
+    np.savez_compressed(fout, x=x, y=y, ids=ids)
+    print(f"\n\t 🎉 Success! Saved {fname} ({x.nbytes / 1e6:.2f}")
+
+def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
+    """
+    Pipeline to fetch, download and save sentinel pixels as numpy arrays
+    """
+    try:
+        ee.Initialize(project = gee_proj_name)
+    except:
+        ee.Authenticate()
+        ee.Initialize(project = gee_proj_name)
+    sentinel_batches = sampled_to_batch(df, batch_size)
+
+    for batch_name, batch_df in sampled_to_batch_dfs(sentinel_batches, df):
+        print("-"*80)
+        print(f"\t📦 STARTING BATCH: {batch_name}")
+        # Generate objects per batch
+        image_list, label_list, composite_key_list = [], [], []
+
+        for row in batch_df.itertuples():
+            i = row.Index
+            try:
+                geom          = ee.Geometry(row.geometry.__geo_interface__)
+                date          = row.date
+                fire_lbl      = row.fire_lbl
+                composite_key = row.composite_key  
+                # Fetch sentinel data
+                sentinel_data = fetch_sentinel_data(geom, date, sentinel_params)
+                sentinel_data = transform_sentinel_data(sentinel_data)
+                # Generate objects to save
+                image_list.append(sentinel_data)
+                label_list.append(fire_lbl)
+                composite_key_list.append(composite_key)
+                print(f"\t✅ Downloaded & Resized {i+1}: sentinel_data.shape")
+            except Exception as e:
+                print(f"\t❌ Error on row {i}: {e}")
+        # Save batch as npz file
+        save_sentinel_nps(image_list, label_list, composite_key_list, batch_name)
