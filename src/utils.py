@@ -148,7 +148,15 @@ def split_df_by_year(df: pd.DataFrame) -> dict:
   Returns:
     - dict: A dictionary containing a each year of the df as keys and the data frames as values
   """
-  return df
+  df_year         = df.copy()
+  df_year['year'] = df['date'].dt.strftime("%Y")
+  unique_years    = set(df_year['year'])
+
+  for y in unique_years:
+    print(y)
+
+  
+  return unique_years
 
 if __name__ == "__main__":
   df_test = pd.DataFrame({'date': pd.to_datetime(['2025-01-01', '2026-01-01', '2027-01-01', '2027-01-01'])})
