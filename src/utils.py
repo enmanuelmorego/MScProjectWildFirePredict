@@ -137,3 +137,19 @@ def save_plots(plot_obj: Figure, plot_title: str, run_id: str) -> None:
   except IOError as e: 
     print(f"❌ ERROR {e}")
   
+def split_df_by_year(df: pd.DataFrame) -> dict:
+  """
+  Function that takes a data frame and splits it into separate dataframes for each year available in the data
+  Each data frame is saved on a dictionary where the `key` values are the corresponding years of the data extract
+  
+  Args:
+    - df (dataframe): A dataframe containing a `date` column
+  
+  Returns:
+    - dict: A dictionary containing a each year of the df as keys and the data frames as values
+  """
+  return df
+
+if __name__ == "__main__":
+  df_test = pd.DataFrame({'date': pd.to_datetime(['2025-01-01', '2026-01-01', '2027-01-01', '2027-01-01'])})
+  print(split_df_by_year(df_test))
