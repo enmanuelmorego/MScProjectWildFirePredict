@@ -25,10 +25,11 @@ DATA_DIR        = os.environ.get("DATA_DIR")
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
 RANDOM_SEED     = 42
 
-VIIRS_DIR              = 'VIIRS'
-FWI_DIR                = 'FWI'
-FIRENOFIRE_SAMPLED_DIR = "SampledFireNoFire"
-SP_FILENAME            ='ukcp18-uk-land-12km.shp'
+VIIRS_DIR                = 'VIIRS'
+FWI_DIR                  = 'FWI'
+FIRENOFIRE_SAMPLED_DIR   = "SampledFireNoFire"
+FIRENOFIRE_SAMPLED_FNAME = "sampled_firenofire.csv"
+SP_FILENAME              ='ukcp18-uk-land-12km.shp'
 
 # --------------------------
 # LOAD DATA
@@ -40,7 +41,7 @@ required_years    = set(YEAR_FILTER) - available_sampled
 df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME, 
                              crs       = CRS)
 if not required_years:
-    df_sampled = ld.load_cached_sampled(YEAR_FILTER, "SampledFireNoFire", "sampled_firenofire.csv")
+    df_sampled = ld.load_cached_sampled(YEAR_FILTER, FIRENOFIRE_SAMPLED_DIR, FIRENOFIRE_SAMPLED_FNAME)
     print("✨ All requested years are already cached. Skipping load_data pipeline...")
 else:
     #region
@@ -136,7 +137,7 @@ else:
     sampled_by_year = u.split_df_by_year(df_sampled)
     output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
     for year, df in sampled_by_year.items():
-        u.df_to_csv(df, f"{year}_sampled_firenofire.csv", str(output_dir))
+        u.df_to_csv(df, f"{year}_{FIRENOFIRE_SAMPLED_FNAME}", str(output_dir))
 
 # Generate sampled value report
 pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
