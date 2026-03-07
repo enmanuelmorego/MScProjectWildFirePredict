@@ -191,6 +191,7 @@ def available_files_by_year(data_directory: str) -> set:
     available_years = [f for f in files if re.search(r".csv$", str(f)) is not None]
     available_years = [re.search(r"\d{4}", str(y)).group() for y in available_years if re.search(r"\d{4}", str(y)) is not None]
     return set(available_years)
+
 if __name__ == "__main__":
   df = pd.DataFrame({'a': [1,2,3,4],
                      'b': [5,6,7,8]})

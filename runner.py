@@ -33,6 +33,9 @@ SP_FILENAME            ='ukcp18-uk-land-12km.shp'
 # --------------------------
 # LOAD DATA
 # --------------------------
+# Get available sampled data
+available_sampled = u.available_files_by_year("SampledFireNoFire")
+
 #region
 # --------------------------
 # VIIRS DATA
