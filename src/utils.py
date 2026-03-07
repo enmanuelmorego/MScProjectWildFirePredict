@@ -187,9 +187,9 @@ def available_files_by_year(data_directory: str) -> set:
       - Set: A set containing the available years
     """
     folder          = Path(os.getenv("DATA_DIR"))/data_directory
-    files           = u.get_filepaths(folder)
+    files           = get_filepaths(folder)
     available_years = [f for f in files if re.search(r".csv$", str(f)) is not None]
-    available_years = [re.search(r"\d{4}", str(y)).group() for y in available_years if re.search(r"\d{4}", str(y)) is not None]
+    available_years = [int(re.search(r"\d{4}", str(y)).group()) for y in available_years if re.search(r"\d{4}", str(y)) is not None]
     return set(available_years)
 
 if __name__ == "__main__":
