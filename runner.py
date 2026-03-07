@@ -24,6 +24,11 @@ DATA_DIR        = os.environ.get("DATA_DIR")
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
 RANDOM_SEED     = 42
 
+VIIRS_DIR              = 'VIIRS'
+FWI_DIR                = 'FWI'
+FIRENOFIRE_SAMPLED_DIR = "SampledFireNoFire"
+SP_FILENAME            ='ukcp18-uk-land-12km.shp'
+
 # --------------------------
 # LOAD DATA
 # --------------------------
@@ -32,7 +37,7 @@ RANDOM_SEED     = 42
 # VIIRS DATA
 # --------------------------
 
-viirs_dict = ld.viirs_load_pipeline(dir_name   = 'VIIRS',
+viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
                                     crs        = CRS,
                                     date_range = YEAR_FILTER)
 df_viirs = viirs_dict.get('df_viirs')
@@ -46,7 +51,7 @@ print(df_viirs.head())
 # --------------------------
 # UK GRID 
 # --------------------------
-df_uk_grid = ld.load_uk_grid(file_name ='ukcp18-uk-land-12km.shp', 
+df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME, 
                              crs       = CRS)
 print(f"{'='*80}")
 print(f"UK Grid")
@@ -80,7 +85,7 @@ print(df_daily_grid.head())
 # -------------------------
 print(f"{'='*80}")
 print(f"🌡️ FIRE WEATHER INDEX")  
-fwi_path    = Path(DATA_DIR)/"FWI"
+fwi_path    = Path(DATA_DIR)/FWI_DIR
 df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path, 
                               df_uk_daily_grid = df_daily_grid,
                               df_uk_grid       = df_uk_grid,
@@ -119,13 +124,13 @@ df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre,
 
 # Store sampled data as csv
 sampled_by_year = u.split_df_by_year(df_sampled)
-output_dir      = Path(os.environ.get("DATA_DIR"))/"SampledFireNoFire"
+output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
 for year, df in sampled_by_year.items():
     u.df_to_csv(df, f"{year}_sampled_firenofire.csv", str(output_dir))
 
 pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
                                 df_uk_grid      = df_uk_grid, 
-                                uk_sp_file_name = 'ukcp18-uk-land-12km.shp',
+                                uk_sp_file_name = SP_FILENAME,
                                 crs             = CRS, 
                                 run_id          = RUN_ID)
 #endregion
