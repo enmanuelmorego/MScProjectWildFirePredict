@@ -20,6 +20,7 @@ from datetime import datetime
 YEAR_FILTER     = [2018,2019]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
+GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
 DATA_DIR        = os.environ.get("DATA_DIR")
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
 RANDOM_SEED     = 42
@@ -90,7 +91,7 @@ df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path,
                               df_uk_daily_grid = df_daily_grid,
                               df_uk_grid       = df_uk_grid,
                               crs              = CRS,
-                              grb_name         = 'Forest fire weather index (as defined by the Canadian Forest Service)')
+                              grb_name         = GRB_NAME)
 print(type(df_fwi['date'].max()))
 print(df_fwi.shape)
 print(df_fwi.head())
