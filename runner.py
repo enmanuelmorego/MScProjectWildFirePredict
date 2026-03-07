@@ -40,10 +40,7 @@ required_years    = set(YEAR_FILTER) - available_sampled
 df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME, 
                              crs       = CRS)
 if not required_years:
-    list_sampled = [pd.read_csv(f"{DATA_DIR}/{FIRENOFIRE_SAMPLED_DIR}/{year}_sampled_firenofire.csv") for year in YEAR_FILTER ]
-    df_sampled   = pd.concat(list_sampled)
-    df_sampled['date'] = pd.to_datetime(df_sampled['date'])
-    df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
+    df_sampled = ld.load_cached_sampled(YEAR_FILTER, "SampledFireNoFire", "sampled_firenofire.csv")
     print("✨ All requested years are already cached. Skipping load_data pipeline...")
 else:
     #region
@@ -140,11 +137,11 @@ else:
     output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
     for year, df in sampled_by_year.items():
         u.df_to_csv(df, f"{year}_sampled_firenofire.csv", str(output_dir))
-print(df_sampled.dtypes)
+
+# Generate sampled value report
 pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
                                 df_uk_grid      = df_uk_grid, 
                                 uk_sp_file_name = SP_FILENAME,
                                 crs             = CRS, 
                                 run_id          = RUN_ID)
-    #endregion
 

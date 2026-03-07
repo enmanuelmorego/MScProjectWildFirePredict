@@ -661,7 +661,24 @@ def fwi_load_pipeline(fwi_path: Path,
   df_fwi["date"] = pd.to_datetime(df_fwi["date"])
   return df_fwi
 
+def load_cached_sampled(years: list, data_dir: str, file_name: str) -> pd.DataFrame:
+  """
+  Function to load the cached sampled data for the requested years
+  
+  Args:
+    - year (list): List containing the required years for data processing
+    - data_dir (str): Folder name containing the required data
+    - file_name (str): Name of the file to fetch
 
+  Returns:
+    - df: SAmpled dataframe 
+  """
+  parent_data_dir       = os.getenv("DATA_DIR")
+  list_sampled          = [pd.read_csv(f"{parent_data_dir}/{data_dir}/{year}_{file_name}") for year in years ]
+  df_sampled            = pd.concat(list_sampled)
+  df_sampled['date']    = pd.to_datetime(df_sampled['date'])
+  df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
+  return df_sampled
 
 
 
@@ -670,12 +687,3 @@ if __name__ == "__main__":
     import config as c
     DATA_DIR = os.environ.get("DATA_DIR")
     CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
-
-
-    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
-    df_uk_grid = pd.DataFrame({'date': dates})
-
-
-    fwi_p    = Path(DATA_DIR)/"FWI"
-    f = fwi_load_pipeline(fwi_p, df_uk_grid)
-    print(f)
