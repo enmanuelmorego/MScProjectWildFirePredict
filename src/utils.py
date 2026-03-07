@@ -151,12 +151,12 @@ def split_df_by_year(df: pd.DataFrame) -> dict:
   df_year         = df.copy()
   df_year['year'] = df['date'].dt.strftime("%Y")
   unique_years    = set(df_year['year'])
-
+  out_dict        = dict()
   for y in unique_years:
-    print(y)
-
-  
-  return unique_years
+    df_subset   = df_year[df_year['year'] == y].copy()
+    df_subset   = df_subset.drop(columns = ['year'])
+    out_dict[y] = df_subset
+  return out_dict
 
 if __name__ == "__main__":
   df_test = pd.DataFrame({'date': pd.to_datetime(['2025-01-01', '2026-01-01', '2027-01-01', '2027-01-01'])})
