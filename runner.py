@@ -34,108 +34,117 @@ SP_FILENAME            ='ukcp18-uk-land-12km.shp'
 # LOAD DATA
 # --------------------------
 # Get available sampled data
-available_sampled = u.available_files_by_year("SampledFireNoFire")
-
-#region
-# --------------------------
-# VIIRS DATA
-# --------------------------
-
-viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
-                                    crs        = CRS,
-                                    date_range = YEAR_FILTER)
-df_viirs = viirs_dict.get('df_viirs')
-print(f"{'='*80}")
-print(f"🔥 VIIRS Data")
-print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")
-print(f"\tData Type: {type(df_viirs)}")
-print(f"\t📅 Date Range: {df_viirs['date'].min()} to {df_viirs['date'].max()}")
-print(df_viirs.head())
-
-# --------------------------
-# UK GRID 
-# --------------------------
+available_sampled = u.available_files_by_year(FIRENOFIRE_SAMPLED_DIR)
+required_years    = set(YEAR_FILTER) - available_sampled
+# Load df_uk_grid for reporting values
 df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME, 
                              crs       = CRS)
-print(f"{'='*80}")
-print(f"UK Grid")
-print(f"Columns: \n\t{df_uk_grid.columns}")
-print(f"Shape: \n\t{df_uk_grid.shape}")
-print(df_uk_grid.head())
+if not required_years:
+    list_sampled = [pd.read_csv(f"{DATA_DIR}/{FIRENOFIRE_SAMPLED_DIR}/{year}_sampled_firenofire.csv") for year in YEAR_FILTER ]
+    df_sampled   = pd.concat(list_sampled)
+    df_sampled['date'] = pd.to_datetime(df_sampled['date'])
+    df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
+    print("✨ All requested years are already cached. Skipping load_data pipeline...")
+else:
+    #region
+    # --------------------------
+    # VIIRS DATA
+    # --------------------------
 
-# Grids by Day
-print(f"{'='*80}")
-print(f"🇬🇧 UK Grid Daily")
-df_daily_grid = ld.uk_grid_data_pipeline(df_uk_grid, df_viirs)
-print(f"Daily UK Grid Columns: \n\t{df_daily_grid.columns}")
-print(type(df_daily_grid['date'][0]))
-print(f"Shape: \n\t{df_daily_grid.shape}")
-print(df_daily_grid.head())
+    viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
+                                        crs        = CRS,
+                                        date_range = YEAR_FILTER)
+    df_viirs = viirs_dict.get('df_viirs')
+    print(f"{'='*80}")
+    print(f"🔥 VIIRS Data")
+    print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")
+    print(f"\tData Type: {type(df_viirs)}")
+    print(f"\t📅 Date Range: {df_viirs['date'].min()} to {df_viirs['date'].max()}")
+    print(df_viirs.head())
 
-# -------------------------
-# GOOGLE EE SENTINEL-2
-# -------------------------
-# print(f"{'='*80}")
-# print(f"🛰️ GOOGLE EE SENTINEL-2")  
-# # Get stored files 
-# sentinel_path  = Path(DATA_DIR)/"sentinel2"
-# df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
-#                                         df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
-#                                         SATELITE_IMAGES)
-# print(df_sentinel.head())
+    # --------------------------
+    # UK GRID 
+    # --------------------------
+  
+    print(f"{'='*80}")
+    print(f"UK Grid")
+    print(f"Columns: \n\t{df_uk_grid.columns}")
+    print(f"Shape: \n\t{df_uk_grid.shape}")
+    print(df_uk_grid.head())
 
-# -------------------------
-# FIRE WEATHER INDEX 
-# -------------------------
-print(f"{'='*80}")
-print(f"🌡️ FIRE WEATHER INDEX")  
-fwi_path    = Path(DATA_DIR)/FWI_DIR
-df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path, 
-                              df_uk_daily_grid = df_daily_grid,
-                              df_uk_grid       = df_uk_grid,
-                              crs              = CRS,
-                              grb_name         = GRB_NAME)
-print(type(df_fwi['date'].max()))
-print(df_fwi.shape)
-print(df_fwi.head())
+    # Grids by Day
+    print(f"{'='*80}")
+    print(f"🇬🇧 UK Grid Daily")
+    df_daily_grid = ld.uk_grid_data_pipeline(df_uk_grid, df_viirs)
+    print(f"Daily UK Grid Columns: \n\t{df_daily_grid.columns}")
+    print(type(df_daily_grid['date'][0]))
+    print(f"Shape: \n\t{df_daily_grid.shape}")
+    print(df_daily_grid.head())
 
-#endregion
+    # -------------------------
+    # GOOGLE EE SENTINEL-2
+    # -------------------------
+    # print(f"{'='*80}")
+    # print(f"🛰️ GOOGLE EE SENTINEL-2")  
+    # # Get stored files 
+    # sentinel_path  = Path(DATA_DIR)/"sentinel2"
+    # df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
+    #                                         df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
+    #                                         SATELITE_IMAGES)
+    # print(df_sentinel.head())
 
-# --------------------------
-# PRE PROCESSING
-# --------------------------
-#region
-print(f"{'='*80}")
-print(f"🏗️ PRE PROCESSING")  
+    # -------------------------
+    # FIRE WEATHER INDEX 
+    # -------------------------
+    print(f"{'='*80}")
+    print(f"🌡️ FIRE WEATHER INDEX")  
+    fwi_path    = Path(DATA_DIR)/FWI_DIR
+    df_fwi = ld.fwi_load_pipeline(fwi_path         = fwi_path, 
+                                df_uk_daily_grid = df_daily_grid,
+                                df_uk_grid       = df_uk_grid,
+                                crs              = CRS,
+                                grb_name         = GRB_NAME)
+    print(type(df_fwi['date'].max()))
+    print(df_fwi.shape)
+    print(df_fwi.head())
 
-dfs_loaded = {'df_viirs'     : df_viirs,
-              'df_uk_grid'   : df_uk_grid,
-              'df_daily_grid': df_daily_grid,
-              'df_fwi'       : df_fwi}
-df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
-#endregion
+    #endregion
 
-# --------------------------
-# SAMPLING FIRE/NOFIRE
-# --------------------------
-#region
-print(f"{'='*80}")
-print(f"🔬 SAMPLING FIRE/NOFIRE")  
-df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre, 
-                                   nofire_proximity_window_days = 30, 
-                                   nofire_total_samples         = 3,
-                                   random_seed                  = RANDOM_SEED)
+    # --------------------------
+    # PRE PROCESSING
+    # --------------------------
+    #region
+    print(f"{'='*80}")
+    print(f"🏗️ PRE PROCESSING")  
 
-# Store sampled data as csv
-sampled_by_year = u.split_df_by_year(df_sampled)
-output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
-for year, df in sampled_by_year.items():
-    u.df_to_csv(df, f"{year}_sampled_firenofire.csv", str(output_dir))
+    dfs_loaded = {'df_viirs'     : df_viirs,
+                'df_uk_grid'   : df_uk_grid,
+                'df_daily_grid': df_daily_grid,
+                'df_fwi'       : df_fwi}
+    df_model_pre = pps.preprocessing_pipeline(dfs_loaded, RUN_ID)
+    #endregion
 
+    # --------------------------
+    # SAMPLING FIRE/NOFIRE
+    # --------------------------
+    #region
+    print(f"{'='*80}")
+    print(f"🔬 SAMPLING FIRE/NOFIRE")  
+    df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre, 
+                                    nofire_proximity_window_days = 30, 
+                                    nofire_total_samples         = 3,
+                                    random_seed                  = RANDOM_SEED)
+
+    # Store sampled data as csv
+    sampled_by_year = u.split_df_by_year(df_sampled)
+    output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
+    for year, df in sampled_by_year.items():
+        u.df_to_csv(df, f"{year}_sampled_firenofire.csv", str(output_dir))
+print(df_sampled.dtypes)
 pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
                                 df_uk_grid      = df_uk_grid, 
                                 uk_sp_file_name = SP_FILENAME,
                                 crs             = CRS, 
                                 run_id          = RUN_ID)
-#endregion
+    #endregion
 

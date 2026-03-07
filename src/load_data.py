@@ -664,6 +664,7 @@ def fwi_load_pipeline(fwi_path: Path,
 
 
 
+
 if __name__ == "__main__":
     os.environ.setdefault("RUN_DEMO", "ON")
     import config as c
