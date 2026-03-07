@@ -157,3 +157,28 @@ def split_df_by_year(df: pd.DataFrame) -> dict:
     df_subset   = df_subset.drop(columns = ['year'])
     out_dict[y] = df_subset
   return out_dict
+
+def df_to_csv(df: pd.DataFrame, file_name: str, directory: str) -> None:
+  """
+  Function that takes a dataframe along with the relevant parameters and saves the df as a `csv` 
+
+  Args:
+    - df (pd.DataFrame): Dataframe to save as csv
+    - file_name(str): A string value containing the name of the file
+    - directory (str): Name of the directory to save the file at
+
+  Returns: 
+    - None
+  """
+  os.makedirs(directory, exist_ok = True)
+  fout = Path(directory)/file_name
+  df.to_csv(fout, index = False)
+  print(f"✅ Succesfully saved {fout}")
+
+if __name__ == "__main__":
+  df = pd.DataFrame({'a': [1,2,3,4],
+                     'b': [5,6,7,8]})
+  df_to_csv(df, 
+            'TEST_sampledfirenofire.csv',
+            "data/SampledFireNoFire")
+            #Path(os.environ.get("DATA_DIR"))/"SampledFireNoFire")

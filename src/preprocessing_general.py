@@ -8,6 +8,8 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
+from pathlib import Path
+import os
 
 def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """

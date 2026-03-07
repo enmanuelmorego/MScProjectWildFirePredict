@@ -116,6 +116,13 @@ df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre,
                                    nofire_proximity_window_days = 30, 
                                    nofire_total_samples         = 3,
                                    random_seed                  = RANDOM_SEED)
+
+# Store sampled data as csv
+sampled_by_year = u.split_df_by_year(df_sampled)
+output_dir      = Path(os.environ.get("DATA_DIR"))/"SampledFireNoFire"
+for year, df in sampled_by_year.items():
+    u.df_to_csv(df, f"{year}_sampled_firenofire.csv", str(output_dir))
+
 pps.sampling_reporting_pipeline(df_plot         = df_sampled, 
                                 df_uk_grid      = df_uk_grid, 
                                 uk_sp_file_name = 'ukcp18-uk-land-12km.shp',
