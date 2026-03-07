@@ -175,6 +175,22 @@ def df_to_csv(df: pd.DataFrame, file_name: str, directory: str) -> None:
   df.to_csv(fout, index = False)
   print(f"✅ Succesfully saved {fout}")
 
+def available_files_by_year(data_directory: str) -> set:
+    """
+    Function to get the available data from a given directory containing yearly data.
+    It returns a set of years which can be compared with the YEAR input to check whether data download is required or not
+
+    Args:
+      - data_directory(str): A string containg the specific data directory of the required data
+
+    Returns:
+      - Set: A set containing the available years
+    """
+    folder          = Path(os.getenv("DATA_DIR"))/data_directory
+    files           = u.get_filepaths(folder)
+    available_years = [f for f in files if re.search(r".csv$", str(f)) is not None]
+    available_years = [re.search(r"\d{4}", str(y)).group() for y in available_years if re.search(r"\d{4}", str(y)) is not None]
+    return set(available_years)
 if __name__ == "__main__":
   df = pd.DataFrame({'a': [1,2,3,4],
                      'b': [5,6,7,8]})
