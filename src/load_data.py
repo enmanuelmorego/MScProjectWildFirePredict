@@ -458,34 +458,28 @@ def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
     out_file_path = Path(fwi_data_dir)/fname
 
     dataset = "cems-fire-historical-v1"
-    request = {
-        "product_type": "reanalysis",
-        "variable": ["fire_weather_index"],
-        "dataset_type": "consolidated_dataset",
-        "system_version": ["4_1"],
-        "year": [y],
-        "month": [
-            "01", "02", "03",
-            "04", "05", "06",
-            "07", "08", "09",
-            "10", "11", "12"
-        ],
-        "day": [
-            "01", "02", "03",
-            "04", "05", "06",
-            "07", "08", "09",
-            "10", "11", "12",
-            "13", "14", "15",
-            "16", "17", "18",
-            "19", "20", "21",
-            "22", "23", "24",
-            "25", "26", "27",
-            "28", "29", "30",
-            "31"
-        ],
-        "grid": "original_grid",
-        "data_format": "grib"
-    }
+    request = {"product_type"  : "reanalysis",
+               "variable"      : ["fire_weather_index"],
+               "dataset_type"  : "consolidated_dataset",
+               "system_version": ["4_1"],
+               "year"          : [y],
+               "month"         : ["01", "02", "03",
+                                  "04", "05", "06",
+                                  "07", "08", "09",
+                                  "10", "11", "12"],
+               "day"           : ["01", "02", "03",
+                                  "04", "05", "06",
+                                  "07", "08", "09",
+                                  "10", "11", "12",
+                                  "13", "14", "15",
+                                  "16", "17", "18",
+                                  "19", "20", "21",
+                                  "22", "23", "24",
+                                  "25", "26", "27",
+                                  "28", "29", "30",
+                                  "31"],
+               "grid"          : "original_grid",
+               "data_format"   : "grib"}
 
     client = cdsapi.Client()
     client.retrieve(dataset, request, out_file_path.as_posix())
