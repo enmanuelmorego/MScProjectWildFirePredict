@@ -10,6 +10,9 @@ import requests
 import tifffile
 import io
 from skimage.transform import resize
+import utils as u
+from datetime import datetime 
+import re
 
 def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """"
@@ -270,6 +273,33 @@ def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: li
     fout = Path(os.environ.get('DATA_DIR'))/ 'Sentinel2'/fname
     np.savez_compressed(fout, x=x, y=y, ids=ids)
     print(f"\n\t 🎉 Success! Saved {fname} ({x.nbytes / 1e6:.2f}")
+
+def fetch_available_sentinel_ranges(data_folder = "Sentinel2", file_extension = ".npz") -> list:
+    """
+    Function that finds all available `np` sentinel data in local disk, and extracts the date period covered by the already existing data
+    Arguments are provided, but populated with default values 
+
+    Args:
+        - data_folder(str = Sentinel2): Folder name of the location where the Sentinel2 data is stored
+        - file_extension(str = .npz): File extension to identify the relevany file types
+
+    Returns:
+        - list: List containing tuples of the date ranges covered by the existing data
+        
+        Example:
+            list = [('2025-01-01','2025-01-02'), ('2025-02-01','2025-02-02')]
+    """
+    # Get the full file names from directory
+    files       = u.get_filepaths(data_folder)
+    # Keep only the relevant file types
+    files       = [f for f in files if re.search(file_extension, str(f)) is not None]
+    date_ranges = []
+    for f in files:
+        date_range = re.findall(r"\d{8}", str(f))
+        date_min   = datetime.strptime(str(date_range[0]), "%Y%m%d")
+        date_max   = datetime.strptime(str(date_range[1]), "%Y%m%d")   
+        date_ranges.append((date_min, date_max))
+    return date_ranges
 
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
     """
