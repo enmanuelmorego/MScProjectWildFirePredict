@@ -175,20 +175,22 @@ def df_to_csv(df: pd.DataFrame, file_name: str, directory: str) -> None:
   df.to_csv(fout, index = False)
   print(f"✅ Succesfully saved {fout}")
 
-def available_files_by_year(data_directory: str) -> set:
+def available_files_by_year(data_directory: str, file_type: str) -> set:
     """
     Function to get the available data from a given directory containing yearly data.
     It returns a set of years which can be compared with the YEAR input to check whether data download is required or not
 
     Args:
       - data_directory(str): A string containg the specific data directory of the required data
+      - file_type(str): A string containing the file extension that determines the type of files to search for in the directory
 
     Returns:
       - Set: A set containing the available years
     """
     folder          = Path(os.getenv("DATA_DIR"))/data_directory
     files           = get_filepaths(folder)
-    available_years = [f for f in files if re.search(r".csv$", str(f)) is not None]
+    file_extension  = f"{file_type}$"
+    available_years = [f for f in files if re.search(file_extension, str(f)) is not None]
     available_years = [int(re.search(r"\d{4}", str(y)).group()) for y in available_years if re.search(r"\d{4}", str(y)) is not None]
     return set(available_years)
 

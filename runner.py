@@ -35,12 +35,12 @@ SP_FILENAME              ='ukcp18-uk-land-12km.shp'
 # LOAD DATA
 # --------------------------
 # Get available sampled data
-available_sampled = u.available_files_by_year(FIRENOFIRE_SAMPLED_DIR)
-required_years    = set(YEAR_FILTER) - available_sampled
+sampled_available      = u.available_files_by_year(FIRENOFIRE_SAMPLED_DIR, ".csv")
+sampled_required_years = set(YEAR_FILTER) - sampled_available
 # Load df_uk_grid for reporting values
 df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME, 
                              crs       = CRS)
-if not required_years:
+if not sampled_required_years:
     df_sampled = ld.load_cached_sampled(YEAR_FILTER, FIRENOFIRE_SAMPLED_DIR, FIRENOFIRE_SAMPLED_FNAME)
     print("✨ All requested years are already cached. Skipping load_data pipeline...")
 else:
@@ -48,7 +48,6 @@ else:
     # --------------------------
     # VIIRS DATA
     # --------------------------
-
     viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
                                         crs        = CRS,
                                         date_range = YEAR_FILTER)
@@ -63,7 +62,6 @@ else:
     # --------------------------
     # UK GRID 
     # --------------------------
-  
     print(f"{'='*80}")
     print(f"UK Grid")
     print(f"Columns: \n\t{df_uk_grid.columns}")
@@ -145,4 +143,7 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
                                 uk_sp_file_name = SP_FILENAME,
                                 crs             = CRS, 
                                 run_id          = RUN_ID)
-
+# --------------------------
+# SENTINEL DATA
+# --------------------------
+sentinel_available      = u.available_files_by_year(FIRENOFIRE_SAMPLED_DIR)
