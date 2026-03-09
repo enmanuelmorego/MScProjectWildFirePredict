@@ -274,9 +274,9 @@ def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: li
     np.savez_compressed(fout, x=x, y=y, composite_key=ids)
     print(f"\n\t 🎉 Success! Saved {fname} ({x.nbytes / 1e6:.2f}")
 
-def fetch_available_sentinel_ranges(data_folder: str = "Sentinel2", file_extension: str = ".npz") -> list:
+def fetch_available_sentinel_files(data_folder: str = "Sentinel2", file_extension: str = ".npz") -> list:
     """
-    Function that finds all available `np` sentinel data in local disk, and extracts the date period covered by the already existing data
+    Function that finds all available `np` sentinel data in local disk
     Arguments are provided, but populated with default values 
 
     Args:
@@ -284,10 +284,8 @@ def fetch_available_sentinel_ranges(data_folder: str = "Sentinel2", file_extensi
         - file_extension(str = .npz): File extension to identify the relevany file types
 
     Returns:
-        - list: List containing tuples of the date ranges covered by the existing data
+        - list: List containing the full file paths of all available sentinel files
         
-        Example:
-            list = [('2025-01-01','2025-01-02'), ('2025-02-01','2025-02-02')]
     """
     # Get the full file names from directory
     files       = u.get_filepaths(data_folder)
