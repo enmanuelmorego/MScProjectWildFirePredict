@@ -169,6 +169,6 @@ else:
     ppsent.sentinel_download_pipeline(df              = df_sentinel_required,
                                       gee_proj_name   = GEE_PROJECT,
                                       sentinel_params = sentinel_parameters,
-                                      batch_size      = 50)
+                                      batch_size      = 10)
 
 

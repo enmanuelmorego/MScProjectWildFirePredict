@@ -73,7 +73,7 @@ def close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
 
     return results, batch_num
 
-def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
+def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
 
@@ -96,6 +96,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
 
     Args:
         - df_sampled (df): Data frame containing the sampled data, preprocessed
+        - next_batch_num (int): Batch number value to act as the starting point. Takes into account existing batches on disk
         - batch_size (int): Set to 800 as max as default. But can be adjusted if needed
 
     Raises:
@@ -126,7 +127,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, batch_size: int = 800) -> dict:
     df_batches = df_batches.sort_values('date').reset_index(drop = True)
     # Generate counts for each date object 
     df_batches   = df_batches.groupby('date')['date'].count().reset_index(name = "count")
-    batch_num    = 0
+    batch_num    = next_batch_num
     groups_dict  = dict()
     group_buffer = []
 
@@ -329,11 +330,11 @@ def find_required_sentinel_from_sampled(df_sampled: pd.DataFrame, sentinel_compo
     df_samp['composite_key'] = df_samp['composite_key'].astype(str)
     df_sent['composite_key'] = df_sent['composite_key'].astype(str)
 
-    df_pending = df_samp.merge(df_sent, on = 'composite_key', how = 'left', indicator = True)
-    df_pending = df_pending[df_pending['_merge'] == 'left_only']
-    df_pending = df_pending.drop(columns = ['_merge'])
+    df_pending         = df_samp.merge(df_sent, on = 'composite_key', how = 'left', indicator = True)
+    df_pending         = df_pending[df_pending['_merge'] == 'left_only']
+    df_pending         = df_pending.drop(columns = ['_merge'])
     df_pending['date'] = pd.to_datetime(df_pending['date'])
-    df_pending = df_pending.sort_values(by = ['date', 'grid_id']).reset_index(drop = True)
+    df_pending         = df_pending.sort_values(by = ['date', 'grid_id']).reset_index(drop = True)
 
     return df_pending
 
@@ -351,6 +352,25 @@ def required_sentinel_pipeline(df_sampled):
     df_sentinel_required = find_required_sentinel_from_sampled(df_sampled, sentinel_comp_keys)
     return df_sentinel_required
 
+def fetch_max_batch_num():
+    """
+    Function that fetches the max batch number existing on disk
+    If there is no files available, then the function returns 1 to be used as the first batch, 
+    Else, +1 is added to the latest existing batch to avoid duplication of batches
+
+    Returns:
+        int: An integer, representing the max batch number value + 1, as this will be the starting value for the next batch
+    """
+    files     = fetch_available_sentinel_files()
+    max_batch = 0
+    for f in files:
+        batch_str = re.search(r"[B]\d{3}", str(f)).group()
+        batch_int = int(batch_str[1:])
+        if batch_int > max_batch:
+            max_batch = batch_int
+    max_batch = int(max_batch) + 1
+    return max_batch 
+
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
     """
     Pipeline to fetch, download and save sentinel pixels as numpy arrays
@@ -360,7 +380,8 @@ def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_pa
     except:
         ee.Authenticate()
         ee.Initialize(project = gee_proj_name)
-    sentinel_batches = sampled_to_batch(df, batch_size)
+    sentinel_max_batch_num = fetch_max_batch_num()
+    sentinel_batches       = sampled_to_batch(df, sentinel_max_batch_num, batch_size)
 
     for batch_name, batch_df in sampled_to_batch_dfs(sentinel_batches, df):
         print("-"*80)
