@@ -336,6 +336,15 @@ def find_required_sentinel_from_sampled(df_sampled: pd.DataFrame, sentinel_compo
 
     return df_pending
 
+def required_sentinel_pipeline(df_sampled):
+    """
+    Wrapper function to find the rows that require sentinel2 download based on the input sampled data
+    """
+    sentinel_available   = fetch_available_sentinel_files()
+    sentinel_comp_keys   = load_sentinel_composite_keys(sentinel_available)
+    df_sentinel_required = find_required_sentinel_from_sampled(df_sampled, sentinel_comp_keys)
+    return df_sentinel_required
+
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
     """
     Pipeline to fetch, download and save sentinel pixels as numpy arrays

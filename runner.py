@@ -21,6 +21,8 @@ from datetime import datetime
 YEAR_FILTER     = [2018]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELLITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"
+SATELLITE_BANDS = ["B2","B3","B4","B8"]
+SATELLITE_SCALE = 80
 GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
 DATA_DIR        = os.environ.get("DATA_DIR")
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
@@ -31,6 +33,7 @@ FWI_DIR                  = 'FWI'
 FIRENOFIRE_SAMPLED_DIR   = "SampledFireNoFire"
 FIRENOFIRE_SAMPLED_FNAME = "sampled_firenofire.csv"
 SP_FILENAME              ='ukcp18-uk-land-12km.shp'
+GEE_PROJECT              = "ee-enmanuelmorego"
 
 # --------------------------
 # LOAD DATA
@@ -147,8 +150,20 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # --------------------------
 # SENTINEL DATA
 # --------------------------
-print(f"{'='*80}")
-print(f"🛰️ GOOGLE EE SENTINEL-2")  
-sentinel_available = ppsent.fetch_available_sentinel_files()
-sentinel_comp_keys = ppsent.load_sentinel_composite_keys(sentinel_available)
-print(sentinel_comp_keys.head())
+df_sentinel_required = ppsent.required_sentinel_pipeline(df_sampled)
+if df_sentinel_required.empty:
+    print("✨ All requested years are already cached. Skipping sentinel2_download pipeline...")
+else:
+    print(f"{'='*80}")
+    print(f"🛰️ GOOGLE EE SENTINEL-2")  
+    sentinel_parameters = {'satelite_img'   : SATELLITE_IMAGES,
+                           'satelite_bands' : SATELLITE_BANDS,
+                           'satelite_scale' : SATELLITE_SCALE,
+                           'satelite_format' :'GEO_TIFF',
+                           'crs'            : CRS}
+    ppsent.sentinel_download_pipeline(df               = df_sentinel_required,
+                                      gee_project_name = GEE_PROJECT,
+                                      sentinel_params  = sentinel_parameters,
+                                      batch_size       = 800)
+
+
