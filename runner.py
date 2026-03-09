@@ -147,5 +147,7 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # --------------------------
 # SENTINEL DATA
 # --------------------------
+print(f"{'='*80}")
+print(f"🛰️ GOOGLE EE SENTINEL-2")  
 sentinel_available      = ppsent.fetch_available_sentinel_files()
 print(sentinel_available)
