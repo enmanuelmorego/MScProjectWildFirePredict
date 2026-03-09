@@ -669,6 +669,7 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) ->
     - year (list): List containing the required years for data processing
     - data_dir (str): Folder name containing the required data
     - file_name (str): Name of the file to fetch
+    - crs (str): Reference system of the project
 
   Returns:
     - df: Sampled dataframe 
@@ -690,4 +691,4 @@ if __name__ == "__main__":
     os.environ.setdefault("RUN_DEMO", "ON")
     import config as c
     DATA_DIR = os.environ.get("DATA_DIR")
-    CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
+    CRS             = "EPSG: 4326"          # Set  Reference System (CRS) so it is uniform across all data inputs

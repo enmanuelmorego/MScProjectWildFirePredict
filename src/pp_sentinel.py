@@ -305,8 +305,7 @@ def load_sentinel_composite_keys(sentinel_files: list) -> pd.DataFrame:
     sentinel_data_list = []
     for f in sentinel_files:
         data = np.load(f)
-        #TODO change id for composite_key once re ran sentiel fetchinf
-        sentinel_data_list.append(data['ids'])
+        sentinel_data_list.append(data['composite_key'])
 
     combined_ids = np.concatenate(sentinel_data_list)
     df           = pd.DataFrame(combined_ids, columns = ['composite_key'])
@@ -333,6 +332,8 @@ def find_required_sentinel_from_sampled(df_sampled: pd.DataFrame, sentinel_compo
     df_pending = df_samp.merge(df_sent, on = 'composite_key', how = 'left', indicator = True)
     df_pending = df_pending[df_pending['_merge'] == 'left_only']
     df_pending = df_pending.drop(columns = ['_merge'])
+    df_pending['date'] = pd.to_datetime(df_pending['date'])
+    df_pending = df_pending.sort_values(by = ['date', 'grid_id']).reset_index(drop = True)
 
     return df_pending
 
@@ -343,6 +344,8 @@ def required_sentinel_pipeline(df_sampled):
     sentinel_available   = fetch_available_sentinel_files()
     if not sentinel_available:
         # Return df_sampled as all are required
+        df_sampled['date'] = pd.to_datetime(df_sampled['date'])
+        df_sampled = df_sampled.sort_values(by = ['date', 'grid_id']).reset_index(drop = True)
         return df_sampled
     sentinel_comp_keys   = load_sentinel_composite_keys(sentinel_available)
     df_sentinel_required = find_required_sentinel_from_sampled(df_sampled, sentinel_comp_keys)

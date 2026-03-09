@@ -45,7 +45,7 @@ sampled_required_years = set(YEAR_FILTER) - sampled_available
 df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME, 
                              crs       = CRS)
 if not sampled_required_years:
-    df_sampled = ld.load_cached_sampled(YEAR_FILTER, FIRENOFIRE_SAMPLED_DIR, FIRENOFIRE_SAMPLED_FNAME)
+    df_sampled = ld.load_cached_sampled(YEAR_FILTER, FIRENOFIRE_SAMPLED_DIR, FIRENOFIRE_SAMPLED_FNAME, CRS)
     print("✨ All requested years are already cached. Skipping [load_data_pipeline]...")
 else:
     #region
@@ -151,7 +151,11 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # SENTINEL DATA
 # --------------------------
 df_sentinel_required = ppsent.required_sentinel_pipeline(df_sampled)
-
+# print("HEAD====")
+# print(df_sentinel_required[['date_dv','grid_id_dv','fire_lbl_dv','bridge_composite_key_dv','date','viirs_n','composite_key']].head())
+# print(f"Row 799")
+# print()
+# input()
 if df_sentinel_required.empty:
     print("✨ All requested years are already cached. Skipping [sentinel_download_pipeline]...")
 else:
@@ -165,6 +169,6 @@ else:
     ppsent.sentinel_download_pipeline(df              = df_sentinel_required,
                                       gee_proj_name   = GEE_PROJECT,
                                       sentinel_params = sentinel_parameters,
-                                      batch_size      = 800)
+                                      batch_size      = 50)
 
 
