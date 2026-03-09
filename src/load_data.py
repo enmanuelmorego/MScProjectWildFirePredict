@@ -671,13 +671,14 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str) -> pd.DataFr
     - file_name (str): Name of the file to fetch
 
   Returns:
-    - df: SAmpled dataframe 
+    - df: Sampled dataframe 
   """
   parent_data_dir       = os.getenv("DATA_DIR")
   list_sampled          = [pd.read_csv(f"{parent_data_dir}/{data_dir}/{year}_{file_name}") for year in years ]
   df_sampled            = pd.concat(list_sampled)
   df_sampled['date']    = pd.to_datetime(df_sampled['date'])
   df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
+
   return df_sampled
 
 

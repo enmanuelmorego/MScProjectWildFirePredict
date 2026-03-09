@@ -46,7 +46,7 @@ df_uk_grid = ld.load_uk_grid(file_name = SP_FILENAME,
                              crs       = CRS)
 if not sampled_required_years:
     df_sampled = ld.load_cached_sampled(YEAR_FILTER, FIRENOFIRE_SAMPLED_DIR, FIRENOFIRE_SAMPLED_FNAME)
-    print("✨ All requested years are already cached. Skipping load_data pipeline...")
+    print("✨ All requested years are already cached. Skipping [load_data_pipeline]...")
 else:
     #region
     # --------------------------
@@ -131,9 +131,9 @@ else:
     print(f"{'='*80}")
     print(f"🔬 SAMPLING FIRE/NOFIRE")  
     df_sampled = pps.sampling_pipeline(df_preprocessed              = df_model_pre, 
-                                    nofire_proximity_window_days = 30, 
-                                    nofire_total_samples         = 3,
-                                    random_seed                  = RANDOM_SEED)
+                                       nofire_proximity_window_days = 30, 
+                                       nofire_total_samples         = 3,
+                                       random_seed                  = RANDOM_SEED)
 
     # Store sampled data as csv
     sampled_by_year = u.split_df_by_year(df_sampled)
@@ -151,19 +151,20 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # SENTINEL DATA
 # --------------------------
 df_sentinel_required = ppsent.required_sentinel_pipeline(df_sampled)
+
 if df_sentinel_required.empty:
-    print("✨ All requested years are already cached. Skipping sentinel2_download pipeline...")
+    print("✨ All requested years are already cached. Skipping [sentinel_download_pipeline]...")
 else:
     print(f"{'='*80}")
     print(f"🛰️ GOOGLE EE SENTINEL-2")  
-    sentinel_parameters = {'satelite_img'   : SATELLITE_IMAGES,
-                           'satelite_bands' : SATELLITE_BANDS,
-                           'satelite_scale' : SATELLITE_SCALE,
+    sentinel_parameters = {'satelite_img'    : SATELLITE_IMAGES,
+                           'satelite_bands'  : SATELLITE_BANDS,
+                           'satelite_scale'  : SATELLITE_SCALE,
                            'satelite_format' :'GEO_TIFF',
-                           'crs'            : CRS}
-    ppsent.sentinel_download_pipeline(df               = df_sentinel_required,
-                                      gee_project_name = GEE_PROJECT,
-                                      sentinel_params  = sentinel_parameters,
-                                      batch_size       = 800)
+                           'crs'             : CRS}
+    ppsent.sentinel_download_pipeline(df              = df_sentinel_required,
+                                      gee_proj_name   = GEE_PROJECT,
+                                      sentinel_params = sentinel_parameters,
+                                      batch_size      = 800)
 
 

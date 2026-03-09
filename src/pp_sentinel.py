@@ -341,6 +341,9 @@ def required_sentinel_pipeline(df_sampled):
     Wrapper function to find the rows that require sentinel2 download based on the input sampled data
     """
     sentinel_available   = fetch_available_sentinel_files()
+    if not sentinel_available:
+        # Return df_sampled as all are required
+        return df_sampled
     sentinel_comp_keys   = load_sentinel_composite_keys(sentinel_available)
     df_sentinel_required = find_required_sentinel_from_sampled(df_sampled, sentinel_comp_keys)
     return df_sentinel_required
