@@ -266,12 +266,12 @@ def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
 
 def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str) -> None:
 
-    x = np.array(image_list)
-    y = np.array(label_list)
-    ids = np.array(composite_key_list)
+    x     = np.array(image_list)
+    y     = np.array(label_list)
+    ids   = np.array(composite_key_list)
     fname = f"{batch_name}.npz"
-    fout = Path(os.environ.get('DATA_DIR'))/ 'Sentinel2'/fname
-    np.savez_compressed(fout, x=x, y=y, ids=ids)
+    fout  = Path(os.environ.get('DATA_DIR'))/ 'Sentinel2'/fname
+    np.savez_compressed(fout, x=x, y=y, composite_key=ids)
     print(f"\n\t 🎉 Success! Saved {fname} ({x.nbytes / 1e6:.2f}")
 
 def fetch_available_sentinel_ranges(data_folder: str = "Sentinel2", file_extension: str = ".npz") -> list:
