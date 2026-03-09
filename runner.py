@@ -7,6 +7,7 @@ import src.config as c
 import src.load_data as ld
 import src.google_ee as gee
 import src.preprocessing_general as pps
+import pp_sentinel as ppsent
 import geopandas as gpd
 from pathlib import Path
 import pandas as pd
@@ -17,7 +18,7 @@ from datetime import datetime
 # --------------------------
 # VARIABLES
 # --------------------------
-YEAR_FILTER     = [2018,2019]
+YEAR_FILTER     = [2018]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELLITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"
 GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
@@ -146,4 +147,5 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # --------------------------
 # SENTINEL DATA
 # --------------------------
-sentinel_available      = u.available_files_by_year(FIRENOFIRE_SAMPLED_DIR)
+sentinel_available      = ppsent.fetch_available_sentinel_files()
+print(sentinel_available)

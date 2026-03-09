@@ -288,31 +288,55 @@ def fetch_available_sentinel_files(data_folder: str = "Sentinel2", file_extensio
         
     """
     # Get the full file names from directory
-    files       = u.get_filepaths(data_folder)
+    files = u.get_filepaths(data_folder)
     # Keep only the relevant file types
-    files       = [f for f in files if re.search(file_extension, str(f)) is not None]
-    date_ranges = []
-    for f in files:
-        date_range = re.findall(r"\d{8}", str(f))
-        date_min   = datetime.strptime(str(date_range[0]), "%Y%m%d")
-        date_max   = datetime.strptime(str(date_range[1]), "%Y%m%d")   
-        date_ranges.append((date_min, date_max))
-    return date_ranges
+    files = [f for f in files if re.search(file_extension, str(f)) is not None]
+    return files
 
-def find_required_sentinel_from_sampled(df: pd.DataFrame, sentinel_date_ranges: list) -> pd.DataFrame:
+def load_sentinel_composite_keys(sentinel_files: list) -> pd.DataFrame:
     """
-    Function that takes the sampled data frame and the available date ranges of sentinel data as a list of tuples
-    It finds all the values in the dataframe not covered by the existing Sentinel2 data
+    Function that loads all the composite keys for the availabel Sentinel2 images in disk
+    as a single column dataframe
+
+    Args:
+        - sentinel_files(list): A list containing the full paths of all available Sentinel2 files
+
+    Returns:
+        - df (pd.DataFrame): A data frame containing one column, composite_key, and all the available values from files 
+    """
+    sentinel_data_list = []
+    for f in sentinel_files:
+        data = np.load(f)
+        #TODO change id for composite_key once re ran sentiel fetchinf
+        sentinel_data_list.append(data['ids'])
+
+    combined_ids = np.concatenate(sentinel_data_list)
+    df           = pd.DataFrame(combined_ids, columns = ['composite_key'])
+    return df
+
+def find_required_sentinel_from_sampled(df_sampled: pd.DataFrame, sentinel_composite_key: pd.DataFrame) -> pd.DataFrame:
+    """
+    Function that takes the sampled data frame and the available Sentinel2 Composite keys
+    It finds all the values in the sampled dataframe not covered by the existing Sentinel2 data
     and returns the data frame with only the rows that require Sentinel2 data download
-    """
-    rows_to_remove = set()
-    df_filtered = df.copy()
-    for start, end in sentinel_date_ranges:
-        # Find rows in range
-        df_filtered = df[(df['date'] >= start) & (df['date_dv'] <= end)]
-        rows_to_remove.update(df_filtered.index)
 
-    return df.drop(index = list(rows_to_remove))
+    Args:
+        - df_sampled (pd.DataFrame): Sampled data frame
+        - sentinel_composite_key (pd.DataFrame): Dataframe containing all available composite_keys in Sentinel2 local data
+
+    Returns:
+        - df (pd.DataFrame): A copy of df_sampled containing only the rows of data not currently existing in Sentinel2 local data
+    """
+    df_samp                  = df_sampled.copy()
+    df_sent                  = sentinel_composite_key.copy()
+    df_samp['composite_key'] = df_samp['composite_key'].astype(str)
+    df_sent['composite_key'] = df_sent['composite_key'].astype(str)
+
+    df_pending = df_samp.merge(df_sent, on = 'composite_key', how = 'left', indicator = True)
+    df_pending = df_pending[df_pending['_merge'] == 'left_only']
+    df_pending = df_pending.drop(columns = ['_merge'])
+
+    return df_pending
 
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
     """
