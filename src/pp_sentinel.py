@@ -274,7 +274,7 @@ def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: li
     np.savez_compressed(fout, x=x, y=y, ids=ids)
     print(f"\n\t 🎉 Success! Saved {fname} ({x.nbytes / 1e6:.2f}")
 
-def fetch_available_sentinel_ranges(data_folder = "Sentinel2", file_extension = ".npz") -> list:
+def fetch_available_sentinel_ranges(data_folder: str = "Sentinel2", file_extension: str = ".npz") -> list:
     """
     Function that finds all available `np` sentinel data in local disk, and extracts the date period covered by the already existing data
     Arguments are provided, but populated with default values 
@@ -300,6 +300,21 @@ def fetch_available_sentinel_ranges(data_folder = "Sentinel2", file_extension = 
         date_max   = datetime.strptime(str(date_range[1]), "%Y%m%d")   
         date_ranges.append((date_min, date_max))
     return date_ranges
+
+def find_required_sentinel_from_sampled(df: pd.DataFrame, sentinel_date_ranges: list) -> pd.DataFrame:
+    """
+    Function that takes the sampled data frame and the available date ranges of sentinel data as a list of tuples
+    It finds all the values in the dataframe not covered by the existing Sentinel2 data
+    and returns the data frame with only the rows that require Sentinel2 data download
+    """
+    rows_to_remove = set()
+    df_filtered = df.copy()
+    for start, end in sentinel_date_ranges:
+        # Find rows in range
+        df_filtered = df[(df['date'] >= start) & (df['date_dv'] <= end)]
+        rows_to_remove.update(df_filtered.index)
+
+    return df.drop(index = list(rows_to_remove))
 
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
     """

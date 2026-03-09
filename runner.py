@@ -19,7 +19,7 @@ from datetime import datetime
 # --------------------------
 YEAR_FILTER     = [2018,2019]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
-SATELITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"   
+SATELLITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"
 GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
 DATA_DIR        = os.environ.get("DATA_DIR")
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
@@ -86,7 +86,7 @@ else:
     # sentinel_path  = Path(DATA_DIR)/"sentinel2"
     # df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
     #                                         df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
-    #                                         SATELITE_IMAGES)
+    #                                         SATELLITE_IMAGES)
     # print(df_sentinel.head())
 
     # -------------------------
