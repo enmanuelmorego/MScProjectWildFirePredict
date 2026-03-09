@@ -11,7 +11,7 @@ import utils as u
 import google_ee as gee
 import cdsapi
 import pygrib
-import time
+from shapely.wkt import loads
 
 # -------------------------
 # VIIRS DATA
@@ -661,7 +661,7 @@ def fwi_load_pipeline(fwi_path: Path,
   df_fwi["date"] = pd.to_datetime(df_fwi["date"])
   return df_fwi
 
-def load_cached_sampled(years: list, data_dir: str, file_name: str) -> pd.DataFrame:
+def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) -> pd.DataFrame:
   """
   Function to load the cached sampled data for the requested years
   
@@ -678,8 +678,11 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str) -> pd.DataFr
   df_sampled            = pd.concat(list_sampled)
   df_sampled['date']    = pd.to_datetime(df_sampled['date'])
   df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
+  # Transform to GeoDF 
+  df_sampled['geometry'] = df_sampled['geometry'].apply(loads)
+  gdf_sampled = gpd.GeoDataFrame(df_sampled, geometry = 'geometry', crs = crs)
 
-  return df_sampled
+  return gdf_sampled
 
 
 
