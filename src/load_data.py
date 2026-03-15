@@ -372,7 +372,6 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   df_fwi.to_csv(fname_out, index = False)
   print(f"\n\t...✅  Succesfully processed {grib_fname}")
 
-
 def fwi_load_pipeline(fwi_path: Path,
                       df_uk_daily_grid: gpd.GeoDataFrame,
                       df_uk_grid: gpd.GeoDataFrame,
