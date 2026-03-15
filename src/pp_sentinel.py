@@ -191,7 +191,6 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generato
 
         yield batch_name, df_filtered
 
-
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict ) -> np.ndarray: 
     """
     Fetches raw pixels from Google Earth Engine (GEE) into RAM.
