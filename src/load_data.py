@@ -317,7 +317,7 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
     None
   """
   fname_path = Path(fwi_path)/grib_fname
-  grbs       = pygrib.open(fname_path)
+  grbs       = pygrib.open(fname_path) # type: ignore
   fwi_msgs   = grbs.select(name=grb_name)
 
   # Initialise object to store data
@@ -488,7 +488,7 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) ->
   df_sampled['date']    = pd.to_datetime(df_sampled['date'])
   df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
   # Transform to GeoDF 
-  df_sampled['geometry'] = df_sampled['geometry'].apply(loads)
+  df_sampled['geometry'] = df_sampled['geometry'].apply(loads) # type: ignore
   gdf_sampled = gpd.GeoDataFrame(df_sampled, geometry = 'geometry', crs = crs)
 
   return gdf_sampled
