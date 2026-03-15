@@ -139,11 +139,6 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # SENTINEL DATA
 # --------------------------
 df_sentinel_required = ppsent.required_sentinel_pipeline(df_sampled)
-# print("HEAD====")
-# print(df_sentinel_required[['date_dv','grid_id_dv','fire_lbl_dv','bridge_composite_key_dv','date','viirs_n','composite_key']].head())
-# print(f"Row 799")
-# print()
-# input()
 if df_sentinel_required.empty:
     print("✨ All requested years are already cached. Skipping [sentinel_download_pipeline]...")
 else:
