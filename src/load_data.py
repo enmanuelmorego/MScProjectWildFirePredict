@@ -88,7 +88,7 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
     ValueError if SNPP data is not provided 
   """
   cols_merge = ['longitude','latitude','acq_date']
-  df_snpp = viirs_dict.get('snpp', 'SNPP: No data available')
+  df_snpp = viirs_dict.get('snpp')
   df_noaa = viirs_dict.get('noaa', 'NOAA: No data available')
 
   if df_snpp is None:

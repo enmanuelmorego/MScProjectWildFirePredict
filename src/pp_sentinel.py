@@ -196,10 +196,9 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
     """
     Fetches raw pixels from Google Earth Engine (GEE) into RAM.
 
-    This function does a cloud to RAM rather than to Disk process. It creates a 5-day 
-    median composite to mitigate cloud cover and requests a GeoTIFF 
-    download URL for a specific 12km grid
- 
+    Retrieves an ImageCollection filtered by location and a 6-day window (target date and -5 days to target).
+    It computes a median composite to mitigate the impact of cloud cover and other noise before downloading as GeoTIFF
+    
     Args:
         geom (ee.Geometry): The GEE geometry object defining the clip area
         date_str (str): The target date (YYYY-MM-DD) for the satellite observation
@@ -218,6 +217,7 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
         tifffile.TiffFileError: If the downloaded bytes cannot be parsed as a TIFF
     """
     # Extract satelite objects
+    #TODO remove default values as this is dangerous to code here due to changing updates
     satelite_img    = satelite_params.get('satelite_img',    "COPERNICUS/S2_SR_HARMONIZED")
     satelite_bands  = satelite_params.get('satelite_bands',  ["B2","B3","B4","B8"])
     satelite_scale  = satelite_params.get('satelite_scale',  80)
