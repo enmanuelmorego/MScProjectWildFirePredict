@@ -5,7 +5,6 @@ import os
 os.environ.setdefault("RUN_DEMO", "ON")
 import src.config as c
 import src.load_data as ld
-import src.google_ee as gee
 import src.preprocessing_general as pps
 import pp_sentinel as ppsent
 import geopandas as gpd
@@ -21,7 +20,7 @@ from datetime import datetime
 YEAR_FILTER     = [2018]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELLITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"
-SATELLITE_BANDS = ["B2","B3","B4","B8"]
+SATELLITE_BANDS = ["B2","B3","B4","B8","B11","B12"]
 SATELLITE_SCALE = 80
 GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
 DATA_DIR        = os.environ.get("DATA_DIR")

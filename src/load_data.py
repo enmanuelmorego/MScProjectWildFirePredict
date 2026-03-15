@@ -8,7 +8,6 @@ import math
 import re
 #from config import CRS
 import utils as u
-import google_ee as gee
 import cdsapi
 import pygrib
 from shapely.wkt import loads
@@ -208,191 +207,191 @@ def uk_grid_data_pipeline(df_grid: pd.DataFrame, df_viirs_in: pd.DataFrame) -> p
 # -------------------------
 # GOOGLE EE SENTINEL-2
 # -------------------------  
-def check_drive_sentinel(geo_df: gpd.GeoDataFrame,
-                         available_files: List[Path]) -> dict[str, List]:
-  """"
-  Checks whether Sentinel-2 .csv files already exist in GoogleDrive ready to use for a given date range
+# def check_drive_sentinel(geo_df: gpd.GeoDataFrame,
+#                          available_files: List[Path]) -> dict[str, List]:
+#   """"
+#   Checks whether Sentinel-2 .csv files already exist in GoogleDrive ready to use for a given date range
 
-  The required date range is inferred from the input GeoDataFrame, which represents the UK grid expanded across daily timestamps. 
-  The function compares this required knowing date range against Sentinel-2 metadata files already available in local storage (Google Drive).
+#   The required date range is inferred from the input GeoDataFrame, which represents the UK grid expanded across daily timestamps. 
+#   The function compares this required knowing date range against Sentinel-2 metadata files already available in local storage (Google Drive).
   
-  Args:
-    df (GeoDataFrame): Geo data frame containing the whole UK Map split by grids, with grid_id, and for each day in the given range
-                       Expects a continuos date range
-    available_file (List): A list contaning all the available files in GoogleDrive 
-                           Format of filenames expected <yyyymmdd-yyyymmdd_sentinel_images_layer1
+#   Args:
+#     df (GeoDataFrame): Geo data frame containing the whole UK Map split by grids, with grid_id, and for each day in the given range
+#                        Expects a continuos date range
+#     available_file (List): A list contaning all the available files in GoogleDrive 
+#                            Format of filenames expected <yyyymmdd-yyyymmdd_sentinel_images_layer1
 
-  Returns
-    A dictionary with the following entries:
+#   Returns
+#     A dictionary with the following entries:
 
-      "available_files":
-      A list of filenames corresponding to Sentinel-2 metadata CSVs that can be reused directly for the requested date range.
+#       "available_files":
+#       A list of filenames corresponding to Sentinel-2 metadata CSVs that can be reused directly for the requested date range.
 
-      "required_ranges":
-      A list of date objects representing each of the days that need to be retrieved from Google Earth Engine 
+#       "required_ranges":
+#       A list of date objects representing each of the days that need to be retrieved from Google Earth Engine 
 
-  Example:
-    `df_geo <Date range 2019-01-01 - 2019-01-20>`
+#   Example:
+#     `df_geo <Date range 2019-01-01 - 2019-01-20>`
 
-    Assume that in Google Drive there are Sentinel files for:`2019-01-01` to `2019-01-05` AND `2019-01-10` to `2019-01-20`::
+#     Assume that in Google Drive there are Sentinel files for:`2019-01-01` to `2019-01-05` AND `2019-01-10` to `2019-01-20`::
 
-      out_dict = {'available_files' : ['20190101-20190105_sentinel_images_layer1.csv', 
-                                       '20190110-20190120_sentinel_images_layer1.csv'],
-                  'required_ranges'  : [datetime.date(2019, 1, 6), datetime.date(2019, 1, 7)
-                                        datetime.date(2019, 1, 8), datetime.date(2019, 1, 9)]}
-  """
-  # Extract date range
-  geo_dates = pd.to_datetime(geo_df['date']).dt.date
-  min_d, max_d = geo_dates.min(), geo_dates.max()
+#       out_dict = {'available_files' : ['20190101-20190105_sentinel_images_layer1.csv', 
+#                                        '20190110-20190120_sentinel_images_layer1.csv'],
+#                   'required_ranges'  : [datetime.date(2019, 1, 6), datetime.date(2019, 1, 7)
+#                                         datetime.date(2019, 1, 8), datetime.date(2019, 1, 9)]}
+#   """
+#   # Extract date range
+#   geo_dates = pd.to_datetime(geo_df['date']).dt.date
+#   min_d, max_d = geo_dates.min(), geo_dates.max()
 
-  requested_days = set(pd.date_range(start = min_d, 
-                                     end   = max_d,
-                                     freq  = "D").date)
-  # If no files exists, all are required
-  if not available_files:
-    return {"available_files": [],
-            "required_days": sorted(requested_days)}
+#   requested_days = set(pd.date_range(start = min_d, 
+#                                      end   = max_d,
+#                                      freq  = "D").date)
+#   # If no files exists, all are required
+#   if not available_files:
+#     return {"available_files": [],
+#             "required_days": sorted(requested_days)}
 
-  available_days: set[date] = set()
-  used_files: List[Path] = []
+#   available_days: set[date] = set()
+#   used_files: List[Path] = []
 
-   # Find files relevant to current date range 
-  for f in available_files:
-    try:
-      avail_min = datetime.strptime(f[:8],   "%Y%m%d").date() 
-      avail_max = datetime.strptime(f[9:17], "%Y%m%d").date()
-    except ValueError:
-      continue
+#    # Find files relevant to current date range 
+#   for f in available_files:
+#     try:
+#       avail_min = datetime.strptime(f[:8],   "%Y%m%d").date() 
+#       avail_max = datetime.strptime(f[9:17], "%Y%m%d").date()
+#     except ValueError:
+#       continue
 
-    if avail_max < min_d or avail_min > max_d:
-      continue
+#     if avail_max < min_d or avail_min > max_d:
+#       continue
 
-    used_files.append(f)
-    available_days.update(pd.date_range(start = avail_min,
-                                        end   = avail_max,
-                                        freq  = "D")
-                                        .date)
-  # Find missing dates
-  required_days = sorted(requested_days - available_days)
+#     used_files.append(f)
+#     available_days.update(pd.date_range(start = avail_min,
+#                                         end   = avail_max,
+#                                         freq  = "D")
+#                                         .date)
+#   # Find missing dates
+#   required_days = sorted(requested_days - available_days)
 
-  return {"available_files": used_files,
-          "required_days": sorted(required_days)}
+#   return {"available_files": used_files,
+#           "required_days": sorted(required_days)}
 
-def batch_create_sentinel(df: pd.DataFrame, required_days: list, batch_size: int = 10) -> dict:
-  """
-  Takes the UK Grid by day, along with the computed required_days list from `check_drive_sentinel` and
-  splits the data frame into batches of 14 days max. This allows for each data frame to be approximately 
-  20k-25k rows max
-  This is to ensure that the request is under the max size set by Google EE engine
+# def batch_create_sentinel(df: pd.DataFrame, required_days: list, batch_size: int = 10) -> dict:
+#   """
+#   Takes the UK Grid by day, along with the computed required_days list from `check_drive_sentinel` and
+#   splits the data frame into batches of 14 days max. This allows for each data frame to be approximately 
+#   20k-25k rows max
+#   This is to ensure that the request is under the max size set by Google EE engine
 
-  Args:
-    df (DataFrame): UK grid data frame by day
+#   Args:
+#     df (DataFrame): UK grid data frame by day
 
-    required_days (list): List of dates to request from google earth
+#     required_days (list): List of dates to request from google earth
 
-    batch_size (int): Number of days allowed in each batch. this controls the size of the data to be processed
-                      defaults to 10 days
+#     batch_size (int): Number of days allowed in each batch. this controls the size of the data to be processed
+#                       defaults to 10 days
 
-  Returns:
-    dict_out (dict): A dictionary of data frames, each containing `batch_size` days worth of data
-  """
-  min_i       = 0
-  max_i       = batch_size - 1
-  batch       = 1
-  total_dates = len(required_days)
-  df['date'] = pd.to_datetime(df['date']).dt.date
-  required_days = sorted(required_days)
+#   Returns:
+#     dict_out (dict): A dictionary of data frames, each containing `batch_size` days worth of data
+#   """
+#   min_i       = 0
+#   max_i       = batch_size - 1
+#   batch       = 1
+#   total_dates = len(required_days)
+#   df['date'] = pd.to_datetime(df['date']).dt.date
+#   required_days = sorted(required_days)
 
-  # Get total batches required
-  total_batches = math.ceil(total_dates / batch_size)
-  dict_out = {}
-  total_rows = 0
+#   # Get total batches required
+#   total_batches = math.ceil(total_dates / batch_size)
+#   dict_out = {}
+#   total_rows = 0
 
-  for _ in range(1, total_batches + 1):
-    if max_i >= total_dates:
-      max_d = required_days[total_dates - 1]
-    else:
-      max_d = required_days[max_i]
-    min_d = required_days[min_i]
+#   for _ in range(1, total_batches + 1):
+#     if max_i >= total_dates:
+#       max_d = required_days[total_dates - 1]
+#     else:
+#       max_d = required_days[max_i]
+#     min_d = required_days[min_i]
 
-    df_batch = df[(df['date'] >= min_d) &
-                  (df['date'] <= max_d)].copy()
-    dict_out[f"batch_{batch}"] = df_batch
-    # Update values
-    min_i += batch_size
-    max_i += batch_size
-    batch += 1
-    total_rows += df_batch.shape[0]
+#     df_batch = df[(df['date'] >= min_d) &
+#                   (df['date'] <= max_d)].copy()
+#     dict_out[f"batch_{batch}"] = df_batch
+#     # Update values
+#     min_i += batch_size
+#     max_i += batch_size
+#     batch += 1
+#     total_rows += df_batch.shape[0]
 
-  total_minutes = 0.012 * total_rows
-  dur = timedelta(minutes=total_minutes)
-  hrs, rmdr = divmod(dur.total_seconds(), 3600)
-  mins = rmdr // 60
-  print(f"\t⏱️  Google Earth Engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
-  return dict_out
+#   total_minutes = 0.012 * total_rows
+#   dur = timedelta(minutes=total_minutes)
+#   hrs, rmdr = divmod(dur.total_seconds(), 3600)
+#   mins = rmdr // 60
+#   print(f"\t⏱️  Google Earth Engine will take approximately {int(hrs)}hrs {int(mins)}mins to process {total_rows} rows of data")
+#   return dict_out
 
-def load_from_drive_sentinel(sentinel_2_path: Path, relevant_files: list) -> pd.DataFrame:
-  """
-  Loads previously downloaded Sentinel-2 files from GoogleDrive 
-  It combines all the files into a single data frame
+# def load_from_drive_sentinel(sentinel_2_path: Path, relevant_files: list) -> pd.DataFrame:
+#   """
+#   Loads previously downloaded Sentinel-2 files from GoogleDrive 
+#   It combines all the files into a single data frame
 
-  Please note, this function loads only the relevant files, not all available files. 
-  This is to allow users to run small batch tests, and flexibility
+#   Please note, this function loads only the relevant files, not all available files. 
+#   This is to allow users to run small batch tests, and flexibility
 
-  Args:
-    sentinel_2_path (Path): A Path object contaning the parent location of where all the Sentinel-2 files are stored 
+#   Args:
+#     sentinel_2_path (Path): A Path object contaning the parent location of where all the Sentinel-2 files are stored 
 
-    relevant_files (List): A list of strings containing the files names of the relevant files for the current processing pipeline
+#     relevant_files (List): A list of strings containing the files names of the relevant files for the current processing pipeline
 
-  Returns:
-    Dataframe: A data frame containing all the data from all relevant files 
-  """
-  df = pd.DataFrame()
-  for f in relevant_files:
-    file_path = Path(sentinel_2_path)/f
-    df_in = pd.read_csv(file_path)
-    df = pd.concat([df, df_in])
-  return df
+#   Returns:
+#     Dataframe: A data frame containing all the data from all relevant files 
+#   """
+#   df = pd.DataFrame()
+#   for f in relevant_files:
+#     file_path = Path(sentinel_2_path)/f
+#     df_in = pd.read_csv(file_path)
+#     df = pd.concat([df, df_in])
+#   return df
 
-def sentinel_load_pipeline(data_dir_sentinel: Path,
-                           df_uk_daily_grid: gpd.GeoDataFrame,
-                           sat_img: str) -> pd.DataFrame:
-  """
-  Wrapper function to load the Sentinel data
-  - Takes the input data of the UK Gridded df by day
-  - Checks if there are any dates to request from GoogleEE
-  - If data is needed, sends the request to Google EE
-  - Loads the available files from GoogleDrive
-  - Returns a dataframe with a single df containing all the data from all files covering the requested period 
+# def sentinel_load_pipeline(data_dir_sentinel: Path,
+#                            df_uk_daily_grid: gpd.GeoDataFrame,
+#                            sat_img: str) -> pd.DataFrame:
+#   """
+#   Wrapper function to load the Sentinel data
+#   - Takes the input data of the UK Gridded df by day
+#   - Checks if there are any dates to request from GoogleEE
+#   - If data is needed, sends the request to Google EE
+#   - Loads the available files from GoogleDrive
+#   - Returns a dataframe with a single df containing all the data from all files covering the requested period 
 
-  Args:
-    data_dir_sentinel (Path): Path contaning the directory of where the Sentinel data is stored in Google Drive
+#   Args:
+#     data_dir_sentinel (Path): Path contaning the directory of where the Sentinel data is stored in Google Drive
 
-    df_uk_daily_grid (DataFrame): Data frame contaning all the 12x12 grids for the UK for each of the relevant days in the analysis
+#     df_uk_daily_grid (DataFrame): Data frame contaning all the 12x12 grids for the UK for each of the relevant days in the analysis
 
-    sat_img (str): A string containing the name of the satelites images used 
+#     sat_img (str): A string containing the name of the satelites images used 
 
-  Returns:
-    DataFrame containing all the Sentinel-2 metadata in a single data frame for the relevant period defined in df_uk_daily_grid
+#   Returns:
+#     DataFrame containing all the Sentinel-2 metadata in a single data frame for the relevant period defined in df_uk_daily_grid
 
-  """
+#   """
 
-  sentinel_files = os.listdir(data_dir_sentinel)
+#   sentinel_files = os.listdir(data_dir_sentinel)
 
-  # Get required dates to fetch from Google EE
-  avail_files_req_days = check_drive_sentinel(df_uk_daily_grid, sentinel_files)
-  available_files = avail_files_req_days['available_files']
-  required_days   = avail_files_req_days['required_days']
-  if required_days:
-      print("\t🌍  Google EE connect ")
-      gee.google_ee_request_runner(satelite      = sat_img,
-                                   df_grid_date  = df_uk_daily_grid,
-                                   required_days = required_days)
-  else:
-    print(f"\t🗂️  All data available in Drive - No connection to Google Earth required")
+#   # Get required dates to fetch from Google EE
+#   avail_files_req_days = check_drive_sentinel(df_uk_daily_grid, sentinel_files)
+#   available_files = avail_files_req_days['available_files']
+#   required_days   = avail_files_req_days['required_days']
+#   if required_days:
+#       print("\t🌍  Google EE connect ")
+#       gee.google_ee_request_runner(satelite      = sat_img,
+#                                    df_grid_date  = df_uk_daily_grid,
+#                                    required_days = required_days)
+#   else:
+#     print(f"\t🗂️  All data available in Drive - No connection to Google Earth required")
     
-  df_sentinel = load_from_drive_sentinel(data_dir_sentinel, available_files)
-  return df_sentinel
+#   df_sentinel = load_from_drive_sentinel(data_dir_sentinel, available_files)
+#   return df_sentinel
 
 # -------------------------
 # FIRE WEATHER INDEX
