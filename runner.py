@@ -3,13 +3,10 @@
 # --------------------------
 import os
 os.environ.setdefault("RUN_DEMO", "ON")
-import src.config as c
 import src.load_data as ld
 import src.preprocessing_general as pps
 import pp_sentinel as ppsent
-import geopandas as gpd
 from pathlib import Path
-import pandas as pd
 import utils as u
 from datetime import datetime
 

@@ -4,11 +4,9 @@ Scripts that collapses and summarises data frames into specified format for anal
 import pandas as pd
 import geopandas as gpd
 import utils as u
-from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
-from pathlib import Path
 from typing import Any
 
 def summarise_viirs(df_viirs: gpd.GeoDataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:

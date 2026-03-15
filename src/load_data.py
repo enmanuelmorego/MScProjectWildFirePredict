@@ -2,11 +2,9 @@ from pathlib import Path
 import os 
 import pandas as pd
 import geopandas as gpd
-from datetime import date, datetime, timedelta
-from typing import Dict, List, Tuple, Any
-import math
+from datetime import datetime
+from typing import Any
 import re
-#from config import CRS
 import utils as u
 import cdsapi
 import pygrib
@@ -495,8 +493,3 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) ->
 
 
 
-if __name__ == "__main__":
-    os.environ.setdefault("RUN_DEMO", "ON")
-    import config as c
-    DATA_DIR = os.environ.get("DATA_DIR")
-    CRS             = "EPSG: 4326"          # Set  Reference System (CRS) so it is uniform across all data inputs
