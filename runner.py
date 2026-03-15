@@ -82,18 +82,6 @@ else:
     print(df_daily_grid.head())
 
     # -------------------------
-    # GOOGLE EE SENTINEL-2
-    # -------------------------
-    # print(f"{'='*80}")
-    # print(f"🛰️ GOOGLE EE SENTINEL-2")  
-    # # Get stored files 
-    # sentinel_path  = Path(DATA_DIR)/"sentinel2"
-    # df_sentinel = ld.sentinel_load_pipeline(sentinel_path,
-    #                                         df_daily_grid[df_daily_grid['date'] < '2019-01-31'],
-    #                                         SATELLITE_IMAGES)
-    # print(df_sentinel.head())
-
-    # -------------------------
     # FIRE WEATHER INDEX 
     # -------------------------
     print(f"{'='*80}")
