@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 from pathlib import Path
-import os
+from typing import Any
 
-def summarise_viirs(df_viirs: pd.DataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
+def summarise_viirs(df_viirs: gpd.GeoDataFrame, df_uk_grid: gpd.GeoDataFrame) -> pd.DataFrame:
     """
     Function that summarises VIIRS data and generates fire/nofire labels for each `grid_id` `date` pairs (and renames acq_date to date)
 
@@ -216,6 +216,7 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
     df_nofire_grouped = df_nofire.groupby('grid_id')
 
     for r in df_fire.itertuples():
+        r: Any
         anchor_grid_id   = r.grid_id_dv
         anchor_date      = r.date_dv
 
@@ -225,7 +226,6 @@ def sample_nofire_obs(df_preproc                  :gpd.GeoDataFrame,
         df_grid = df_nofire_grouped.get_group(anchor_grid_id)
         # Extract ALL potential no fire candidate values
         df_nofire_sample = df_grid[(
-                                      #(df_grid['grid_id'] == anchor_grid_id) &
                                       # Find days within a 30 day range of current date 
                                       ((df_grid['date'] >= (anchor_date - pd.DateOffset(days=nofire_proximity_window_days))) &
                                        (df_grid['date'] <= (anchor_date + pd.DateOffset(days=nofire_proximity_window_days)))) &

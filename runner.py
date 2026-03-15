@@ -51,10 +51,10 @@ else:
     # --------------------------
     # VIIRS DATA
     # --------------------------
-    viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
+    viirs_dict: dict[pd.DataFrame, pd.DataFrame] = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
                                         crs        = CRS,
                                         date_range = YEAR_FILTER)
-    df_viirs = viirs_dict.get('df_viirs')
+    df_viirs: pd.DataFrame = viirs_dict.get('df_viirs')
     print(f"{'='*80}")
     print(f"🔥 VIIRS Data")
     print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")

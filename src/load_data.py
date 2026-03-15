@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import geopandas as gpd
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 import math
 import re
 #from config import CRS
@@ -38,7 +38,7 @@ def to_load_viirs(files: list[Path], year_load: list[int] | None = None) -> list
     print(f"⚠️ WARNING:\nNo files found for years {year_load}")
   return files_out
 
-def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
+def load_viirs(paths_to_load: list[Path]) -> dict[str, pd.DataFrame]:
   """
   Function to load the VIIRS data and store them in a dictionary
   It loads NOAA-20 and SNPP separately
@@ -67,7 +67,7 @@ def load_viirs(paths_to_load: list[Path]) -> dict[pd.DataFrame]:
   df_noaa = pd.concat(viirs_noaa,ignore_index=True)
   return {'snpp': df_viirs, 'noaa': df_noaa}
 
-def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dict[str, object]:
+def merge_viirs(viirs_dict: dict[str, Any], append_noaa: bool = True) -> dict[str, Any]:
   """
   Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged
   them into a single data frame
@@ -157,8 +157,8 @@ def viirs_load_pipeline(dir_name: str,
   viirs_to_load    = to_load_viirs(viirs_files,date_range)
   viirs_data       = load_viirs(viirs_to_load)
   df_viirs_raw     = merge_viirs(viirs_data)
-  df_viirs_report  = df_viirs_raw.get('data_report')
-  df_viirs_temp    = df_viirs_raw.get('df')
+  df_viirs_report  = df_viirs_raw['data_report']
+  df_viirs_temp    = df_viirs_raw['df']
   df_viirs         = filter_viirs(df_viirs_temp)
   df_viirs         = df_viirs.rename(columns = {'acq_date': 'date'})
   df_viirs["date"] = pd.to_datetime(df_viirs["date"])
@@ -180,7 +180,7 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   Returns:
     df (GeoPandasDataFrame)
   """
-  grid_path = Path(os.environ.get('DATA_DIR'))/'UKGrid'/file_name
+  grid_path = Path(os.environ.get('DATA_DIR',''))/'UKGrid'/file_name
   uk_grid = gpd.read_file(grid_path)
   uk_grid = uk_grid.rename(columns = {'id': 'grid_id'})
   uk_grid = uk_grid.to_crs(crs)
