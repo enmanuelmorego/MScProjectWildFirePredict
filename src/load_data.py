@@ -138,7 +138,7 @@ def geo_viirs(viirs_data: pd.DataFrame, crs: str) -> gpd.GeoDataFrame:
 
 def viirs_load_pipeline(dir_name: str,
                         crs: str,
-                        date_range: list[int] = [] ):
+                        date_range: list[int] = [] ) -> dict[str, Any]:
   """
   Pipeline to load VIIRS data
   Cleaning and data transformation steps included in each of the individual functions
@@ -186,7 +186,7 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   uk_grid = uk_grid.to_crs(crs)
   return uk_grid
 
-def uk_grid_data_pipeline(df_grid: pd.DataFrame, df_viirs_in: pd.DataFrame) -> pd.DataFrame:
+def uk_grid_data_pipeline(df_grid: gpd.GeoDataFrame, df_viirs_in: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
   """
   Pipeline that takes the df_uk_grid loaded and creates a grid per day in the date range specified 
 

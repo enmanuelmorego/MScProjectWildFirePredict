@@ -23,7 +23,7 @@ SATELLITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"
 SATELLITE_BANDS = ["B2","B3","B4","B8","B11","B12"]
 SATELLITE_SCALE = 80
 GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
-DATA_DIR        = os.environ.get("DATA_DIR")
+DATA_DIR        = os.environ.get("DATA_DIR","")
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
 RANDOM_SEED     = 42
 
@@ -51,10 +51,10 @@ else:
     # --------------------------
     # VIIRS DATA
     # --------------------------
-    viirs_dict: dict[pd.DataFrame, pd.DataFrame] = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
+    viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
                                         crs        = CRS,
                                         date_range = YEAR_FILTER)
-    df_viirs: pd.DataFrame = viirs_dict.get('df_viirs')
+    df_viirs = viirs_dict.get('df_viirs','')
     print(f"{'='*80}")
     print(f"🔥 VIIRS Data")
     print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")
@@ -124,7 +124,7 @@ else:
 
     # Store sampled data as csv
     sampled_by_year = u.split_df_by_year(df_sampled)
-    output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
+    output_dir      = Path(os.environ.get("DATA_DIR",""))/FIRENOFIRE_SAMPLED_DIR
     for year, df in sampled_by_year.items():
         u.df_to_csv(df, f"{year}_{FIRENOFIRE_SAMPLED_FNAME}", str(output_dir))
 
