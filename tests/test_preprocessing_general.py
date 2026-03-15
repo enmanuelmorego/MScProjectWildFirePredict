@@ -1,4 +1,5 @@
 import pandas as pd
+import geopandas as gpd
 import preprocessing_general as pps
 from pandas.testing import assert_frame_equal
 
@@ -193,6 +194,7 @@ def test_sample_nofire_obs_modelcase():
                               'grid_id': [1,1,2,1,9,1],
                               'composite_key': ['120200109', '120200122','220200128','120200610','920200117','120200118'],
                               'fire_lbl': [False, False,False,False,False,True]})
+    df_main = gpd.GeoDataFrame(df_main)
                               
     df_expect = pd.DataFrame({'date_dv': pd.to_datetime(['2020-01-09','2020-01-22','2020-01-28']),
                               'grid_id_dv': [1,1,2],
@@ -209,7 +211,7 @@ def test_sample_nofire_obs_nofire_total_samples():
                                 'grid_id': [1]*9,
                                 'fire_lbl': [False]*9})
     df_main["composite_key"] = df_main["grid_id"].astype(str) + df_main["date"].dt.strftime("%Y%m%d")
-    
+    df_main = gpd.GeoDataFrame(df_main)
     df_test_small = pps.sample_nofire_obs(df_main, df_fire, 5, 2, 42)
     df_test_large = pps.sample_nofire_obs(df_main, df_fire, 5, 5, 42)
 
@@ -225,6 +227,7 @@ def test_sample_nofire_obs_overlapping_date_expect1():
                               'grid_id': [1,1],
                               'composite_key': ['120200109', '120200101'],
                               'fire_lbl': [False, False]})
+    df_main = gpd.GeoDataFrame(df_main)
     df_expect = pd.DataFrame({'date_dv': pd.to_datetime(['2020-01-09']),
                               'grid_id_dv': [1],
                               'fire_lbl_dv': [False]})

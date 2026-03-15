@@ -98,7 +98,7 @@ def test_sampled_to_batch_raise_valuerror():
     df = pd.DataFrame({'date': ['2025-01-01','2023-02-12','2025-01-01','2023-10-11','2025-01-01']})
     df['date']  = pd.to_datetime(df['date'])
     with pytest.raises(ValueError):  
-        dict_test = psent.sampled_to_batch(df, 0, 900)
+        psent.sampled_to_batch(df, 0, 900)
 
 # -------------------------------------
 # TEST sampled_to_batch_dfs

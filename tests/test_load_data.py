@@ -1,9 +1,7 @@
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import load_data as ld
-from datetime import datetime, date
-from pathlib import Path
-
+import geopandas as gpd
 
 '''
 pipenv run pytest
@@ -33,7 +31,7 @@ def test_merge_viirs_merges_df_correctly():
     test_viirs_data = {'snpp': d1,
                        'noaa': d2}
     dict_test = ld.merge_viirs(test_viirs_data)
-    assert_frame_equal(df_expect, dict_test.get('df'))
+    assert_frame_equal(df_expect, dict_test.get('df',''))
 
 def test_merge_viirs_ignores_noaa():
     d1 = pd.DataFrame(
@@ -50,7 +48,7 @@ def test_merge_viirs_ignores_noaa():
     test_viirs_data = {'snpp': d1,
                        'noaa': d2}
     dict_test = ld.merge_viirs(test_viirs_data, False)
-    assert_frame_equal(test_viirs_data.get('snpp'), dict_test.get('df'))
+    assert_frame_equal(test_viirs_data['snpp'], dict_test['df'])
     
 def test_merge_viirs_data_report():
     d1 = pd.DataFrame(
@@ -67,9 +65,9 @@ def test_merge_viirs_data_report():
     test_viirs_data = {'snpp': d1,
                        'noaa': d2}
     dict_test = ld.merge_viirs(test_viirs_data)
-    dict_data_report = dict_test.get('data_report')
-    assert dict_data_report.get('total_rows_snpp') == 5
-    assert dict_data_report.get('total_rows_noaa') == 3
+    dict_data_report = dict_test['data_report']
+    assert dict_data_report['total_rows_snpp'] == 5
+    assert dict_data_report['total_rows_noaa'] == 3
 
 # -----
 def test_filter_viirs_keeps_only_high_quality_vegetation():
@@ -113,6 +111,8 @@ def test_filter_viirs_case_insensitive():
 def test_check_drive_fwi_correct_years():
     dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10','2018-01-01', '2027-01-01'])
     df_test = pd.DataFrame({'date': dates})
+    df_test = gpd.GeoDataFrame(df_test)
+
     f = ['2018FWI.csv', 
          '2020FWI.csv',
 
@@ -129,6 +129,8 @@ def test_check_drive_fwi_correct_years():
 def test_check_drive_fwi_nomatching_years():
     dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
     df_test = pd.DataFrame({'date': dates})
+    df_test = gpd.GeoDataFrame(df_test)
+
     f = ['2015FWI.csv', 
          '2010FWI.csv',
          '2015FWI.grib',
@@ -145,6 +147,7 @@ def test_check_drive_fwi_full_match():
                             '2020-02-02', 
                             '2021-01-01'])
     df_test = pd.DataFrame({'date': dates})
+    df_test = gpd.GeoDataFrame(df_test)
     f = ['1990FWI.csv',
          '2017FWI.csv',
          '2018FWI.csv',
@@ -165,6 +168,7 @@ def test_check_drive_fwi_full_match():
 def test_check_drive_fwi_empty_files():
     dates = pd.to_datetime(['2019-01-01', '2020-02-02','2017-02-02', '2019-12-10'])
     df_test = pd.DataFrame({'date': dates})
+    df_test = gpd.GeoDataFrame(df_test)
     f = []
     out = ld.check_drive_fwi(df_test, f)
     expect = {'available_csv': [], 'available_grib': [], 'required_years': {'2017', '2019', '2020'}}

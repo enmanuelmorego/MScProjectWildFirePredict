@@ -13,7 +13,6 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.pyright]
-# Tell Pylance your code lives in 'src' so 'import utils' works
 extraPaths = ["src"]
 typeCheckingMode = "standard"
 
