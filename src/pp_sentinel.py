@@ -324,18 +324,18 @@ def load_sentinel_composite_keys(sentinel_files: list) -> pd.DataFrame:
     return df
 
 def find_required_sentinel_from_sampled(df_sampled: pd.DataFrame, sentinel_composite_key: pd.DataFrame) -> pd.DataFrame:
-    """
-    Function that takes the sampled data frame and the available Sentinel2 Composite keys
+    """Takes the sampled data frame and the available Sentinel2 Composite keys
     It finds all the values in the sampled dataframe not covered by the existing Sentinel2 data
     and returns the data frame with only the rows that require Sentinel2 data download
 
     Args:
-        - df_sampled (pd.DataFrame): Sampled data frame
-        - sentinel_composite_key (pd.DataFrame): Dataframe containing all available composite_keys in Sentinel2 local data
-
+        df_sampled (pd.DataFrame): Sampled data frame
+        sentinel_composite_key (pd.DataFrame): Dataframe containing all available composite_keys in Sentinel2 local data
+    
     Returns:
-        - df (pd.DataFrame): A copy of df_sampled containing only the rows of data not currently existing in Sentinel2 local data
-    """
+        pd.DataFrame: A copy of df_sampled containing only the rows of data not currently existing in Sentinel2 local data
+    """    
+
     df_samp                  = df_sampled.copy()
     df_sent                  = sentinel_composite_key.copy()
     df_samp['composite_key'] = df_samp['composite_key'].astype(str)
@@ -383,9 +383,8 @@ def fetch_max_batch_num():
     return max_batch 
 
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
-    """
-    Pipeline to fetch, download and save sentinel pixels as numpy arrays
-    """
+    #Pipeline to fetch, download and save sentinel pixels as numpy arrays
+    
     try:
         ee.Initialize(project = gee_proj_name)
     except:
