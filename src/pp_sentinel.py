@@ -257,9 +257,6 @@ def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
     Returns:
         sentinel_npyarray (np.ndarray): resized and transformed numpy array
     """
-    print(f"--- DEBUG: START TRANSFORM ---")
-    print(f"[DEBUG] Input Shape: {sentinel_npyarray.shape} | Input Max: {np.nanmax(sentinel_npyarray)}")
-
     # Handle NA values
     pixel_data = np.nan_to_num(sentinel_npyarray, nan = 0.0)
     # Adjust axis: Expected format (H, W, 4)
@@ -267,7 +264,6 @@ def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
         pixel_data = np.moveaxis(pixel_data, 0, -1)
     elif pixel_data.shape[1] == 4:
         pixel_data = np.moveaxis(pixel_data, 1, -1)
-    print(f"[DEBUG] Post-Axis-Fix Shape: {pixel_data.shape}")
     # Scale the pixel data
     pixel_data = pixel_data / 10000.0
     # Clip outlier values (pixels where birightness might be too much, and due to data quality issues)
@@ -275,11 +271,6 @@ def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
     # Resize data
     pixel_data_resized = resize(pixel_data, (128,128), anti_aliasing = True)
     pixel_data_resized = img_as_float32(pixel_data_resized)
-
-    print(f"[DEBUG] Final Shape: {pixel_data_resized.shape}")
-    print(f"[DEBUG] Final Max: {pixel_data_resized.max():.4f} | Final Min: {pixel_data_resized.min():.4f}")
-    input("--- DEBUG: END TRANSFORM ---, y to continue")
-
 
     return pixel_data_resized
 
