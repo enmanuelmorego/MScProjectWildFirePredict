@@ -240,10 +240,6 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
 
     with io.BytesIO(response.content) as f:
         raw_data = tifffile.imread(f)
-        print(f"DEBUG - Raw Image Shape: {raw_data.shape}")
-        print(f"DEBUG - Raw Max Value: {np.nanmax(raw_data)}")
-        print(f"DEBUG - Raw Data Type: {raw_data.dtype}")
-        input('DEBUG BREAK')
         return raw_data
 
 def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
