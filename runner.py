@@ -3,14 +3,11 @@
 # --------------------------
 import os
 os.environ.setdefault("RUN_DEMO", "ON")
-import src.config as c
+import src.config # type: ignore
 import src.load_data as ld
-import src.google_ee as gee
 import src.preprocessing_general as pps
 import pp_sentinel as ppsent
-import geopandas as gpd
 from pathlib import Path
-import pandas as pd
 import utils as u
 from datetime import datetime
 
@@ -21,10 +18,10 @@ from datetime import datetime
 YEAR_FILTER     = [2018]
 CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
 SATELLITE_IMAGES = "COPERNICUS/S2_SR_HARMONIZED"
-SATELLITE_BANDS = ["B2","B3","B4","B8"]
+SATELLITE_BANDS = ["B3","B4","B8"]
 SATELLITE_SCALE = 80
 GRB_NAME        = 'Forest fire weather index (as defined by the Canadian Forest Service)'
-DATA_DIR        = os.environ.get("DATA_DIR")
+DATA_DIR        = os.environ["DATA_DIR"]
 RUN_ID          = f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}"
 RANDOM_SEED     = 42
 
@@ -55,7 +52,7 @@ else:
     viirs_dict = ld.viirs_load_pipeline(dir_name   = VIIRS_DIR,
                                         crs        = CRS,
                                         date_range = YEAR_FILTER)
-    df_viirs = viirs_dict.get('df_viirs')
+    df_viirs = viirs_dict.get('df_viirs','')
     print(f"{'='*80}")
     print(f"🔥 VIIRS Data")
     print(f"\tVIIRS data report\n\t\t{viirs_dict.get('data_report')}")
@@ -125,7 +122,7 @@ else:
 
     # Store sampled data as csv
     sampled_by_year = u.split_df_by_year(df_sampled)
-    output_dir      = Path(os.environ.get("DATA_DIR"))/FIRENOFIRE_SAMPLED_DIR
+    output_dir      = Path(os.environ.get("DATA_DIR",""))/FIRENOFIRE_SAMPLED_DIR
     for year, df in sampled_by_year.items():
         u.df_to_csv(df, f"{year}_{FIRENOFIRE_SAMPLED_FNAME}", str(output_dir))
 
@@ -139,11 +136,6 @@ pps.sampling_reporting_pipeline(df_plot         = df_sampled,
 # SENTINEL DATA
 # --------------------------
 df_sentinel_required = ppsent.required_sentinel_pipeline(df_sampled)
-# print("HEAD====")
-# print(df_sentinel_required[['date_dv','grid_id_dv','fire_lbl_dv','bridge_composite_key_dv','date','viirs_n','composite_key']].head())
-# print(f"Row 799")
-# print()
-# input()
 if df_sentinel_required.empty:
     print("✨ All requested years are already cached. Skipping [sentinel_download_pipeline]...")
 else:

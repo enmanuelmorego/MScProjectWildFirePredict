@@ -46,7 +46,7 @@ def test_sampled_to_batch_within_limit_batches_singledate():
     df['date']  = pd.to_datetime(df['date'])
     dict_expect = {"2023_B000_20230101_20230101_sentinel_batch": {'date': [pd.Timestamp('2023-01-01')],'split_group': None},
                    "2023_B001_20230102_20230102_sentinel_batch": {'date': [pd.Timestamp('2023-01-02')],'split_group': None}}
-    dict_test = psent.sampled_to_batch(df, 3)
+    dict_test = psent.sampled_to_batch(df, 0, 3)
     assert dict_expect == dict_test
 
 def test_sampled_to_batch_within_limit_batches_multidate():
@@ -61,7 +61,7 @@ def test_sampled_to_batch_within_limit_batches_multidate():
                    "2023_B003_20230201_20230201_sentinel_batch": {'date': [pd.Timestamp('2023-02-01')],'split_group': None}
                    }
                    
-    dict_test = psent.sampled_to_batch(df, 3)
+    dict_test = psent.sampled_to_batch(df, 0, 3)
     assert dict_expect == dict_test
 
 def test_sampled_to_batch_above_limit_batches():
@@ -75,7 +75,7 @@ def test_sampled_to_batch_above_limit_batches():
                    "2023_B003_20230202_20230301_sentinel_batch": {'date': [pd.Timestamp('2023-02-02'),pd.Timestamp('2023-03-01')],'split_group': None}}
                    
                    
-    dict_test = psent.sampled_to_batch(df, 4)
+    dict_test = psent.sampled_to_batch(df, 0, 4)
     assert dict_expect == dict_test
 
 def test_sampled_to_batch_unsorted_input():
@@ -91,14 +91,14 @@ def test_sampled_to_batch_unsorted_input():
                    "2025_B002_20250101_20250101_sentinel_batch": {'date': [pd.Timestamp('2025-01-01')],'split_group': [2,3]}}
                    
                    
-    dict_test = psent.sampled_to_batch(df, 2)
+    dict_test = psent.sampled_to_batch(df, 0, 2)
     assert dict_expect == dict_test
 
 def test_sampled_to_batch_raise_valuerror():
     df = pd.DataFrame({'date': ['2025-01-01','2023-02-12','2025-01-01','2023-10-11','2025-01-01']})
     df['date']  = pd.to_datetime(df['date'])
     with pytest.raises(ValueError):  
-        dict_test = psent.sampled_to_batch(df, 900)
+        psent.sampled_to_batch(df, 0, 900)
 
 # -------------------------------------
 # TEST sampled_to_batch_dfs
@@ -162,7 +162,7 @@ def test_sampled_to_batch_pipeline_large_group():
     df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05','2023-05-05','2023-05-05','2023-05-05', '2023-05-05']),
                        'id':                  [1, 2, 3, 4, 5]})
 
-    batch_dict = psent.sampled_to_batch(df, 2)
+    batch_dict = psent.sampled_to_batch(df, 0, 2)
     test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
     assert len(test_dict["2023_B000_20230505_20230505_sentinel_batch"])        == 2
@@ -180,7 +180,7 @@ def test_sampled_to_batch_pipeline_small_group_poly():
                        'id':                  ['a','b',
                                                'c','d','e','f']})
 
-    batch_dict = psent.sampled_to_batch(df, 4)
+    batch_dict = psent.sampled_to_batch(df, 0, 4)
     test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
     assert len( test_dict["2023_B000_20230505_20230506_sentinel_batch"])         == 4

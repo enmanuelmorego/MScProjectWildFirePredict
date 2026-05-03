@@ -11,3 +11,13 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pyright]
+extraPaths = ["src"]
+typeCheckingMode = "standard"
+
+# Set diagnostic levels for libraries that don't have type stubs (pygrib, cdsapi)
+reportMissingTypeStubs = "none"
+# Force unused imports to show up as warnings or errors
+reportUnusedImport = "warning" 
+reportUnusedVariable = "warning"

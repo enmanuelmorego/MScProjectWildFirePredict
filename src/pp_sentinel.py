@@ -3,13 +3,13 @@ import numpy as np
 import os
 from pathlib import Path
 import pandas as pd
-from typing import Generator
+from typing import Generator, Any
 import requests
 import tifffile
 import io
 from skimage.transform import resize
+from skimage import img_as_float32
 import utils as u
-from datetime import datetime 
 import re
 
 def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
@@ -132,8 +132,9 @@ def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: 
     group_buffer = []
 
     for row in df_batches.itertuples():
-        current_group_size = row.count
-        date               = row.date   
+        row: Any
+        current_group_size:int = row.count
+        date                   = row.date   
 
         # Single group is larger than size limit         
         if current_group_size > batch_size:
@@ -191,7 +192,6 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generato
 
         yield batch_name, df_filtered
 
-
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict ) -> np.ndarray: 
     """
     Fetches raw pixels from Google Earth Engine (GEE) into RAM.
@@ -217,12 +217,11 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
         tifffile.TiffFileError: If the downloaded bytes cannot be parsed as a TIFF
     """
     # Extract satelite objects
-    #TODO remove default values as this is dangerous to code here due to changing updates
-    satelite_img    = satelite_params.get('satelite_img',    "COPERNICUS/S2_SR_HARMONIZED")
-    satelite_bands  = satelite_params.get('satelite_bands',  ["B2","B3","B4","B8"])
-    satelite_scale  = satelite_params.get('satelite_scale',  80)
-    satelite_format = satelite_params.get('satelite_format', 'GEO_TIFF')
-    crs             = satelite_params.get('crs',             'EPSG:4326').replace(" ", "")
+    satelite_img    = satelite_params['satelite_img']
+    satelite_bands  = satelite_params['satelite_bands']
+    satelite_scale  = satelite_params['satelite_scale']
+    satelite_format = satelite_params['satelite_format']
+    crs             = satelite_params['crs']
 
     # Get satelite img object
     img      = (ee.ImageCollection(satelite_img)
@@ -240,7 +239,8 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
     response.raise_for_status()
 
     with io.BytesIO(response.content) as f:
-        return tifffile.imread(f)
+        raw_data = tifffile.imread(f)
+        return raw_data
 
 def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
     """
@@ -253,14 +253,21 @@ def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
     Returns:
         sentinel_npyarray (np.ndarray): resized and transformed numpy array
     """
+    # Handle NA values
     pixel_data = np.nan_to_num(sentinel_npyarray, nan = 0.0)
     # Adjust axis: Expected format (H, W, 4)
     if pixel_data.shape[0] == 4:
         pixel_data = np.moveaxis(pixel_data, 0, -1)
     elif pixel_data.shape[1] == 4:
         pixel_data = np.moveaxis(pixel_data, 1, -1)
+    # Scale the pixel data
+    pixel_data = pixel_data / 10000.0
+    # Clip outlier values (pixels where birightness might be too much, and due to data quality issues)
+    pixel_data = np.clip(pixel_data, 0, 1)
     # Resize data
-    pixel_data_resized = resize(pixel_data, (128,128), anti_aliasing = True).astype('float32')
+    pixel_data_resized = resize(pixel_data, (128,128), anti_aliasing = True)
+    pixel_data_resized = img_as_float32(pixel_data_resized)
+
     return pixel_data_resized
 
 def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str) -> None:
@@ -269,7 +276,7 @@ def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: li
     y     = np.array(label_list)
     ids   = np.array(composite_key_list)
     fname = f"{batch_name}.npz"
-    fout  = Path(os.environ.get('DATA_DIR'))/ 'Sentinel2'/fname
+    fout  = Path(os.environ['DATA_DIR'])/ 'Sentinel2'/fname
     np.savez_compressed(fout, x=x, y=y, composite_key=ids)
     print(f"\n\t 🎉 Success! Saved {fname} ({x.nbytes / 1e6:.2f}")
 
@@ -313,18 +320,18 @@ def load_sentinel_composite_keys(sentinel_files: list) -> pd.DataFrame:
     return df
 
 def find_required_sentinel_from_sampled(df_sampled: pd.DataFrame, sentinel_composite_key: pd.DataFrame) -> pd.DataFrame:
-    """
-    Function that takes the sampled data frame and the available Sentinel2 Composite keys
+    """Takes the sampled data frame and the available Sentinel2 Composite keys
     It finds all the values in the sampled dataframe not covered by the existing Sentinel2 data
     and returns the data frame with only the rows that require Sentinel2 data download
 
     Args:
-        - df_sampled (pd.DataFrame): Sampled data frame
-        - sentinel_composite_key (pd.DataFrame): Dataframe containing all available composite_keys in Sentinel2 local data
-
+        df_sampled (pd.DataFrame): Sampled data frame
+        sentinel_composite_key (pd.DataFrame): Dataframe containing all available composite_keys in Sentinel2 local data
+    
     Returns:
-        - df (pd.DataFrame): A copy of df_sampled containing only the rows of data not currently existing in Sentinel2 local data
-    """
+        pd.DataFrame: A copy of df_sampled containing only the rows of data not currently existing in Sentinel2 local data
+    """    
+
     df_samp                  = df_sampled.copy()
     df_sent                  = sentinel_composite_key.copy()
     df_samp['composite_key'] = df_samp['composite_key'].astype(str)
@@ -364,7 +371,7 @@ def fetch_max_batch_num():
     files     = fetch_available_sentinel_files()
     max_batch = 0
     for f in files:
-        batch_str = re.search(r"[B]\d{3}", str(f)).group()
+        batch_str = re.search(r"[B]\d{3}", str(f)).group() # type: ignore
         batch_int = int(batch_str[1:])
         if batch_int > max_batch:
             max_batch = batch_int
@@ -372,9 +379,8 @@ def fetch_max_batch_num():
     return max_batch 
 
 def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_params: dict, batch_size: int = 800) -> None:
-    """
-    Pipeline to fetch, download and save sentinel pixels as numpy arrays
-    """
+    #Pipeline to fetch, download and save sentinel pixels as numpy arrays
+    
     try:
         ee.Initialize(project = gee_proj_name)
     except:
@@ -390,6 +396,7 @@ def sentinel_download_pipeline(df: pd.DataFrame, gee_proj_name: str, sentinel_pa
         image_list, label_list, composite_key_list = [], [], []
 
         for row in batch_df.itertuples():
+            row: Any
             i = row.Index
             try:
                 geom          = ee.Geometry(row.geometry.__geo_interface__)

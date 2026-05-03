@@ -187,7 +187,7 @@ def available_files_by_year(data_directory: str, file_type: str) -> set:
     Returns:
       - Set: A set containing the available years
     """
-    folder          = Path(os.getenv("DATA_DIR"))/data_directory
+    folder          = Path(os.getenv["DATA_DIR"])/data_directory
     files           = get_filepaths(folder)
     file_extension  = f"{file_type}$"
     available_years = [f for f in files if re.search(file_extension, str(f)) is not None]
