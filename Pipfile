@@ -24,6 +24,7 @@ tensorflow = "*"
 opencv-python = "*"
 tifffile = "*"
 scikit-image = "*"
+seaborn = "*"
 
 [dev-packages]
 pandas-stubs = "*"
