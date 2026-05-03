@@ -6,7 +6,7 @@
 |- data/
 |   |- raw/
 |       |- fwi/           # .grib files for each year
-|       |- ukgrid         # .shp files to split UK into grids
+|       |- ukgrid/        # .shp files to split UK into grids
 |       |- viirs/         # .csv files fire labels for each year
 |   |- preprocessed/  
 |       |- sampled/       # .csv of sampled data, per year
