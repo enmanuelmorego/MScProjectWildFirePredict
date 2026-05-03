@@ -15,6 +15,7 @@ models/
 outputs/
 *.csv
 *.bkp
+.idea/
 
 # MacOS
 .DS_Store
