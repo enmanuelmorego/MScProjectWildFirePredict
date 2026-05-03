@@ -14,7 +14,7 @@ def geodf_to_ee(geo_df: gpd.GeoDataFrame) -> ee.FeatureCollection:
         geo_df (GeoDataFrame): Data frame containing the plygon for the UK Grids, for each date of the date range
                                Expected columns:
                                - 'date' (datetime or date-like)
-                               - 'id'   (grid identifier)
+                               - 'grid_id'   (grid identifier)
                                - 'geometry' (polygon geometry)
 
     Returns:

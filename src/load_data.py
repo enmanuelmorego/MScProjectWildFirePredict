@@ -11,7 +11,7 @@ import utils as u
 import google_ee as gee
 import cdsapi
 import pygrib
-import time
+from shapely.wkt import loads
 
 # -------------------------
 # VIIRS DATA
@@ -88,7 +88,7 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
     ValueError if SNPP data is not provided 
   """
   cols_merge = ['longitude','latitude','acq_date']
-  df_snpp = viirs_dict.get('snpp', 'SNPP: No data available')
+  df_snpp = viirs_dict.get('snpp')
   df_noaa = viirs_dict.get('noaa', 'NOAA: No data available')
 
   if df_snpp is None:
@@ -98,6 +98,7 @@ def merge_viirs(viirs_dict: dict[pd.DataFrame], append_noaa: bool = True) -> dic
     # Find values in NOAA not in SNPP 
     df_diff = df_noaa.loc[~df_noaa.set_index(cols_merge).index.isin(df_snpp.set_index(cols_merge).index)]
     df_out = pd.concat([df_snpp, df_diff], ignore_index = True)
+
     data_report = {'total_rows_snpp': df_snpp.shape[0],
                    'total_rows_noaa': df_diff.shape[0]}
     return {'df': df_out,
@@ -153,14 +154,16 @@ def viirs_load_pipeline(dir_name: str,
     Dictionary containing the final data frame and the data report (the dataframe returned is a GeoPandas df)
     `{'df_viirs': df_viirs, 'data_report': df_viirs_report}`
   """
-  viirs_files =     u.get_filepaths(dir_name)
-  viirs_to_load =   to_load_viirs(viirs_files,date_range)
-  viirs_data =      load_viirs(viirs_to_load)
-  df_viirs_raw =    merge_viirs(viirs_data)
-  df_viirs_report = df_viirs_raw.get('data_report')
-  df_viirs_temp =   df_viirs_raw.get('df')
-  df_viirs =        filter_viirs(df_viirs_temp)
-  df_viirs_geo =    geo_viirs(df_viirs, crs)
+  viirs_files      = u.get_filepaths(dir_name)
+  viirs_to_load    = to_load_viirs(viirs_files,date_range)
+  viirs_data       = load_viirs(viirs_to_load)
+  df_viirs_raw     = merge_viirs(viirs_data)
+  df_viirs_report  = df_viirs_raw.get('data_report')
+  df_viirs_temp    = df_viirs_raw.get('df')
+  df_viirs         = filter_viirs(df_viirs_temp)
+  df_viirs         = df_viirs.rename(columns = {'acq_date': 'date'})
+  df_viirs["date"] = pd.to_datetime(df_viirs["date"])
+  df_viirs_geo     = geo_viirs(df_viirs, crs)
   return {'df_viirs': df_viirs_geo,
           'data_report': df_viirs_report}
 
@@ -183,6 +186,23 @@ def load_uk_grid(file_name: str, crs: str) -> gpd.GeoDataFrame:
   uk_grid = uk_grid.rename(columns = {'id': 'grid_id'})
   uk_grid = uk_grid.to_crs(crs)
   return uk_grid
+
+def uk_grid_data_pipeline(df_grid: pd.DataFrame, df_viirs_in: pd.DataFrame) -> pd.DataFrame:
+  """
+  Pipeline that takes the df_uk_grid loaded and creates a grid per day in the date range specified 
+
+  Args:
+    df_grid (dataframe): Dataframe containing the UK map gridded into 12 x 12 km grids
+    df_viirs_in (dataframe): Dataframe containing the data from VIIRS to be used as fire flag
+
+  Returns:
+    df (dataframe): Dataframe containing the UK grid for each day specified in the computed date range
+  """
+  dates = u.extract_year_range(df_viirs_in)
+  df_daily_grid = df_grid.copy()
+  df_daily_grid['join_key'] = 1
+  df_daily_grid = df_daily_grid.merge(dates, on='join_key').drop(columns='join_key')
+  return df_daily_grid
 
 #sentinel_batch_create
 # -------------------------
@@ -438,34 +458,28 @@ def fetch_fwi_api(required_years: set, fwi_data_dir: Path) -> None:
     out_file_path = Path(fwi_data_dir)/fname
 
     dataset = "cems-fire-historical-v1"
-    request = {
-        "product_type": "reanalysis",
-        "variable": ["fire_weather_index"],
-        "dataset_type": "consolidated_dataset",
-        "system_version": ["4_1"],
-        "year": [y],
-        "month": [
-            "01", "02", "03",
-            "04", "05", "06",
-            "07", "08", "09",
-            "10", "11", "12"
-        ],
-        "day": [
-            "01", "02", "03",
-            "04", "05", "06",
-            "07", "08", "09",
-            "10", "11", "12",
-            "13", "14", "15",
-            "16", "17", "18",
-            "19", "20", "21",
-            "22", "23", "24",
-            "25", "26", "27",
-            "28", "29", "30",
-            "31"
-        ],
-        "grid": "original_grid",
-        "data_format": "grib"
-    }
+    request = {"product_type"  : "reanalysis",
+               "variable"      : ["fire_weather_index"],
+               "dataset_type"  : "consolidated_dataset",
+               "system_version": ["4_1"],
+               "year"          : [y],
+               "month"         : ["01", "02", "03",
+                                  "04", "05", "06",
+                                  "07", "08", "09",
+                                  "10", "11", "12"],
+               "day"           : ["01", "02", "03",
+                                  "04", "05", "06",
+                                  "07", "08", "09",
+                                  "10", "11", "12",
+                                  "13", "14", "15",
+                                  "16", "17", "18",
+                                  "19", "20", "21",
+                                  "22", "23", "24",
+                                  "25", "26", "27",
+                                  "28", "29", "30",
+                                  "31"],
+               "grid"          : "original_grid",
+               "data_format"   : "grib"}
 
     client = cdsapi.Client()
     client.retrieve(dataset, request, out_file_path.as_posix())
@@ -501,11 +515,15 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   list_fwi = []
   total = len(fwi_msgs)
   i = 1
+
+  # Compute grid centroids
+  df_grid_centroids_proj = df_uk_grid.to_crs("EPSG:27700")
+  df_grid_centroids_proj["geometry"] = df_grid_centroids_proj.geometry.centroid
+
   # Process data
   for grb in fwi_msgs:
     print(f"\r\t...⚙️  [{grib_fname}] Processing {i} of {total} [{round((i/total)*100,2)}]%", end="")
     # Extract variables
-    date       = grb.validDate
     date       = datetime.strptime(f"{grb.dataDate}{grb.dataTime:04d}", "%Y%m%d%H%M")
     lats, lons = grb.latlons()
     fwi_values = grb.values
@@ -522,17 +540,25 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                                    geometry = gpd.points_from_xy(df_grib.longitude,
                                                                  df_grib.latitude),
                                    crs = crs_val)
+    
+    df_geo_grib_proj = df_geo_grib.to_crs("EPSG:27700")
     # Join FWI to UK Grid to get value per Grid
-    df_join = gpd.sjoin(df_geo_grib, df_uk_grid, how = 'inner', predicate = 'within')
-    df_grouped = (df_join
-                  .groupby(['grid_id', 'date'], as_index = False)
-                  .agg(fwi_max  = ('fwi', 'max'),
-                       fwi_mean = ('fwi', 'mean')))
-    list_fwi.append(df_grouped)
+    df_join = gpd.sjoin_nearest(df_grid_centroids_proj,
+                                df_geo_grib_proj[['geometry','fwi']],
+                                how = 'left')
+    df_join['date'] = date
+
+    list_fwi.append(df_join)
     # User Messages objects
     i += 1
   
   df_fwi = pd.concat(list_fwi, ignore_index = True)
+  df_fwi["date"] = pd.to_datetime(df_fwi["date"]).dt.normalize()
+  # Aggregate to daily grid level and compute mean and max
+  df_fwi = (df_fwi
+            .groupby(["grid_id", "date"], as_index=False)
+            .agg(fwi_max=("fwi", "max"),
+                 fwi_mean=("fwi", "mean")))
   fname_out = Path(fwi_path)/grib_fname.replace(".grib", ".csv")
   df_fwi.to_csv(fname_out, index = False)
   print(f"\n\t...✅  Succesfully processed {grib_fname}")
@@ -632,20 +658,37 @@ def fwi_load_pipeline(fwi_path: Path,
     df_load = pd.read_csv(fname_load)
     fwi_list.append(df_load)
   df_fwi = pd.concat(fwi_list, ignore_index = True)
+  df_fwi["date"] = pd.to_datetime(df_fwi["date"])
   return df_fwi
+
+def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) -> pd.DataFrame:
+  """
+  Function to load the cached sampled data for the requested years
+  
+  Args:
+    - year (list): List containing the required years for data processing
+    - data_dir (str): Folder name containing the required data
+    - file_name (str): Name of the file to fetch
+    - crs (str): Reference system of the project
+
+  Returns:
+    - df: Sampled dataframe 
+  """
+  parent_data_dir       = os.getenv("DATA_DIR")
+  list_sampled          = [pd.read_csv(f"{parent_data_dir}/{data_dir}/{year}_{file_name}") for year in years ]
+  df_sampled            = pd.concat(list_sampled)
+  df_sampled['date']    = pd.to_datetime(df_sampled['date'])
+  df_sampled['date_dv'] = pd.to_datetime(df_sampled['date_dv'])
+  # Transform to GeoDF 
+  df_sampled['geometry'] = df_sampled['geometry'].apply(loads)
+  gdf_sampled = gpd.GeoDataFrame(df_sampled, geometry = 'geometry', crs = crs)
+
+  return gdf_sampled
+
 
 
 if __name__ == "__main__":
     os.environ.setdefault("RUN_DEMO", "ON")
     import config as c
     DATA_DIR = os.environ.get("DATA_DIR")
-    CRS             = "EPSG: 4326"          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
-
-
-    dates = pd.to_datetime(['2019-01-01', '2019-02-02','2019-02-02', '2019-12-10'])
-    df_uk_grid = pd.DataFrame({'date': dates})
-
-
-    fwi_p    = Path(DATA_DIR)/"FWI"
-    f = fwi_load_pipeline(fwi_p, df_uk_grid)
-    print(f)
+    CRS             = "EPSG: 4326"          # Set  Reference System (CRS) so it is uniform across all data inputs

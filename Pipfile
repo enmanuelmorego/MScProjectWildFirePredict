@@ -20,10 +20,14 @@ geemap = "*"
 pygrib = "*"
 xarray = "*"
 cdsapi = "*"
+tensorflow = "*"
+opencv-python = "*"
+tifffile = "*"
+scikit-image = "*"
 
 [dev-packages]
-ipykernel = "*"
 pandas-stubs = "*"
+ipykernel = "*"
 
 [requires]
-python_version = "3.12"
+python_version = "3.11"
