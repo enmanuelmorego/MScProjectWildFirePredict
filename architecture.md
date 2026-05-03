@@ -10,7 +10,7 @@
 |       |- viirs/         # .csv files fire labels for each year
 |   |- preprocessed/  
 |       |- sampled/       # .csv of sampled data, per year
-|       |- senitnel2/     # .npz downloaded from sampled dataset
+|       |- sentinel2/     # .npz downloaded from sampled dataset
 |       |- satellitefeat/ # .csv of sampled sentinel features
 |   |- ml_model_input/    # .csv of sampled + sentinel2 features
 ```
