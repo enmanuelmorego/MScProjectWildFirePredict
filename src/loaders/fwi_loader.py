@@ -106,7 +106,7 @@ def fwi_fetch_from_api(required_years: set, fwi_data_dir: Path) -> None:
     client = cdsapi.Client()
     client.retrieve(dataset, request, out_file_path.as_posix())
 
-def fwi_load_csv_files(fwi_csvs: list[Path], fwi_path: str) -> pd.DataFrame:
+def fwi_load_csv_files(fwi_csvs: list[Path], fwi_path: Path) -> pd.DataFrame:
   """Takes list of available and relevant .csv files, loads them as .csv onto a list and are concatenated into a single df
 
   Args:

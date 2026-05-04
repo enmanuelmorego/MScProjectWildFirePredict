@@ -28,8 +28,9 @@ def load_fwi_main(df_uk_grid_in: gpd.GeoDataFrame, data_dir: Path, requested_yea
 
     # 3. Load csv data
     fwi_csv_files = fwi_files['available_csv']
+    df_fwi        = l.fwi_load_csv_files(fwi_csv_files, fwi_path)
 
-    return fwi_csv_files
+    return df_fwi
 
 
 if __name__ == "__main__":
