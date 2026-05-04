@@ -10,12 +10,14 @@ os.environ.setdefault("DATA_DIR", str(Path(__file__).resolve().parents[3] / "dat
 def load_viirs_main(years_to_load: list[int]):
     viirs_files   = fu.get_filepaths('VIIRS', "csv")
     viirs_to_load = l.select_viirs_files(viirs_files, years_to_load)
+    viirs_data    = l.load_viirs(viirs_to_load)
 
-    print(f"Found {len(viirs_to_load)} files") 
-    for i in viirs_to_load:
-        print(i)
+    return viirs_data
+    # print(f"Found {len(viirs_to_load)} files") 
+    # for i in viirs_to_load:
+    #     print(i)
 
 if __name__ == "__main__":
     # python3 -m src.datasets.viirs.pipeline
     years = []
-    load_viirs_main(years)
+    print(load_viirs_main(years).keys())
