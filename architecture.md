@@ -24,7 +24,7 @@ MScProjectWildFirePredict/
 |       |- fwi_loader.py
 |       |- ukgrid_loader.py
 |       |- sentinel2_loader.py
-|   | - transformations/
+|   | - transforms/
 |       |- viirs_transforms.py
 |       |- fwi_transforms.py
 |       |- ukgrid_transforms.py
