@@ -3,7 +3,10 @@ Module to set the parameters for the run and ensure user is updating the file be
 """
 from datetime import date, datetime
 import os
+from pathlib import Path
 
+# Project Root
+PROJ_HOME = Path(__file__).resolve().parents[2]
 # Enter date as yyyy, m, d
 VALIDATION_DATE = date(2026, 5, 4)
 
@@ -13,8 +16,8 @@ PARAMETERS = {"YEAR_FILTER"      : [2018],
               "SATELLITE_BANDS"  : ["B3","B4","B8"],
               "SATELLITE_SCALE"  : 80,
               "GRB_NAME"         : "Forest fire weather index (as defined by the Canadian Forest Service)",
-              "DATA_DIR"         : os.environ["DATA_DIR"],
-              "RUN_ID"           : f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}_RUNNING_DEMO_{os.environ.get('RUN_DEMO')}",
+              "DATA_DIR"         : Path(PROJ_HOME)/"data",
+              "RUN_ID"           : f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}",
               "RANDOM_SEED"      : 42,
               
               "VIIRS_DIR"                : "VIIRS",
@@ -23,3 +26,6 @@ PARAMETERS = {"YEAR_FILTER"      : [2018],
               "FIRENOFIRE_SAMPLED_FNAME" : "sampled_firenofire.csv",
               "SP_FILENAME"              :"ukcp18-uk-land-12km.shp",
               "GEE_PROJECT"              : "ee-enmanuelmorego"}
+if __name__ == "__main__":
+    print(PROJ_HOME)
+    print(PARAMETERS['RUN_ID'])
