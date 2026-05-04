@@ -16,6 +16,8 @@ def run_tabular():
     # Load VIIRS data
     dict_viirs = load_viirs_main(years_to_load = YEAR_FILTER, data_dir = DATA_DIR, crs = CRS)
     df_viirs = dict_viirs['df_viirs']
+    # Load UK Grid data
+    
 
 
     return df_viirs
