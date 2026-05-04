@@ -1,6 +1,8 @@
 """
 Method that contains all the functions to load the FWI data
 """
+import src.utils.file_utils as fu
+
 from pathlib import Path
 import os
 
@@ -45,3 +47,19 @@ def select_fwi_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years:
   return {'available_csv' : matched_csv_files,
           'available_grib': matched_grib_files,
           'required_years': missing_yrs}
+
+def fwi_file_availability_wrapper(data_dir: Path, requested_years: list[int], dir_name: str ):
+  """Wrapper function that searches and checks which files are available as csv, grib and which need downloading
+
+  Args:
+      data_dir (Path): Directory of data storage
+      requested_years (list[int]): Years requested to process (from `set_parameters.py` file)
+      dir_name (str): Name of directory (FWI in this case)
+
+  Returns:
+      _type_: _description_
+  """    
+  fwi_csv_files  = fu.get_filepaths(data_dir, dir_name, "csv")
+  fwi_grib_files = fu.get_filepaths(data_dir, dir_name, "grib")
+  fwi_files      = select_fwi_files(fwi_csv_files, fwi_grib_files, requested_years)
+  return fwi_files
