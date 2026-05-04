@@ -15,16 +15,12 @@ MScProjectWildFirePredict/
 ## Codebase
 Contains the code for the project 
 
-Note to self (delete later):
-```
-list(Path(<some_path>).glob("*"))
-```
 ```
 MScProjectWildFirePredict/
 |- src
 |   | - utils/
 |       |- file_utils.py [get_file_paths(), select_files()]
-|   | - data/
+|   | - datasets/
 |       |- viirs/
 |       |   |- loader.py
 |       |   |- transforms.py
