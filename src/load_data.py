@@ -319,9 +319,9 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   fwi_msgs   = grbs.select(name=grb_name)
 
   # Initialise object to store data
-  list_fwi = []
-  total = len(fwi_msgs)
-  i = 1
+  list_fwi: list[gpd.GeoDataFrame] = []
+  total                            = len(fwi_msgs)
+  i                                = 1
 
   # Compute grid centroids
   df_grid_centroids_proj = df_uk_grid.to_crs("EPSG:27700")
