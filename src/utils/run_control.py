@@ -14,5 +14,5 @@ def validate_params_update(validation_date: date):
     # Get today's date
     today = date.today()
     if today != validation_date:
-        raise ValueError("❌ Please update object VALIDATION_DATE in location:/nsrc/scripts/set_parameters.py")
+        raise ValueError("\n\t❌ Please update object VALIDATION_DATE with today's dates in location:\n\t   src/scripts/set_parameters.py")
  
