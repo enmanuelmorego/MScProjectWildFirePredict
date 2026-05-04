@@ -2,6 +2,7 @@
 Module containing functions to manage and control the run process
 """
 from datetime import date
+
 def validate_params_update(validation_date: date):
     """Function to validate and check user have updated parameters before running pipeline
 

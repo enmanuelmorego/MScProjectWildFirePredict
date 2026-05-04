@@ -33,7 +33,7 @@ if __name__ == "__main__":
     from pathlib import Path
     os.environ.setdefault("DATA_DIR", str(Path(__file__).resolve().parents[3] / "data"))
     # temp
-    years = [2019]
+    years = [2018]
     crs = "EPSG: 4326" 
     output = load_viirs_main(years, crs)
     print(output.get('data_report'))

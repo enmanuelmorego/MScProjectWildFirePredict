@@ -9,7 +9,7 @@ import src.config # type: ignore
 os.environ.setdefault("RUN_DEMO", "ON")
 
 # Enter date as yyyy, m, d
-VALIDATION_DATE = date(2026, 5, 2)
+VALIDATION_DATE = date(2026, 5, 4)
 
 PARAMETERS = {"YEAR_FILTER"      : [2018],
               "CRS"              : "EPSG: 4326",          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
