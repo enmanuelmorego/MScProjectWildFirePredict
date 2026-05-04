@@ -17,6 +17,7 @@ def run_tabular():
     DATA_DIR    = PARAMETERS['DATA_DIR']
     CRS         = PARAMETERS['CRS'] 
     SP_FILENAME = PARAMETERS['SP_FILENAME']
+
     # Load VIIRS data
     dict_viirs = load_viirs_main(years_to_load = YEAR_FILTER, data_dir = DATA_DIR, crs = CRS)
     df_viirs = dict_viirs['df_viirs']
@@ -27,9 +28,9 @@ def run_tabular():
     dict_ukgrid     = load_ukgrid_main(df_days_in = df_days, data_dir = DATA_DIR, file_name = SP_FILENAME, crs = CRS)
     df_ukgrid       = dict_ukgrid['df_ukgrid']
     df_daily_grid   = dict_ukgrid['df_daily_grid']
-    print(df_ukgrid.keys())
-    print(type(df_ukgrid))
-    print(type(df_daily_grid))
+
+    # Load FWI
+
 
 
 
