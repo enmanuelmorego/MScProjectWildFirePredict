@@ -65,7 +65,7 @@ def load_viirs(paths_to_load: list[Path]) -> dict[str, pd.DataFrame]:
   df_noaa = pd.concat(viirs_noaa,ignore_index=True)
   return {'snpp': df_viirs, 'noaa': df_noaa}
 
-def merge_viirs(viirs_dict: dict[str, pd.DataFrame | None], append_noaa: bool = True) -> dict[str, Any]:
+def merge_viirs(viirs_dict: dict[str, pd.DataFrame], append_noaa: bool = True) -> dict[str, Any]:
   """
   Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged
   them into a single data frame
