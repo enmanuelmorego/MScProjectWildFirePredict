@@ -27,7 +27,7 @@ def load_viirs_main(years_to_load: list[int], crs: str, dir_name: str = "VIIRS",
             'data_report': dict_viirs_report}
 
 if __name__ == "__main__":
-    # python3 -m src.datasets.viirs.pipeline
+    # Use this to run: python3 -m src.datasets.viirs.pipeline
     # Temp
     import os
     from pathlib import Path
