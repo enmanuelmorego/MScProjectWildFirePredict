@@ -14,36 +14,31 @@ MScProjectWildFirePredict/
 ```
 ## Codebase
 Contains the code for the project 
-
 ```
 MScProjectWildFirePredict/
 |- src
 |   | - utils/
 |       |- file_utils.py [get_file_paths(), select_files()]
-|   | - datasets/
-|       |- viirs/
-|       |   |- loader.py
-|       |   |- transforms.py
-|       |   |- pipeline.py
-|       |   |- output.py [where reelevant]
-|       |- fwi/
-|       |   |- loader.py
-|       |   |- transforms.py
-|       |   |- pipeline.py
-|       |- ukgrid/
-|       |   |- loader.py
-|       |   |- transforms.py
-|       |   |- pipeline.py
-|       |- sentinel2/
-|       |   |- loader.py
-|       |   |- transforms.py
-|       |   |- pipeline.py
+|   | - loaders/
+|       |- viirs_loader.py
+|       |- fwi_loader.py
+|       |- ukgrid_loader.py
+|       |- sentinel2_loader.py
+|   | - transformations/
+|       |- viirs_transforms.py
+|       |- fwi_transforms.py
+|       |- ukgrid_transforms.py
+|       |- sentinel2_transforms.py
+|   | - pipelines/
+|       |- viirs_pipeline.py
+|       |- fwi_pipeline.py
+|       |- ukgrid_pipeline.py
+|       |- sentinel2_pipeline.py
 |   |- preprocessing/
 |   |- ml_model/
 |   |   |- feature_extraction.py
 |   |   |- create_ml_dataset.py
 |   |   |- random_forest.py
-
 ``` 
 ## Scripts
 This folder contains the modules that performs specific step in the program.
