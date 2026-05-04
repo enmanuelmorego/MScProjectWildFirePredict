@@ -2,6 +2,8 @@ import src.utils.file_utils as fu
 import src.datasets.viirs.loader as l
 import src.datasets.viirs.transforms as t
 
+import pandas as pd
+
 # Temp
 import os
 from pathlib import Path
@@ -15,8 +17,7 @@ def load_viirs_main(years_to_load: list[int]):
     df_viirs_raw    = t.merge_viirs(viirs_data)
     df_viirs_report = df_viirs_raw['data_report']
     df_viirs_temp   = df_viirs_raw['df']
-  
-    df_viirs         = filter_viirs(df_viirs_temp)
+    df_viirs         = t.filter_viirs(df_viirs_temp)
     df_viirs         = df_viirs.rename(columns = {'acq_date': 'date'})
     df_viirs["date"] = pd.to_datetime(df_viirs["date"])
     df_viirs_geo     = geo_viirs(df_viirs, crs)
