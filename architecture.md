@@ -51,6 +51,8 @@ These are split into separate, independent components as they are usually run in
 
 The file structure is shown below, but an in text explanation is also provided for clarity 
 
+`validation_checks.py` = Contains functions used to check and validate expected rules for when the program is being executed
+
 `set_parameters.py` = Define all the values for the variables to be used by all scripts in the program. This includes years to process, file names, etc. This module is called by all modules below.
 
 *Note:*
@@ -69,6 +71,7 @@ If the configuration date does not match the current run date, a warning is rais
 ```
 MScProjectWildFirePredict/
 |- scripts/
+|   |- validation_checks.py
 |   |- set_parameters.py
 |   |- run_tabular.py
 |   |- run_satellite_fetch.py

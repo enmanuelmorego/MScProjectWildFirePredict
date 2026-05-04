@@ -3,12 +3,12 @@ Module to run all the data load, and transformations to prepare all tabular data
 """
 
 from src.scripts.set_parameters import VALIDATION_DATE, PARAMETERS
+import src.scripts.validation_checks as vc
 from src.datasets.viirs.pipeline import load_viirs_main
-import src.utils.run_control as rc
 
 def run_tabular():
     # Validation rule
-    rc.validate_params_update(VALIDATION_DATE)
+    vc.validate_params_update(VALIDATION_DATE)
     # Extract parameter values
     YEAR_FILTER = PARAMETERS['YEAR_FILTER']
     DATA_DIR    = PARAMETERS['DATA_DIR']
