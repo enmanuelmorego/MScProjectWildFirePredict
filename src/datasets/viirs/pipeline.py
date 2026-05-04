@@ -29,10 +29,12 @@ def load_viirs_main(years_to_load: list[int], data_dir: Path, crs: str, dir_name
 
 if __name__ == "__main__":
     # Use this to run: python3 -m src.datasets.viirs.pipeline
-    
+    from pathlib import Path
     years = [2018]
     crs = "EPSG: 4326" 
-    output = load_viirs_main(years, crs)
+    ddir = Path(__file__).resolve().parents[3]
+    ddir = ddir / 'data'
+    output = load_viirs_main(years, ddir, crs)
     print(output.get('data_report'))
     df_v = output.get('df_viirs')
     print(df_v.shape)
