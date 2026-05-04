@@ -23,7 +23,7 @@ PARAMETERS = {"YEAR_FILTER"      : [2018],
               "FWI_DIR"                  : "FWI",
               "FIRENOFIRE_SAMPLED_DIR"   : "SampledFireNoFire",
               "FIRENOFIRE_SAMPLED_FNAME" : "sampled_firenofire.csv",
-              "SP_FILENAME"              :"ukcp18-uk-land-12km.shp",
+              "SP_FILENAME"              : "ukcp18-uk-land-12km.shp",
               "GEE_PROJECT"              : "ee-enmanuelmorego"}
 if __name__ == "__main__":
     print(PROJ_HOME)
