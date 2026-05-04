@@ -3,10 +3,6 @@ Module to set the parameters for the run and ensure user is updating the file be
 """
 from datetime import date, datetime
 import os
-import src.config # type: ignore
-
-
-os.environ.setdefault("RUN_DEMO", "ON")
 
 # Enter date as yyyy, m, d
 VALIDATION_DATE = date(2026, 5, 4)
