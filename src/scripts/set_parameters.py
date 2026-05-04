@@ -3,13 +3,15 @@ Module to set the parameters for the run and ensure user is updating the file be
 """
 from datetime import date, datetime
 import os
+import src.config # type: ignore
+
 
 os.environ.setdefault("RUN_DEMO", "ON")
 
 # Enter date as yyyy, m, d
-validation_date = date(2026, 5, 4)
+VALIDATION_DATE = date(2026, 5, 4)
 
-parameters = {"YEAR_FILTER"      : [2018],
+PARAMETERS = {"YEAR_FILTER"      : [2018],
               "CRS"              : "EPSG: 4326",          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
               "SATELLITE_IMAGES" : "COPERNICUS/S2_SR_HARMONIZED",
               "SATELLITE_BANDS"  : ["B3","B4","B8"],
