@@ -2,7 +2,6 @@
 Module to set the parameters for the run and ensure user is updating the file before running pipeline(s)
 """
 from datetime import date, datetime
-import os
 from pathlib import Path
 
 # Project Root
@@ -28,4 +27,4 @@ PARAMETERS = {"YEAR_FILTER"      : [2018],
               "GEE_PROJECT"              : "ee-enmanuelmorego"}
 if __name__ == "__main__":
     print(PROJ_HOME)
-    print(PARAMETERS['RUN_ID'])
+    print(type(PARAMETERS['DATA_DIR']))

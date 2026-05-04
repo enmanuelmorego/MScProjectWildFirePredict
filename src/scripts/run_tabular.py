@@ -11,6 +11,7 @@ def run_tabular():
     rc.validate_params_update(VALIDATION_DATE)
     # Load VIIRS data
     dict_viirs = load_viirs_main(years_to_load = PARAMETERS['YEAR_FILTER'], 
+                                 data_dir      = PARAMETERS['DATA_DIR'],
                                  crs           = PARAMETERS['CRS'])
     df_viirs = dict_viirs['df_viirs']
 
@@ -19,10 +20,7 @@ def run_tabular():
 
 if __name__ == "__main__":
     # python3 -m src.scripts.run_tabular
-    import os
-    from pathlib import Path
     
-    os.environ.setdefault("DATA_DIR", str(Path(__file__).resolve().parents[3] / "data"))
     x = run_tabular()
     x.head()
     

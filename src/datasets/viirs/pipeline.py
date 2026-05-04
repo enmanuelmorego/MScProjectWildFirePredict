@@ -5,6 +5,7 @@ import src.datasets.viirs.transforms as t
 import pandas as pd
 import geopandas as gpd
 from typing import TypedDict
+from pathlib import Path
 
 
 # Pre define complex dictionaries type hints
@@ -12,8 +13,8 @@ class ViirsPipelineOutput(TypedDict):
     df_viirs: gpd.GeoDataFrame
     data_report: dict | None
 
-def load_viirs_main(years_to_load: list[int], crs: str, dir_name: str = "VIIRS", file_extension:str = "csv") -> ViirsPipelineOutput:
-    viirs_files       = fu.get_filepaths(dir_name, file_extension)
+def load_viirs_main(years_to_load: list[int], data_dir: Path, crs: str, dir_name: str = "VIIRS", file_extension:str = "csv") -> ViirsPipelineOutput:
+    viirs_files       = fu.get_filepaths(data_dir, dir_name, file_extension)
     viirs_to_load     = l.select_viirs_files(viirs_files, years_to_load)
     viirs_data        = l.load_viirs(viirs_to_load)
     df_viirs_raw      = t.merge_viirs(viirs_data)
@@ -28,11 +29,7 @@ def load_viirs_main(years_to_load: list[int], crs: str, dir_name: str = "VIIRS",
 
 if __name__ == "__main__":
     # Use this to run: python3 -m src.datasets.viirs.pipeline
-    # Temp
-    import os
-    from pathlib import Path
-    os.environ.setdefault("DATA_DIR", str(Path(__file__).resolve().parents[3] / "data"))
-    # temp
+    
     years = [2018]
     crs = "EPSG: 4326" 
     output = load_viirs_main(years, crs)
