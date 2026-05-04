@@ -1,4 +1,4 @@
-import src.utils.file_utils as fu
+import utils.file_utils as fu
 import loaders.viirs_loader as l
 import transforms.viirs_transforms as t
 

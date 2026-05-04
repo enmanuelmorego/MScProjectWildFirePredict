@@ -2,10 +2,10 @@
 Module to run all the data load, and transformations to prepare all tabular data for transformations
 """
 
-import src.scripts.validation_checks as vc
-import src.utils.datasets_utils as du
+import scripts.validation_checks as vc
+import utils.datasets_utils as du
 
-from src.scripts.set_parameters import VALIDATION_DATE, PARAMETERS
+from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
 from pipelines.viirs_pipeline import load_viirs_main
 from pipelines.ukgrid_pipeline import load_ukgrid_main
 from pipelines.fwi_pipeline import load_fwi_main
@@ -35,14 +35,10 @@ def run_tabular():
     # Load FWI
     df_fwi = load_fwi_main(df_uk_grid_in = df_ukgrid, data_dir = DATA_DIR, requested_years = YEAR_FILTER, grb_name = GRB_NAME, crs = CRS)
 
-
-
-
     return df_fwi
 
 if __name__ == "__main__":
     # python3 -m src.scripts.run_tabular
-    
     x = run_tabular()
     print(x.head())
     

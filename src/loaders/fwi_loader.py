@@ -1,7 +1,7 @@
 """
 Method that contains all the functions to load the FWI data
 """
-import src.utils.file_utils as fu
+import utils.file_utils as fu
 import cdsapi
 import os
 import pandas as pd

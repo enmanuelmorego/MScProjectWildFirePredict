@@ -1,4 +1,4 @@
-import src.utils.file_utils as fu
+
 import loaders.fwi_loader as l
 import transforms.fwi_transforms as t
 
