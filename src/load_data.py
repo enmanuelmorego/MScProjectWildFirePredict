@@ -50,8 +50,8 @@ def load_viirs(paths_to_load: list[Path]) -> dict[str, pd.DataFrame]:
     `{'snpp': df_viirs, 'noaa': df_noaa}`
 
   """
-  viirs_noaa = []
-  viirs_snpp = []
+  viirs_noaa: list[pd.DataFrame] = []
+  viirs_snpp: list[pd.DataFrame] = []
 
   for p in paths_to_load:
     if "snpp" in p.name:
@@ -492,4 +492,7 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) ->
   return gdf_sampled
 
 
-
+if __name__ == "__main__":
+  years = [2020, 2021, 2025]
+  files = [Path("2021file"), Path("2020file")]
+  print(to_load_viirs(files, years))
