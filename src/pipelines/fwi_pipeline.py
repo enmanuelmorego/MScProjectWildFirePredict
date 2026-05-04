@@ -14,7 +14,7 @@ def load_fwi_main(data_dir: Path, requested_years: list[int], dir_name: str = "F
         l.fwi_fetch_from_api(fetch_from_api, fwi_path)
         # Refresh requirements to include newly downloaded data
         fwi_files = l.fwi_file_availability_wrapper(data_dir, requested_years, dir_name)
-    
+        
     # 2. If Grib file needs to be transformed to csv
     grib_to_csv = fwi_files['available_grib']
     if grib_to_csv:

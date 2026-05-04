@@ -1,5 +1,5 @@
 """
-Module of data transformations
+Module of data transformations for VIIRS
 """
 import pandas as pd
 import geopandas as gpd
