@@ -2,8 +2,14 @@
 Module of data transformations
 """
 import pandas as pd
+from typing import TypedDict
 
-def merge_viirs(viirs_dict: dict[str, pd.DataFrame], append_noaa: bool = True) -> dict[str, pd.DataFrame | dict | None ]:
+# Pre define complex dictionaries type hints
+class MergeViirsOutput(TypedDict):
+    df: pd.DataFrame
+    data_report: dict | None
+
+def merge_viirs(viirs_dict: dict[str, pd.DataFrame], append_noaa: bool = True) -> MergeViirsOutput:
     """Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged them into a single data frame.
     Data from SNPP takes precedence over NOAA as SNPP data is more robust and undergoes more strict QA
 
@@ -37,3 +43,21 @@ def merge_viirs(viirs_dict: dict[str, pd.DataFrame], append_noaa: bool = True) -
     else:
         return {'df'         : df_snpp,
                 'data_report': None}
+
+def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
+    """Filters the VIIRS data to only the desired rows to ensure data quality
+    - Filter only Vegetation Fires:                     `type == 0`
+    - Filter to keep Nominal and high Confidence class: `confidence == 'N' or confidence == 'H'`
+
+    Args:
+        viirs_data (pd.DataFrame): Combined, full viirs dataframe
+
+    Returns:
+        pd.DataFrame: Dataframe filtered to relevant rows only
+    """  
+    df_viirs = viirs_data.copy()
+    df_viirs['confidence'] = df_viirs['confidence'].str.lower().str.strip()
+    df_out = df_viirs[(df_viirs['type'] == 0) & 
+                        (df_viirs['confidence'].isin(['h','n']))
+                    ].copy()
+    return df_out
