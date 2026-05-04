@@ -5,13 +5,13 @@ from pathlib import Path
 
 def load_fwi_main(data_dir: Path, requested_years: list[int], dir_name: str = "FWI"):
 
+    fwi_path  = Path(data_dir)/dir_name
     fwi_files = l.fwi_file_availability_wrapper(data_dir, requested_years, dir_name)
 
     # 1. Check if any files are required from CEMS API
     fetch_from_api = fwi_files['required_years']
     if fetch_from_api:
-        print("\t📈 Fetching FWI data from CDS API...")
-        fetch_fwi_api(fetch_from_api, fwi_path)
+        l.fwi_fetch_from_api(fetch_from_api, fwi_path)
         # Refresh requirements to include newly downloaded data
         fwi_files = l.fwi_file_availability_wrapper(data_dir, requested_years, dir_name)
     

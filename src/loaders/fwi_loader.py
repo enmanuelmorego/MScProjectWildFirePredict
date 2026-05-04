@@ -4,9 +4,10 @@ Method that contains all the functions to load the FWI data
 import src.utils.file_utils as fu
 
 from pathlib import Path
+import cdsapi
 import os
 
-def select_fwi_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years: list[int] ) -> dict:
+def fwi_select_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years: list[int] ) -> dict:
   """  Function to check .csv and .grib file availability in Google Drive for Fire Weather Index data
   Each FWI file corresponds to a full year worth of data, therefore, the checks are performed in a year by year basis 
   - Compare the years with a list of available files provided 
@@ -61,5 +62,46 @@ def fwi_file_availability_wrapper(data_dir: Path, requested_years: list[int], di
   """    
   fwi_csv_files  = fu.get_filepaths(data_dir, dir_name, "csv")
   fwi_grib_files = fu.get_filepaths(data_dir, dir_name, "grib")
-  fwi_files      = select_fwi_files(fwi_csv_files, fwi_grib_files, requested_years)
+  fwi_files      = fwi_select_files(fwi_csv_files, fwi_grib_files, requested_years)
   return fwi_files
+
+def fwi_fetch_from_api(required_years: set, fwi_data_dir: Path) -> None:
+  """ Function to fetch the FWI data from CEMS Early Warning Data Store for the required years passed in the argument
+  Uses cdsapi to fetch the data and download the corresponding .grib file
+
+  Args:
+      required_years (set): A set of strings containing the years required to download
+      fwi_data_dir (Path): Path of the FWI data folder
+  """
+  print("\t📈 Fetching FWI data from CDS API...")
+  for y in required_years:
+    fname         = f"{y}FWI.grib"
+    out_file_path = Path(fwi_data_dir)/fname
+    dataset       = "cems-fire-historical-v1"
+    request       = {"product_type"  : "reanalysis",
+                     "variable"      : ["fire_weather_index"],
+                     "dataset_type"  : "consolidated_dataset",
+                     "system_version": ["4_1"],
+                     "year"          : [y],
+                     "month"         : ["01", "02", "03",
+                                        "04", "05", "06",
+                                        "07", "08", "09",
+                                        "10", "11", "12"],
+                     "day"           : ["01", "02", "03",
+                                        "04", "05", "06",
+                                        "07", "08", "09",
+                                        "10", "11", "12",
+                                        "13", "14", "15",
+                                        "16", "17", "18",
+                                        "19", "20", "21",
+                                        "22", "23", "24",
+                                        "25", "26", "27",
+                                        "28", "29", "30",
+                                        "31"],
+                     "grid"          : "original_grid",
+                     "data_format"   : "grib"}
+      
+    client = cdsapi.Client()
+    client.retrieve(dataset, request, out_file_path.as_posix())
+
+
