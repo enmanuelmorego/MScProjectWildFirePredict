@@ -2,6 +2,7 @@
 Method that contains all the functions to load the VIIRS data
 """
 from pathlib import Path
+import pandas as pd
 
 def select_viirs_files(files: list[Path], year_load: list[int] | None = None) -> list[Path]:
     """  Function to select the VIIRS files to load from local storage. The list of files is filtered if a year is specified
@@ -23,3 +24,28 @@ def select_viirs_files(files: list[Path], year_load: list[int] | None = None) ->
     if not files_out:
         print(f"⚠️ WARNING:\nNo files found for years {year_load}")
     return files_out
+
+def load_viirs(paths_to_load: list[Path]) -> dict[str, pd.DataFrame]:
+    """  Function to load the VIIRS data and store them in a dictionary. 
+    It loads NOAA-20 and SNPP separately
+
+    Args:
+        paths_to_load (list[Path]): List of Path objects to load 
+
+    Returns:
+        dict[str, pd.DataFrame]: dictionary containing both data frames from both used products 
+    """    
+    viirs_noaa: list[pd.DataFrame] = []
+    viirs_snpp: list[pd.DataFrame] = []
+
+    for p in paths_to_load:
+        if "snpp" in p.name:
+            df_in_v = pd.read_csv(p)
+            viirs_snpp.append(df_in_v)
+        elif 'jpss' in p.name:
+            df_in_n = pd.read_csv(p)
+            viirs_noaa.append(df_in_n)
+
+    df_viirs = pd.concat(viirs_snpp, ignore_index=True)
+    df_noaa  = pd.concat(viirs_noaa,ignore_index=True)
+    return {'snpp': df_viirs, 'noaa': df_noaa}
