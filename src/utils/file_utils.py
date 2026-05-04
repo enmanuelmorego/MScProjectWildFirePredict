@@ -4,7 +4,7 @@ Module to manage and interact with files and directory
 from pathlib import Path
 import os
 
-def get_filepaths(dir_name: str, file_extension: str) -> list[Path]: 
+def get_filepaths(data_dir: Path, dir_name: str, file_extension: str) -> list[Path]: 
     """  Function to get all the files in a directory inside the data folder based on the specified file extension
 
     Args:
@@ -14,6 +14,6 @@ def get_filepaths(dir_name: str, file_extension: str) -> list[Path]:
     Returns:
         list[Path]: List containing all the files inside the given folder
     """  
-    dir_path = Path(os.environ['DATA_DIR'])/dir_name
+    dir_path = data_dir/dir_name
     files = list(dir_path.glob(f"*.{file_extension}"))
     return files
