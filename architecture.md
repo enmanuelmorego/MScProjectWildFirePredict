@@ -68,7 +68,7 @@ If the configuration date does not match the current run date, a warning is rais
 ....
 ```
 MScProjectWildFirePredict/
-|- orchestrators/
+|- scripts/
 |   |- set_parameters.py
 |   |- run_tabular.py
 |   |- run_satellite_fetch.py
