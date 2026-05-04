@@ -1,4 +1,4 @@
-import src.datasets.ukgrid.loader as l
+import loaders.ukgrid_loader as l
 from pathlib import Path
 import pandas as pd
 import geopandas as gpd

@@ -6,8 +6,8 @@ import src.scripts.validation_checks as vc
 import src.utils.datasets_utils as du
 
 from src.scripts.set_parameters import VALIDATION_DATE, PARAMETERS
-from src.datasets.viirs.pipeline import load_viirs_main
-from src.datasets.ukgrid.pipeline import load_ukgrid_main
+from pipelines.viirs_pipeline import load_viirs_main
+from pipelines.ukgrid_pipeline import load_ukgrid_main
 
 def run_tabular():
     # Validation rule

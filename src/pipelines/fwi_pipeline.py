@@ -1,5 +1,5 @@
 import src.utils.file_utils as fu
-import src.datasets.fwi.loader as l
+import loaders.fwi_loader as l
 
 from pathlib import Path
 

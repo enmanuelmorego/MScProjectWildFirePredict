@@ -1,6 +1,6 @@
 import src.utils.file_utils as fu
-import src.datasets.viirs.loader as l
-import src.datasets.viirs.transforms as t
+import loaders.viirs_loader as l
+import transforms.viirs_transforms as t
 
 import pandas as pd
 import geopandas as gpd
