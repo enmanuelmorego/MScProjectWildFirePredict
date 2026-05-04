@@ -9,10 +9,12 @@ import src.utils.run_control as rc
 def run_tabular():
     # Validation rule
     rc.validate_params_update(VALIDATION_DATE)
+    # Extract parameter values
+    YEAR_FILTER = PARAMETERS['YEAR_FILTER']
+    DATA_DIR    = PARAMETERS['DATA_DIR']
+    CRS         = PARAMETERS['CRS'] 
     # Load VIIRS data
-    dict_viirs = load_viirs_main(years_to_load = PARAMETERS['YEAR_FILTER'], 
-                                 data_dir      = PARAMETERS['DATA_DIR'],
-                                 crs           = PARAMETERS['CRS'])
+    dict_viirs = load_viirs_main(years_to_load = YEAR_FILTER, data_dir = DATA_DIR, crs = CRS)
     df_viirs = dict_viirs['df_viirs']
 
 
@@ -22,5 +24,5 @@ if __name__ == "__main__":
     # python3 -m src.scripts.run_tabular
     
     x = run_tabular()
-    x.head()
+    print(x.head())
     
