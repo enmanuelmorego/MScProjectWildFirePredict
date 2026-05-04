@@ -2,6 +2,7 @@
 Module of data transformations
 """
 import pandas as pd
+import geopandas as gpd
 from typing import TypedDict
 
 # Pre define complex dictionaries type hints
@@ -61,3 +62,17 @@ def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
                         (df_viirs['confidence'].isin(['h','n']))
                     ].copy()
     return df_out
+
+def transform_to_geo_viirs(viirs_data: pd.DataFrame, crs: str) -> gpd.GeoDataFrame:
+    """ Function to transform the VIIRS input data to a GeoPandasDataFrame
+
+
+    Args:
+        viirs_data (pd.DataFrame): Dataframe with VIIRS data, filtered and cleaned
+        crs (str): A string containing the EPSG value to set the CRS
+
+    Returns:
+        gpd.GeoDataFrame: Transformed dataset from pandas to geopandas
+    """
+    viirs_geo = gpd.GeoDataFrame(viirs_data, geometry=gpd.points_from_xy(viirs_data.longitude, viirs_data.latitude), crs=crs)
+    return viirs_geo
