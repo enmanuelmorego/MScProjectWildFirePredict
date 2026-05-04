@@ -5,10 +5,8 @@ from pathlib import Path
 import os
 
 def select_fwi_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years: list[int] ) -> dict:
-  """
-  Function to check .csv and .grib file availability in Google Drive for Fire Weather Index data
+  """  Function to check .csv and .grib file availability in Google Drive for Fire Weather Index data
   Each FWI file corresponds to a full year worth of data, therefore, the checks are performed in a year by year basis 
-  - Extracts the unique years in the input data frame (which sets the dates required)
   - Compare the years with a list of available files provided 
   - It extracts the csv that matches the requested years
   - Then it extracts the .grib files if the year is part of the `requested_years` set and `not in` the extracted/available .csv files
@@ -21,19 +19,18 @@ def select_fwi_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years:
     - Identify gaps in the data and download data only relevant for the present analysis
 
   Args:
-    df_uk_daily_grid (GeoDataFrame): Data frame containing the full range of dates required for the analysis
-
-    available_files (Path): A list of available files in GoogleDrive, ready for use 
+      fwi_csv (list[Path]): List of file paths of available, processed csv files
+      fwi_grib (list[Path]): List of file paths of available, processed grib files
+      requested_years (list[int]): List of requested years, provided by user in `set_parameters.py` file
 
   Returns:
-    Dictionary with available files (if there are existing files in storage that matches the required years) and required years if the prior is not true
-    
-  Example::
+      dict: Dictionary with available files (if there are existing files in storage that matches the required years) and required years if the prior is not true
 
+  Example:
     out_dict = {'available_csv' : ['2017FWI.csv', '2018FWI.csv'],
                 'available_grib': ['2019FWI.grib', '20202FWI.grib']
                 'required_years': {'2021', '2022'}}
-  """
+  """  
  # initialise output dictionary
 
   requested_years_str = [str(y) for y in requested_years]
