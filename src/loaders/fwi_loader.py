@@ -2,10 +2,12 @@
 Method that contains all the functions to load the FWI data
 """
 import src.utils.file_utils as fu
-
-from pathlib import Path
 import cdsapi
 import os
+import pandas as pd
+
+from pathlib import Path
+
 
 def fwi_select_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years: list[int] ) -> dict:
   """  Function to check .csv and .grib file availability in Google Drive for Fire Weather Index data
@@ -104,4 +106,23 @@ def fwi_fetch_from_api(required_years: set, fwi_data_dir: Path) -> None:
     client = cdsapi.Client()
     client.retrieve(dataset, request, out_file_path.as_posix())
 
+def fwi_load_csv_files(fwi_csvs: list[Path], fwi_path: str) -> pd.DataFrame:
+  """Takes list of available and relevant .csv files, loads them as .csv onto a list and are concatenated into a single df
+
+  Args:
+      fwi_csvs (list[Path]): List of FWI csv files paths
+      fwi_path (str): Path of FWI files
+
+  Returns:
+      pd.DataFrame: Dataframe containing the FWI data
+  """    
+  # Initialise object to store data
+  fwi_list = []
+  for f in fwi_csvs:
+      fname_load = Path(fwi_path)/f
+      df_load = pd.read_csv(fname_load)
+      fwi_list.append(df_load)
+  df_fwi = pd.concat(fwi_list, ignore_index = True)
+  df_fwi["date"] = pd.to_datetime(df_fwi["date"])
+  return df_fwi
 
