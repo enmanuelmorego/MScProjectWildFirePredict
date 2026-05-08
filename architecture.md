@@ -96,3 +96,10 @@ This module contains files and objects used to build the different components of
 Load datasets (`load_viirs_main`, `load_ukgrid_main`, `load_fwi_main`)
 Combine into single dataframe
 ```
+
+# Continue at:
+Implement refactoring of pre processing
+migrate tests of:
+- test_pp_sentinel
+- test_pre_processing_general
+- test_utils
