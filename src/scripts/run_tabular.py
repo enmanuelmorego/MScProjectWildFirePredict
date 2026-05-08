@@ -24,7 +24,8 @@ def run_tabular():
     return dict_tabular_data
 
 if __name__ == "__main__":
-    # python3 -m src.scripts.run_tabular
+
     x = run_tabular()
+    print(x.keys())
 
     

@@ -91,7 +91,8 @@ This module contains files and objects used to build the different components of
 ```
 
 
-## Refactor 1 – Generalise file selection
-- Replace `to_load_viirs` with generic `select_files`
-- Reuse across VIIRS and FWI
-- Support filtering by year + suffix
+## Process
+```
+Load datasets (`load_viirs_main`, `load_ukgrid_main`, `load_fwi_main`)
+Combine into single dataframe
+```
