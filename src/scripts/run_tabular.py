@@ -20,12 +20,11 @@ def run_tabular():
     SP_FILENAME = PARAMETERS['SP_FILENAME']
     GRB_NAME    = PARAMETERS['GRB_NAME']
 
-
     # Load VIIRS data
     dict_viirs = load_viirs_main(years_to_load = YEAR_FILTER, data_dir = DATA_DIR, crs = CRS)
-    df_viirs = dict_viirs['df_viirs']
+    df_viirs   = dict_viirs['df_viirs']
     # Generate dataframe with every day from min to max of df_viirs
-    df_days = du.extract_year_range(df_viirs)
+    df_days    = du.extract_year_range(df_viirs)
 
     # Load UK Grid data
     dict_ukgrid     = load_ukgrid_main(df_days_in = df_days, data_dir = DATA_DIR, file_name = SP_FILENAME, crs = CRS)
