@@ -3,7 +3,6 @@ Module to run all the data load, and transformations to prepare all tabular data
 """
 
 import scripts.validation_checks as vc
-
 import pipelines.tabular_load_pipeline as lp
 from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
 

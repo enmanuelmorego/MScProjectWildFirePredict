@@ -19,7 +19,7 @@ MScProjectWildFirePredict/
 |- src
 |   | - utils/
 |       |- file_utils.py [get_file_paths(), select_files()]
-|   | - loaders/
+|   | - data_io/
 |       |- viirs_loader.py
 |       |- fwi_loader.py
 |       |- ukgrid_loader.py
@@ -35,6 +35,37 @@ MScProjectWildFirePredict/
 |       |- ukgrid_pipeline.py
 |       |- sentinel2_pipeline.py
 |   |- preprocessing/
+|       |- below are the transformations, not yet modules
+            call preprocessing_pipeline() [this can go into pipeline module]
+                call summarise_viirs()
+                    Appends grid_id
+                    groups by grid_id and date
+                    assgns label_fire = True
+                    [potentially rename as its not summarising viirs?]
+                call dfs_metadata()
+                    Validates and compares the combined data with inputs to ensure consistency (more of a qa)
+                call json_save() 
+                    Save data report as json for inspection later and audit trail
+                call combined_dfs()
+                    combines all datasets into a single one. including fwi, viirs, and daily grids
+                call remove_na_fwi_grid1
+                    removes grid_id = 1 from the sataset as the FWI is non-existent for this location
+                    Rationale
+                        - The grid represents <0.1% of all spatial units,
+                        - FWI is entirely missing for that grid across all dates,
+                        - Imputation would introduce artificial meteorological signal
+                Creates composite key (grid_id + date)
+                Creates model summary and save as json (total coumns, rows, grids, etc basic descriptives)
+                Returns dataset with all data combined
+
+            And then from this id have to develop a sampling pipeline where for each fire obs i take 2 non fire. 
+            - 1. find all grids that have never seen a fire (df_grids_no_fire)
+            - 2. 1 of the non fire is the same grid as the fire one but 6 months in the apst and had no fire.  The second is an observation form the same day of the fire, but form a grid that has never seen fire. Select the top 10 closests that match the criteria, and randomly select one (we might want to repeat grids here for data availability and also some spots might repeat in terms of fire every year so no need to make unique)
+
+            final dataset is for easch fire sample, 2 non fire samples..
+            Take some descriptives from this dataset and save for reference  
+
+
 |   |- ml_model/
 |   |   |- feature_extraction.py
 |   |   |- create_ml_dataset.py
