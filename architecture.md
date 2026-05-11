@@ -79,6 +79,11 @@ MScProjectWildFirePredict/
 |   |- reporting/
 |   |   |- preprocessing_reporting.py
 ``` 
+
+### Notes:
+#### .../Pipelines/
+This folder contains a .py for each of the pipelines. The files might contain only one function, and be quite shallow. However, this was a conscious design choice to allow easy testing and debugging of pipeline processes, as it is easier to read than having large scripts with many orchestrators. 
+
 ## Scripts
 This folder contains the modules that performs specific step in the program.
 These are split into separate, independent components as they are usually run in isolation, but the outputs of the previous feeds onto the next. 
