@@ -35,34 +35,6 @@ MScProjectWildFirePredict/
 |       |- ukgrid_pipeline.py
 |       |- sentinel2_pipeline.py
 
-|       |- preprocessing_transforms.py
-            aggregate_viirs_to_grid() <previoysly summarise_viirs>
-            extract_inputs_metadata() (from reporting) prev called dfs_metadata
-            build_tabular_dataset() prev called combined_dfs [now houses creation of cmposite_id too]
-            remove_na_fwi_grid1()
-
-|       |- below are the transformations, not yet modules
-            call preprocessing_pipeline() [this can go into pipeline module]
-                call summarise_viirs()
-                    Appends grid_id
-                    groups by grid_id and date
-                    assgns label_fire = True
-                    [potentially rename as its not summarising viirs?]
-                call dfs_metadata()
-                    Validates and compares the combined data with inputs to ensure consistency (more of a qa)
-                call json_save() 
-                    Save data report as json for inspection later and audit trail
-                call combined_dfs()
-                    combines all datasets into a single one. including fwi, viirs, and daily grids
-                call remove_na_fwi_grid1
-                    removes grid_id = 1 from the sataset as the FWI is non-existent for this location
-                    Rationale
-                        - The grid represents <0.1% of all spatial units,
-                        - FWI is entirely missing for that grid across all dates,
-                        - Imputation would introduce artificial meteorological signal
-                Creates composite key (grid_id + date)
-                Creates model summary and save as json (total coumns, rows, grids, etc basic descriptives)
-                Returns dataset with all data combined
 
             And then from this id have to develop a sampling pipeline where for each fire obs i take 2 non fire. 
             - 1. find all grids that have never seen a fire (df_grids_no_fire)
@@ -77,7 +49,7 @@ MScProjectWildFirePredict/
 |   |   |- create_ml_dataset.py
 |   |   |- random_forest.py
 |   |- reporting/
-|   |   |- preprocessing_reporting.py
+|   |   |- data_profiler.py
 ``` 
 
 ### Notes:
