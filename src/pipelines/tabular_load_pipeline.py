@@ -20,6 +20,11 @@ def load_tabular_data(year_filter: list[int], data_dir: Path, crs: str, sp_filen
 
     Returns:
         Dictionary containing all of the dataframes with the tabular data
+        
+        `{'df_viirs': df_viirs,
+          'df_ukgrid': df_ukgrid,
+          'df_daily_grid': df_daily_grid,
+          'df_fwi': df_fwi}`
     """
     # Load VIIRS data
     dict_viirs = load_viirs_main(years_to_load = year_filter, data_dir = data_dir, crs = crs)
