@@ -30,3 +30,42 @@ def aggregate_viirs_to_grid(df_viirs: gpd.GeoDataFrame, df_uk_grid: gpd.GeoDataF
     df_viirs_summary['fire_lbl'] = True
     
     return df_viirs_summary
+
+def build_tabular_dataset(df_viirs: pd.DataFrame, dict_dfs: dict) -> gpd.GeoDataFrame:
+    """Combines `df_viirs` with `grid_ids` to the df containing all grids+days combination (`df_daily_grid`) and also with `df_fwi`
+
+    Fills in NAs for the following variables with the following values:
+
+    - fire_lbl = False
+    - viirs_n  = 0
+    - far_max  = 0
+    - frp_mean = 0
+
+    Args:
+        df_viirs (pd.DataFrame): Data frame containing VIIRS data with grid ids
+        dict_dfs (dict): Dictionary containg all loaded raw inputs
+
+    Returns:
+        (gpd.GeoDataFrame): Data frame preprocessed with all the datasets combined into a single df
+    """
+    # ------------------------
+    # EXTRACT DFs
+    # ------------------------
+    df_grids_day  = dict_dfs['df_daily_grid']
+    df_fwi        = dict_dfs['df_fwi']
+    # ------------------------
+    # PROCESS VIIRS
+    # ------------------------
+    df_viirs_grid             = df_grids_day.merge(df_viirs, on = ['grid_id','date'], how = 'left')
+    df_viirs_grid['fire_lbl'] = (df_viirs_grid['fire_lbl']
+                                 .astype('boolean')
+                                 .fillna(False))
+    df_viirs_grid[['viirs_n', 'frp_max', 'frp_mean']] = df_viirs_grid[['viirs_n', 'frp_max', 'frp_mean']].fillna(0)
+    # ------------------------
+    # PROCESS FWI
+    # ------------------------
+    df_fwi_viirs_grid = df_viirs_grid.merge(df_fwi,
+                                            on = ['grid_id','date'],
+                                            how = 'left')
+    
+    return df_fwi_viirs_grid
