@@ -60,7 +60,7 @@ def extract_dataset_metadata(df: pd.DataFrame, df_name: str, include_fire_metric
     if include_fire_metrics:
         fire_obs                        = (df[df['fire_lbl'] == True].shape[0])
         metadata['viirs_true_obs']      = fire_obs
-        metadata['fire_lbl_proportion'] = (fire_obs / int(df.shape[0]))
+        metadata['fire_lbl_proportion'] = round((fire_obs / int(df.shape[0])),4)
         metadata['unique_viirs_grids']  = int(df[df['fire_lbl'] == True]['grid_id'].nunique())
 
     if 'fwi_max' in cols_in_df:
