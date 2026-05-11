@@ -35,6 +35,12 @@ MScProjectWildFirePredict/
 |       |- ukgrid_pipeline.py
 |       |- sentinel2_pipeline.py
 |   |- preprocessing/
+|       |- preprocessing_transforms.py
+            aggregate_viirs_to_grid() <previoysly summarise_viirs>
+            extract_inputs_metadata() (from reporting) prev called dfs_metadata
+            build_tabular_dataset() prev called combined_dfs [now houses creation of cmposite_id too]
+            remove_na_fwi_grid1()
+
 |       |- below are the transformations, not yet modules
             call preprocessing_pipeline() [this can go into pipeline module]
                 call summarise_viirs()
@@ -70,6 +76,8 @@ MScProjectWildFirePredict/
 |   |   |- feature_extraction.py
 |   |   |- create_ml_dataset.py
 |   |   |- random_forest.py
+|   |- reporting/
+|   |   |- preprocessing_reporting.py
 ``` 
 ## Scripts
 This folder contains the modules that performs specific step in the program.
