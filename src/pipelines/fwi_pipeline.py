@@ -1,5 +1,5 @@
 
-import loaders.fwi_loader as l
+import data_io.fwi_loader as l
 import transforms.fwi_transforms as t
 
 from pathlib import Path
