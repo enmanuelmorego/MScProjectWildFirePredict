@@ -1,5 +1,5 @@
 import utils.file_utils as fu
-import loaders.viirs_loader as l
+import data_io.viirs_loader as l
 import transforms.viirs_transforms as t
 
 import pandas as pd
