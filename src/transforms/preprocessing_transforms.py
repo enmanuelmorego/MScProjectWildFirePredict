@@ -104,3 +104,32 @@ def remove_na_fwi_grid1(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     df_out = df[~remove].copy()
     return df_out
+
+def create_composite_key(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Function that creates composite key, which is the unique identifier for each row (primary key). 
+    It also validates the column to ensure there are no duplicates and can be used as primary key
+
+    Args:
+        df (gpd.GeoDataFrame): preprocessed dataframe with all the inputs combined
+
+    Raises:
+        ValueError: If `composite_key` contains duplicated values, then cannot be used a primary key, raises ValueError
+
+    Returns:
+        gpd.GeoDataFrame: copy of input dataframe with an added `composite_key` column
+    """
+    # ------------------------
+    # CREATE COMPOSITE KEY
+    # ------------------------
+    df_out = df.copy()
+    df_out['composite_key'] = (df_out['grid_id'].astype(str) + 
+                               df_out['date'].dt.strftime("%Y%m%d"))
+    # ------------------------
+    # VALDIATE COMPOSITE KEY
+    # ------------------------
+    total_rows        = df_out.shape[0]
+    total_unique_keys = int(df_out['composite_key'].nunique())
+    if total_rows != total_unique_keys:
+        raise ValueError("❌ There are duplicated values in composite_key")
+    
+    return df_out
