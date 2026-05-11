@@ -36,17 +36,22 @@ def fwi_select_files(fwi_csv: list[Path], fwi_grib: list[Path], requested_years:
                 'available_grib': ['2019FWI.grib', '20202FWI.grib']
                 'required_years': {'2021', '2022'}}
   """  
- # initialise output dictionary
-
+  # ------------------------
+  # INITIALISE DICT
+  # ------------------------
   requested_years_str = [str(y) for y in requested_years]
   csv_yrs             = set([os.path.basename(fy)[0:4] for fy in fwi_csv if os.path.basename(fy)[0:4] in requested_years_str])
   grib_yrs            = set([os.path.basename(fy)[0:4] for fy in fwi_grib if os.path.basename(fy)[0:4] in requested_years_str and os.path.basename(fy)[0:4] not in csv_yrs])
   all_files           = csv_yrs | grib_yrs
   missing_yrs         = set([my for my in requested_years_str if my not in all_files])
-
+  # ------------------------
+  # SELECT FILES
+  # ------------------------
   matched_csv_files  = [f for f in fwi_csv  if os.path.basename(f)[0:4] in csv_yrs]
   matched_grib_files = [f for f in fwi_grib if os.path.basename(f)[0:4] in grib_yrs]
-
+  # ------------------------
+  # RETURN
+  # ------------------------
   return {'available_csv' : matched_csv_files,
           'available_grib': matched_grib_files,
           'required_years': missing_yrs}
