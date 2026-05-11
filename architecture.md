@@ -34,7 +34,7 @@ MScProjectWildFirePredict/
 |       |- fwi_pipeline.py
 |       |- ukgrid_pipeline.py
 |       |- sentinel2_pipeline.py
-|   |- preprocessing/
+
 |       |- preprocessing_transforms.py
             aggregate_viirs_to_grid() <previoysly summarise_viirs>
             extract_inputs_metadata() (from reporting) prev called dfs_metadata
