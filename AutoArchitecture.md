@@ -125,4 +125,13 @@ MScProjectWildFirePredict/
 |   |- UKGrid
 |   |- VIIRS
 ```
+**Raw inputs:**
+- FWI = `.grib` files for each year
+- UKGrid = `.shp` files to split UK into grids
+- VIIRS = `.csv` files fire labels for each year
 
+**PreProcessed:**
+- Sentinel2 = `.npz` downloaded from sampled dataset
+- SampledFireNoFire = `.csv` of sampled data, per year
+
+**ML Model Input:**
