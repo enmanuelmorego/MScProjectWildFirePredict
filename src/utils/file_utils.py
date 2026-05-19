@@ -41,7 +41,8 @@ def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffix
   for item in items:
     if item.name == "__pycache__" or item.suffix in ignore_suffixes or item.name.startswith("."):
        continue
-    
+    if not show_files and item.is_file():
+       continue
     lines.append(f"{indent}|   |- {item.name}")
 
     if show_files and item.is_dir():
@@ -52,5 +53,5 @@ def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffix
   return "\n".join(lines)
 
 if __name__ == "__main__":
-  root = Path("src")
-  print(build_dir_tree(root, True))
+  root = Path(__file__).resolve().parents[2]
+  print(build_dir_tree(root, False))
