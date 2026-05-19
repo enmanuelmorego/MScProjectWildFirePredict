@@ -1,24 +1,23 @@
 # MScProjectWildFirePredict Architecture
 
-The project is divided into modules, which have specific resposibilities. An overview of the modules is shown here, and below, each of the sections is expanded with futher details
+The project is divided into modules, which have specific responsibilities. An overview of the modules is shown here, and below, each of the sections is expanded with further details
 
 ## Overview
 ```
 MScProjectWildFirePredict/
 |- src/         # The codebase of the program
-|- scripts/     # Execution of program, split by flow checkpoints
 |- notebooks/   # Reads outputs/transformations, contains analysis
-|- data/        # Input data used in the project
+|- data/        # Data used in the project
 |- outputs/     # Output objects from analysis
 |- tests/       # Unit tests
 ```
 ## Codebase
-Contains the code for the project 
 ```
 MScProjectWildFirePredict/
 |- src
 |   | - utils/
 |       |- file_utils.py [get_file_paths(), select_files()]
+|       |- datasets_utils.py
 |   | - data_io/
 |       |- viirs_loader.py
 |       |- fwi_loader.py
@@ -34,6 +33,8 @@ MScProjectWildFirePredict/
 |       |- fwi_pipeline.py
 |       |- ukgrid_pipeline.py
 |       |- sentinel2_pipeline.py
+|   | - scripts/
+
 
 
             And then from this id have to develop a sampling pipeline where for each fire obs i take 2 non fire. 

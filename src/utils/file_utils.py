@@ -31,9 +31,23 @@ def open_file(filename):
         os.startfile(filename) #type: ignore
     elif current_system == "Darwin":
         subprocess.call(["open","-a", "Visual Studio Code",  str(filename)])
+# -------------------------
+# ARCHITECTURE FUNCTIONS
+# ------------------------- 
+def build_dir_tree(path: Path, indent:str = ""):
+  lines = []
+  items = sorted(path.iterdir())
+  for item in items:
+    if item.name == "__pychache__" or item.suffix == ".egg-info":
+      continue
+    
+    if item.is_dir() or item.suffix == ".py":
+      print(f"item: {item} - {'dir' if item.is_dir() else 'file'}")
+    # lines.append(f"{indent}|- {item.name}")
+    # if item.is_dir():
+    #   lines.extend(build_dir_tree(item, indent + "| "))
+  return lines
 
 if __name__ == "__main__":
-
-    param_file = Path(__file__).parents[1]/"scripts"/"set_parameters.py"
-    print(param_file)
-    open_file(param_file)
+  root = Path("src")
+  print(build_dir_tree(root))
