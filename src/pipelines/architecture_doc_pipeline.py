@@ -7,8 +7,8 @@ To make changes to the content of the .md file, open `src/utils/architecture_bui
 """
 
 folder = Path(__file__).resolve().parents[2]
-fout = folder/"AutoArchitecture.md"
+fout = folder/"Project Structure.md"
 
-with open("AutoArchitecture.md", "w") as f:
+with open(fout, "w") as f:
     f.write(markdown)
 open_file(fout)
