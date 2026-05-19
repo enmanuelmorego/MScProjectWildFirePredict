@@ -34,20 +34,23 @@ def open_file(filename):
 # -------------------------
 # ARCHITECTURE FUNCTIONS
 # ------------------------- 
-def build_dir_tree(path: Path, indent:str = ""):
+def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffixes: list = [".egg-info", ".ignore", ".git"]):
+
   lines = []
   items = sorted(path.iterdir())
   for item in items:
-    if item.name == "__pycache__" or item.suffix == ".egg-info":
-      continue
+    if item.name == "__pycache__" or item.suffix in ignore_suffixes or item.name.startswith("."):
+       continue
     
-    if item.is_dir() or item.suffix == ".py":
-      print(f"item: {item} - {'dir' if item.is_dir() else 'file'}")
-    # lines.append(f"{indent}|- {item.name}")
-    # if item.is_dir():
-    #   lines.extend(build_dir_tree(item, indent + "| "))
-  return lines
+    lines.append(f"{indent}|   |- {item.name}")
+
+    if show_files and item.is_dir():
+        subtree = build_dir_tree(item, True, indent + "|   ")
+
+        lines.extend(subtree.splitlines())
+
+  return "\n".join(lines)
 
 if __name__ == "__main__":
   root = Path("src")
-  print(build_dir_tree(root))
+  print(build_dir_tree(root, True))
