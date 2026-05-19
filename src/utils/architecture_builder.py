@@ -8,6 +8,14 @@ The project is divided into modules, which have specific responsibilities. An ov
 
 ## Overview
 ```
-{print(fu.build_dir_tree(Path("src")))}
+| MScProjectWildFirePredict/
+{fu.build_dir_tree(Path(Path(__file__).resolve().parents[2]), False)}
+```
+
+## Codebase
+```
+MScProjectWildFirePredict/
+| src/
+{fu.build_dir_tree(Path("src"), False)}
 ```
 """
