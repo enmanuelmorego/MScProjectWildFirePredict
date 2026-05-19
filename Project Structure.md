@@ -15,17 +15,6 @@ The project is divided into modules, which have specific responsibilities. An ov
 |   |   |- UKGrid
 |   |   |- VIIRS
 |   |- outputs
-|   |   |- 202602270531_RUNNING_DEMO_ON
-|   |   |- 202603151653_RUNNING_DEMO_ON
-|   |   |- 202603151657_RUNNING_DEMO_ON
-|   |   |- 202603151759_RUNNING_DEMO_ON
-|   |   |- 202603160600_RUNNING_DEMO_ON
-|   |   |- 202603162046_RUNNING_DEMO_ON
-|   |   |- 202603162058_RUNNING_DEMO_ON
-|   |   |- 202603162100_RUNNING_DEMO_ON
-|   |   |- 202603162104_RUNNING_DEMO_ON
-|   |   |- 202603172038_RUNNING_DEMO_ON
-|   |   |- 202603180608_RUNNING_DEMO_ON
 |   |   |- maps
 |   |- src
 |   |   |- data_io
@@ -118,53 +107,12 @@ This module contains files and objects used to build the different components of
 MScProjectWildFirePredict/
 |- data/
 |   |- FWI
-|   |   |- 2017FWI.grib
-|   |   |- 2018FWI.csv
-|   |   |- 2018FWI.grib
-|   |   |- 2019FWI.csv
-|   |   |- 2019FWI.grib
 |   |   |- Archive
-|   |   |   |- 2018FWI.csv
-|   |   |   |- 2019FWI.csv
-|   |   |   |- 2019FWI.grib
 |   |- SampledFireNoFire
-|   |   |- 2018_sampled_firenofire.csv
-|   |   |- 2019_sampled_firenofire.csv
 |   |- Sentinel2
-|   |   |- 2018_B001_20180101_20180311_sentinel_batch.npz
-|   |   |- 2018_B002_20180312_20180413_sentinel_batch.npz
-|   |   |- 2018_B003_20180414_20180505_sentinel_batch.npz
-|   |   |- 2018_B004_20180506_20180528_sentinel_batch.npz
-|   |   |- 2018_B005_20180529_20180616_sentinel_batch.npz
-|   |   |- 2018_B006_20180617_20180701_sentinel_batch.npz
-|   |   |- 2018_B007_20180702_20180715_sentinel_batch.npz
-|   |   |- 2018_B008_20180716_20180731_sentinel_batch.npz
-|   |   |- 2018_B009_20180801_20180823_sentinel_batch.npz
-|   |   |- 2018_B010_20180824_20180919_sentinel_batch.npz
-|   |   |- 2018_B011_20180920_20181014_sentinel_batch.npz
-|   |   |- 2018_B012_20181015_20181123_sentinel_batch.npz
-|   |   |- 2018_B013_20181124_20181231_sentinel_batch.npz
 |   |   |- Archive
 |   |- UKGrid
-|   |   |- ukcp18-uk-land-12km.dbf
-|   |   |- ukcp18-uk-land-12km.prj
-|   |   |- ukcp18-uk-land-12km.shp
-|   |   |- ukcp18-uk-land-12km.shx
 |   |- VIIRS
-|   |   |- viirs-jpss1_2018_United_Kingdom.csv
-|   |   |- viirs-jpss1_2019_United_Kingdom.csv
-|   |   |- viirs-jpss1_2020_United_Kingdom.csv
-|   |   |- viirs-jpss1_2021_United_Kingdom.csv
-|   |   |- viirs-jpss1_2022_United_Kingdom.csv
-|   |   |- viirs-jpss1_2023_United_Kingdom.csv
-|   |   |- viirs-jpss1_2024_United_Kingdom.csv
-|   |   |- viirs-snpp_2018_United_Kingdom.csv
-|   |   |- viirs-snpp_2019_United_Kingdom.csv
-|   |   |- viirs-snpp_2020_United_Kingdom.csv
-|   |   |- viirs-snpp_2021_United_Kingdom.csv
-|   |   |- viirs-snpp_2022_United_Kingdom.csv
-|   |   |- viirs-snpp_2023_United_Kingdom.csv
-|   |   |- viirs-snpp_2024_United_Kingdom.csv
 ```
 **Raw inputs:**
 - FWI = `.grib` files for each year

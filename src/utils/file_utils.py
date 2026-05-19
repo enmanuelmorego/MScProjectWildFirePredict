@@ -49,7 +49,7 @@ def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffix
     lines = []
     items = sorted(path.iterdir())
     for item in items:
-      if item.name == "__pycache__" or item.suffix in ignore_suffixes or item.name.startswith("."):
+      if item.name == "__pycache__" or item.suffix in ignore_suffixes or item.name.startswith(".") or item.name.endswith("RUNNING_DEMO_ON"):
          continue
       if not show_files and item.is_file():
          continue
