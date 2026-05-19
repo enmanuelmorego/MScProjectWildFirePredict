@@ -38,7 +38,7 @@ def build_dir_tree(path: Path, indent:str = ""):
   lines = []
   items = sorted(path.iterdir())
   for item in items:
-    if item.name == "__pychache__" or item.suffix == ".egg-info":
+    if item.name == "__pycache__" or item.suffix == ".egg-info":
       continue
     
     if item.is_dir() or item.suffix == ".py":
