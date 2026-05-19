@@ -34,23 +34,33 @@ def open_file(filename):
 # -------------------------
 # ARCHITECTURE FUNCTIONS
 # ------------------------- 
-def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffixes: list = [".egg-info", ".ignore", ".git"]):
+def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffixes: list = [".egg-info", ".ignore", ".git"]) -> str:
+    """Function to generate a tree directory for a given location
 
-  lines = []
-  items = sorted(path.iterdir())
-  for item in items:
-    if item.name == "__pycache__" or item.suffix in ignore_suffixes or item.name.startswith("."):
-       continue
-    if not show_files and item.is_file():
-       continue
-    lines.append(f"{indent}|   |- {item.name}")
+    Args:
+        path (Path): Parent folder to generate tree from
+        show_files (bool): Indicates whether files should be shown on tree or not
+        indent (str, optional): Separator for | . Defaults to "".
+        ignore_suffixes (list, optional): List of suffixes to ignore. Defaults to [".egg-info", ".ignore", ".git"].
 
-    #if show_files and item.is_dir():
-    if item.is_dir():
-        subtree = build_dir_tree(item, show_files, indent + "|   ")
-        lines.extend(subtree.splitlines())
+    Returns:
+        str: A string containing the directory files/folder tree
+    """
+    lines = []
+    items = sorted(path.iterdir())
+    for item in items:
+      if item.name == "__pycache__" or item.suffix in ignore_suffixes or item.name.startswith("."):
+         continue
+      if not show_files and item.is_file():
+         continue
+      lines.append(f"{indent}|   |- {item.name}")
+    
+      #if show_files and item.is_dir():
+      if item.is_dir():
+          subtree = build_dir_tree(item, show_files, indent + "|   ")
+          lines.extend(subtree.splitlines())
 
-  return "\n".join(lines)
+    return "\n".join(lines)
 
 if __name__ == "__main__":
   root = Path(__file__).resolve().parents[2]
