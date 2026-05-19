@@ -15,7 +15,7 @@ The project is divided into modules, which have specific responsibilities. An ov
 ## Codebase
 ```
 MScProjectWildFirePredict/
-| src/
-{fu.build_dir_tree(Path("src"), False)}
+|- src/
+{fu.build_dir_tree(Path("src"), True)}
 ```
 """
