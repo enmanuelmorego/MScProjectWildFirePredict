@@ -9,7 +9,6 @@ google = "*"
 pandas = "*"
 mypy = "*"
 pytest = "*"
-mscprojectwildfirepredict = {file = ".", editable = true}
 geopandas = "*"
 matplotlib = "*"
 mapclassify = "*"
@@ -25,6 +24,7 @@ opencv-python = "*"
 tifffile = "*"
 scikit-image = "*"
 seaborn = "*"
+mscprojectwildfirepredict = {file = ".", editable = true}
 
 [dev-packages]
 pandas-stubs = "*"

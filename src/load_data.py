@@ -50,8 +50,8 @@ def load_viirs(paths_to_load: list[Path]) -> dict[str, pd.DataFrame]:
     `{'snpp': df_viirs, 'noaa': df_noaa}`
 
   """
-  viirs_noaa = []
-  viirs_snpp = []
+  viirs_noaa: list[pd.DataFrame] = []
+  viirs_snpp: list[pd.DataFrame] = []
 
   for p in paths_to_load:
     if "snpp" in p.name:
@@ -65,7 +65,7 @@ def load_viirs(paths_to_load: list[Path]) -> dict[str, pd.DataFrame]:
   df_noaa = pd.concat(viirs_noaa,ignore_index=True)
   return {'snpp': df_viirs, 'noaa': df_noaa}
 
-def merge_viirs(viirs_dict: dict[str, Any], append_noaa: bool = True) -> dict[str, Any]:
+def merge_viirs(viirs_dict: dict[str, pd.DataFrame], append_noaa: bool = True) -> dict[str, Any]:
   """
   Takes a dictionary containing data frame from VIIRS products (NOAA and SNPP) and merged
   them into a single data frame
@@ -85,23 +85,23 @@ def merge_viirs(viirs_dict: dict[str, Any], append_noaa: bool = True) -> dict[st
     ValueError if SNPP data is not provided 
   """
   cols_merge = ['longitude','latitude','acq_date']
-  df_snpp = viirs_dict.get('snpp')
-  df_noaa = viirs_dict.get('noaa', 'NOAA: No data available')
+  df_snpp    = viirs_dict.get('snpp')
+  df_noaa    = viirs_dict.get('noaa')
 
   if df_snpp is None:
     raise ValueError("❌ SNPP data is required")
 
-  if append_noaa:
+  if append_noaa and df_noaa is not None:
     # Find values in NOAA not in SNPP 
     df_diff = df_noaa.loc[~df_noaa.set_index(cols_merge).index.isin(df_snpp.set_index(cols_merge).index)]
-    df_out = pd.concat([df_snpp, df_diff], ignore_index = True)
+    df_out  = pd.concat([df_snpp, df_diff], ignore_index = True)
 
     data_report = {'total_rows_snpp': df_snpp.shape[0],
                    'total_rows_noaa': df_diff.shape[0]}
-    return {'df': df_out,
+    return {'df'         : df_out,
             'data_report': data_report}
   else:
-      return {'df': df_snpp,
+      return {'df'         : df_snpp,
               'data_report': None}
 
 def filter_viirs(viirs_data: pd.DataFrame) -> pd.DataFrame:
@@ -319,9 +319,9 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
   fwi_msgs   = grbs.select(name=grb_name)
 
   # Initialise object to store data
-  list_fwi = []
-  total = len(fwi_msgs)
-  i = 1
+  list_fwi: list[gpd.GeoDataFrame] = []
+  total                            = len(fwi_msgs)
+  i                                = 1
 
   # Compute grid centroids
   df_grid_centroids_proj = df_uk_grid.to_crs("EPSG:27700")
@@ -492,4 +492,7 @@ def load_cached_sampled(years: list, data_dir: str, file_name: str, crs: str) ->
   return gdf_sampled
 
 
-
+if __name__ == "__main__":
+  years = [2020, 2021, 2025]
+  files = [Path("2021file"), Path("2020file")]
+  print(to_load_viirs(files, years))
