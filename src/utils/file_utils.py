@@ -45,9 +45,9 @@ def build_dir_tree(path: Path, show_files: bool,  indent:str = "", ignore_suffix
        continue
     lines.append(f"{indent}|   |- {item.name}")
 
-    if show_files and item.is_dir():
-        subtree = build_dir_tree(item, True, indent + "|   ")
-
+    #if show_files and item.is_dir():
+    if item.is_dir():
+        subtree = build_dir_tree(item, show_files, indent + "|   ")
         lines.extend(subtree.splitlines())
 
   return "\n".join(lines)
