@@ -39,8 +39,6 @@ def run_tabular():
 if __name__ == "__main__":
 
     x = run_tabular()
-    #print(type(x))
-    #print(x.head())
     data_profile = dp.extract_dataset_metadata(x, 'fulldata', True)
-    print(x.shape[0])
+    print(x['fire_lbl'].unique())
     
