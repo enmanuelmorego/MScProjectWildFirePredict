@@ -2,13 +2,13 @@ import pandas as pd
 import random as rd
 
 
-def extract_temporal_samples(df_fire_in         : pd.DataFrame, 
-                             current_grid_id_in : str,
-                             current_date_in    : pd.Timestamp, 
-                             used_comp_keys_in  : set[str], 
-                             temporal_gap_months: int = 6,
-                             date_span_days     : int = 15,
-                             span_limit_days    : int = 60) -> str | None:
+def extract_temporal_sample(df_fire_in         : pd.DataFrame, 
+                            current_grid_id_in : str,
+                            current_date_in    : pd.Timestamp, 
+                            used_comp_keys_in  : set[str], 
+                            temporal_gap_months: int = 6,
+                            date_span_days     : int = 15,
+                            span_limit_days    : int = 60) -> str | None:
     
     working_span_days = date_span_days
     # Calculate date date to extract samples from
@@ -34,7 +34,6 @@ def extract_temporal_samples(df_fire_in         : pd.DataFrame,
             if working_span_days > span_limit_days:
                 return None
             continue
-            
         # Randomly select index of row to select
         temporal_sample = str(df_potential_samples.sample(n=1)['composite_key'].iloc[0])  # type: ignore
         return temporal_sample
@@ -63,7 +62,7 @@ if __name__ == '__main__':
                 'spatial_sample_comp_key' : [],
                 'used_comp_keys'          : {'A_20200615'}} #set()}
     
-    print(extract_temporal_samples(df_fire_in=df_fire,
+    print(extract_temporal_sample(df_fire_in=df_fire,
                              current_grid_id_in="A",
                              current_date_in=pd.Timestamp("2020-12-15"),
                              used_comp_keys_in = samples_dict['used_comp_keys']))
