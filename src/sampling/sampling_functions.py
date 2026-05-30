@@ -1,5 +1,5 @@
 import pandas as pd
-import random as rd
+
 
 
 def extract_temporal_sample(df_fire_in         : pd.DataFrame, 
