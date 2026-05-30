@@ -9,7 +9,38 @@ def extract_temporal_sample(df_fire_in         : pd.DataFrame,
                             temporal_gap_months: int = 6,
                             date_span_days     : int = 15,
                             span_limit_days    : int = 60) -> str | None:
-    
+    """
+    Find the composite key of a temporal sample.
+
+    A temporal sample is selected from the same grid as the target
+    observation and centred around a date occurring a specified number
+    of months before the target observation date.
+
+    The search begins using a +/- date_span_days window around the target
+    centroid date. If no valid sample is found, the search window is
+    expanded incrementally until either a sample is found or
+    span_limit_days is exceeded.
+
+    If multiple valid samples are available, one is selected at random.
+    If no valid sample can be found, None is returned.
+
+Criteria:
+    - Same grid_id as current_grid_id_in.
+    - Date approximately temporal_gap_months before current_date_in.
+    - composite_key must not already exist in used_comp_keys_in.
+
+    Args:
+        df_fire_in (pd.DataFrame): Data set containing all of the candidate fire observations
+        current_grid_id_in (str): Grid identifier of the target observation
+        current_date_in (pd.Timestamp): Date of target observation
+        used_comp_keys_in (set[str]): Set of composite keys that have already been selected and should therefore be excluded 
+        temporal_gap_months (int, optional): Number of months prior to current_date_in around which the search is centred. Defaults to 6.
+        date_span_days (int, optional): Initial search window in days on either side of the centroid date. Defaults to 15.
+        span_limit_days (int, optional): Maximum search window permitted before abandoning the search. Defaults to 60.
+
+    Returns:
+        str | None: A composite_id value of the selected sample, or None if no sample is available
+    """    
     working_span_days = date_span_days
     # Calculate date date to extract samples from
     sample_date_centroid = current_date_in - pd.DateOffset(months = temporal_gap_months)

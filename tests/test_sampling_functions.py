@@ -60,7 +60,7 @@ def test_exclude_if_used_extract_temporal_sample():
                                     used_comp_keys_in = samples_dict['used_comp_keys'])
     assert sample == "A_20200615"
 
-def test_no_sampled_found_extract_temporal_sample():
+def test_no_sample_found_extract_temporal_sample():
     df_fire = pd.DataFrame({"grid_id": ["A", "A", "A", "A", "B", "B", "C"],
                             "date": pd.to_datetime(["2020-06-15",  
                                                     "2020-06-20",  
