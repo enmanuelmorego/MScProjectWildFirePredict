@@ -39,7 +39,7 @@ def extract_temporal_samples(df_fire_in: pd.DataFrame,
             
         # Randomly select index of row to select
         select_row = rd.randint(0, int_potential_samples)
-        temporal_sample = df_potential_samples.loc[select_row, composite_key_idx]  # type: ignore
+        temporal_sample = df_potential_samples.iloc[select_row, composite_key_idx]  # type: ignore
         dict_samples_in['temporal_sample_comp_key'].append(temporal_sample)
         dict_samples_in['used_comp_keys'].append(temporal_sample)
         sample_found = True
