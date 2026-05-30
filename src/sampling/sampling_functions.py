@@ -12,14 +12,15 @@ def extract_temporal_samples(df_fire_in: pd.DataFrame,
     sample_found      = False
     working_span_days = date_span_days
     unavailable_comp_keys = dict_samples_in['used_comp_keys']
+    composite_key_idx     = df_fire_in.columns.get_loc('composite_key')
     # Calculate date date to extract samples from
     sample_date_centroid = current_date_in - pd.DateOffset(months = temporal_gap_months)
 
     # Find the samples
     while not sample_found:
         # Generate date range
-        min_date = sample_date_centroid - pd.DateOffset(days = date_span_days)  
-        max_date = sample_date_centroid + pd.DateOffset(days = date_span_days) 
+        min_date = sample_date_centroid - pd.DateOffset(days = working_span_days)  
+        max_date = sample_date_centroid + pd.DateOffset(days = working_span_days) 
         # Extract potential set of samples 
         df_potential_samples = df_fire_in[  (df_fire_in['grid_id'] == current_grid_id_in) 
                                           & (df_fire_in['composite_key'] not in unavailable_comp_keys)
@@ -44,3 +45,31 @@ def extract_temporal_samples(df_fire_in: pd.DataFrame,
         sample_found = True
     return dict_samples_in
 
+if __name__ == '__main__':
+    import pandas as pd
+
+    df_fire = pd.DataFrame({"grid_id": ["A", "A", "A", "A", "B", "B", "C"],
+                            "date": pd.to_datetime(["2020-06-15",  # should be selected
+                                                    "2020-06-20",  # should be selected
+                                                    "2020-07-01",  # should be selected after expanding window
+                                                    "2020-12-15",  # fire event
+                                                    "2020-06-15",
+                                                    "2020-12-15",
+                                                    "2020-12-15"]),
+                            "composite_key": ["A_20200615",
+                                            "A_20200620",
+                                            "A_20200701",
+                                            "A_20201215",
+                                            "B_20200615",
+                                            "B_20201215",
+                                            "C_20201215"]})
+    
+    samples_dict = {'fire_lbl_comp_key'   : [],
+                'temporal_sample_comp_key': [],
+                'spatial_sample_comp_key' : [],
+                'used_comp_keys'          : ()}
+    
+    print(extract_temporal_samples(df_fire_in=df_fire,
+                             current_grid_id_in="A",
+                             current_date_in=pd.Timestamp("2020-12-15"),
+                             dict_samples_in=samples_dict))
