@@ -10,7 +10,6 @@ pandas = "*"
 mypy = "*"
 pytest = "*"
 geopandas = "*"
-matplotlib = "*"
 mapclassify = "*"
 folium = "*"
 leafmap = "*"
@@ -25,6 +24,7 @@ tifffile = "*"
 scikit-image = "*"
 seaborn = "*"
 mscprojectwildfirepredict = {file = ".", editable = true}
+matplotlib = "*"
 
 [dev-packages]
 pandas-stubs = "*"

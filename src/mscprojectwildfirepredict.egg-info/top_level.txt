@@ -1,5 +1,6 @@
-loaders
+data_io
 pipelines
+reporting
 scripts
 transforms
 utils
