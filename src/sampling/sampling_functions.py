@@ -41,7 +41,7 @@ def extract_temporal_samples(df_fire_in: pd.DataFrame,
         select_row = rd.randint(0, int_potential_samples)
         temporal_sample = df_potential_samples.iloc[select_row, composite_key_idx]  # type: ignore
         dict_samples_in['temporal_sample_comp_key'].append(temporal_sample)
-        dict_samples_in['used_comp_keys'].append(temporal_sample)
+        dict_samples_in['used_comp_keys'].add(temporal_sample)
         sample_found = True
     return dict_samples_in
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     samples_dict = {'fire_lbl_comp_key'   : [],
                 'temporal_sample_comp_key': [],
                 'spatial_sample_comp_key' : [],
-                'used_comp_keys'          : ()}
+                'used_comp_keys'          : set()}
     
     print(extract_temporal_samples(df_fire_in=df_fire,
                              current_grid_id_in="A",
