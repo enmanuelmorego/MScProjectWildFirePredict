@@ -120,29 +120,30 @@ def extract_spatial_sample(df_nofire_in: gpd.GeoDataFrame,
 if __name__ == '__main__':
     import pandas as pd
 
-    df_fire = pd.DataFrame({"grid_id": ["A", "A", "A", "A", "B", "B", "C"],
+    df_fire = pd.DataFrame({"grid_id": [1, 1, 1, 1, 2, 2, 3],
                             "date": pd.to_datetime(["2020-06-15",  
                                                     "2020-06-20",  
                                                     "2020-07-01",  
                                                     "2020-12-15",  
                                                     "2020-06-15",
-                                                    "2019-11-20",
+                                                    "2020-12-15",
                                                     "2020-12-15"]),
-                            "composite_key": ["A_20200615",
-                                            "A_20200620",
-                                            "A_20200701",
-                                            "A_20201215",
-                                            "B_20200615",
-                                            "B_20191120",
-                                            "C_20201215"]})
+                            "composite_key": ["1_20200615",
+                                              "1_20200620",
+                                              "1_20200701",
+                                              "1_20201215",
+                                              "2_20200615",
+                                              "2_20201215",
+                                              "3_20201215"]})
                
     samples_dict = {'fire_lbl_comp_key'       : [],
                     'temporal_sample_comp_key': [],
                     'spatial_sample_comp_key' : [],
-                    'used_comp_keys'          : set()}
+                    'used_comp_keys'          : {"A_20200620"}}
+             
+    sample = extract_temporal_sample(df_all_in=df_fire,
+                                    current_grid_id_in=1,
+                                    current_date_in=pd.Timestamp("2020-12-15"),
+                                    used_comp_keys_in = samples_dict['used_comp_keys'])
     
-    sample_short = extract_temporal_sample(df_all_in=df_fire,
-                                              current_grid_id_in=1,
-                                              current_date_in=pd.Timestamp("2020-06-15"),
-                                              used_comp_keys_in = samples_dict['used_comp_keys'])
-    print(sample_short)
+    print(sample)
