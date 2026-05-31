@@ -1,5 +1,5 @@
 import pandas as pd
-
+import geopandas as gpd
 
 
 def extract_temporal_sample(df_all_in         : pd.DataFrame, 
@@ -68,6 +68,54 @@ Criteria:
         # Randomly select index of row to select
         temporal_sample = str(df_potential_samples.sample(n=1)['composite_key'].iloc[0])  # type: ignore
         return temporal_sample
+
+def extract_spatial_sample(df_nofire_in: gpd.GeoDataFrame, 
+                           x_tgt_in: float,
+                           y_tgt_in: float,
+                           closest_k_grids: int = 10,
+                           max_distance_meters: int = 50000) -> tuple[str | None, float | None]:
+    """Find the composite key of a spatial sample
+
+    A spatial sample is selected from the same day as the fire observation from a set of
+    `grid_ids` that have not had any wildfires recorded in the dataset
+
+    The no-fire samples are stored in `df_nofire_in`
+    The coordinates from the fire observation are used to calculate the distance between each `df_nofire` row and the target observation
+    The `x_coord` and `y_coord` values correspond to the British National Grid coordinate system used by the UKCP18 12km grid. These coordinates are expressed in meters. 
+    This allows the use of Eucledian Distance to find the closest grids 
+    A threshold of `max_distance_meters` is set to avoid sampling locations that are too far from the target value
+    A random sample is selected from the `closest_k_grids` found to avoid an overly deterministic sample
+    
+    Args:
+        df_nofire_in (gpd.GeoDataFrame): Data frame containing observations corresponding to grids that have not seen fire in the dataset
+        x_tgt_in (float): X coordinate of target, expressed in meters
+        y_tgt_in (float): Y coordinate of target, expressed in meters
+        closest_k_grids (int, optional): Number of the total closests samples to select as candidate values. Defaults to 10.
+        max_distance (int, optional): Maximum distance allowed for an observation to be considered a candidate value. Defaults to 50000.
+
+    Returns:
+        tuple[str | None, float | None]: The composite key of the selected sample and the associated distance, in meters, to target values
+    """
+    
+    df_candidates = df_nofire_in.copy()
+    # Calculate the Eucledian Distance between the target inputs and the available observations to sample
+    df_candidates['distance'] = ((df_candidates['x_coord'] - x_tgt_in)**2 + (df_candidates['y_coord'] - y_tgt_in)**2)**0.5
+    # Limit candidates to a distance threshold
+    df_candidates = df_candidates[df_candidates['distance'] <= max_distance_meters]
+    # Sort values to select closest
+    df_candidates = df_candidates.sort_values('distance')
+    # Select top candidates
+    df_candidates = df_candidates.head(closest_k_grids)
+    # Fail safe, in case no values are found
+    if df_candidates.empty:
+        return None, None
+    # Sample single, random candidate
+    sample_row = df_candidates.sample(n=1)
+    sample_key = sample_row['composite_key'].iloc[0]
+    sample_dist = sample_row['distance'].iloc[0]
+
+    return sample_key, sample_dist
+
 
 if __name__ == '__main__':
     import pandas as pd
