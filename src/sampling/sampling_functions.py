@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def extract_temporal_sample(df_all_in         : pd.DataFrame, 
-                            current_grid_id_in : str,
+                            current_grid_id_in : int,
                             current_date_in    : pd.Timestamp, 
                             used_comp_keys_in  : set[str], 
                             temporal_gap_months: int = 6,
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                     'used_comp_keys'          : set()}
     
     sample_short = extract_temporal_sample(df_all_in=df_fire,
-                                              current_grid_id_in="B",
+                                              current_grid_id_in=1,
                                               current_date_in=pd.Timestamp("2020-06-15"),
                                               used_comp_keys_in = samples_dict['used_comp_keys'])
     print(sample_short)
