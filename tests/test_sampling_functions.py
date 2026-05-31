@@ -1,5 +1,6 @@
 import sampling.sampling_functions as sf
 import pandas as pd
+import geopandas as gpd
 
 # -----------------------------------
 # TEST extract_temporal_sample()
@@ -121,3 +122,39 @@ def test_window_expand_extract_temporal_sample():
                                               used_comp_keys_in = samples_dict['used_comp_keys'])
     assert sample_short == None
     assert sample_long  == "2_20191120"
+
+# -----------------------------------
+# TEST extract_temporal_sample()
+# -----------------------------------
+def test_valid_sample_extract_spatial_sample():
+    df_nofire = gpd.GeoDataFrame({"grid_id": [1, 2, 3, 4, 5, 6],
+                                  "x_coord": [12000, 24000, 36000, 48000, 60000, 120000],
+                                  "y_coord": [0, 0, 0, 0, 0, 0],
+                                  "composite_key": ["G1", "G2", "G3", "G4", "G5", "G6"]})
+    
+    sample_key, sample_dist = sf.extract_spatial_sample(df_nofire_in=df_nofire,
+                                                        x_tgt_in=0,
+                                                        y_tgt_in=0,
+                                                        closest_k_grids=3,
+                                                        max_distance_meters=50000)
+
+    assert sample_key in {"G1", "G2", "G3"}
+    assert sample_dist in {12000, 24000, 36000}
+
+def test_distance_threshold_limit_extract_spatial_sample():
+    df_nofire = gpd.GeoDataFrame({"grid_id": [1, 2, 3, 4, 5, 6],
+                                  "x_coord": [12000, 24000, 36000, 48000, 60000, 120000],
+                                  "y_coord": [0, 0, 0, 0, 0, 0],
+                                  "composite_key": ["G1", "G2", "G3", "G4", "G5", "G6"]})
+    
+    sample_key, sample_dist = sf.extract_spatial_sample(df_nofire_in=df_nofire,
+                                                        x_tgt_in=0,
+                                                        y_tgt_in=0,
+                                                        closest_k_grids=3,
+                                                        max_distance_meters=1000)
+
+    assert sample_key == None
+    assert sample_dist == None
+
+
+
