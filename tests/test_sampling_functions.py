@@ -156,5 +156,20 @@ def test_distance_threshold_limit_extract_spatial_sample():
     assert sample_key == None
     assert sample_dist == None
 
+def test_closest_param_works_limit_extract_spatial_sample():
+    df_nofire = gpd.GeoDataFrame({"grid_id": [1, 2, 3, 4, 5, 6],
+                                  "x_coord": [12000, 24000, 36000, 48000, 60000, 120000],
+                                  "y_coord": [0, 0, 0, 0, 0, 0],
+                                  "composite_key": ["G1", "G2", "G3", "G4", "G5", "G6"]})
+    
+    sample_key, sample_dist = sf.extract_spatial_sample(df_nofire_in=df_nofire,
+                                                        x_tgt_in=0,
+                                                        y_tgt_in=0,
+                                                        closest_k_grids=1,
+                                                        max_distance_meters=50000)
+
+    assert sample_key == "G1"
+    assert sample_dist == 12000
+
 
 
