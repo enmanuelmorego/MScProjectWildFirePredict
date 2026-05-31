@@ -26,7 +26,7 @@ def test_valid_sample_extract_temporal_sample():
                     'spatial_sample_comp_key' : [],
                     'used_comp_keys'          : set()}
     
-    sample = sf.extract_temporal_sample(df_fire_in=df_fire,
+    sample = sf.extract_temporal_sample(df_all_in=df_fire,
                                        current_grid_id_in="A",
                                        current_date_in=pd.Timestamp("2020-12-15"),
                                        used_comp_keys_in = samples_dict['used_comp_keys'])
@@ -54,7 +54,7 @@ def test_exclude_if_used_extract_temporal_sample():
                     'spatial_sample_comp_key' : [],
                     'used_comp_keys'          : {"A_20200620"}}
              
-    sample = sf.extract_temporal_sample(df_fire_in=df_fire,
+    sample = sf.extract_temporal_sample(df_all_in=df_fire,
                                     current_grid_id_in="A",
                                     current_date_in=pd.Timestamp("2020-12-15"),
                                     used_comp_keys_in = samples_dict['used_comp_keys'])
@@ -82,7 +82,7 @@ def test_no_sample_found_extract_temporal_sample():
                     'spatial_sample_comp_key' : [],
                     'used_comp_keys'          : set()}
              
-    sample = sf.extract_temporal_sample(df_fire_in=df_fire,
+    sample = sf.extract_temporal_sample(df_all_in=df_fire,
                                         current_grid_id_in="B",
                                         current_date_in=pd.Timestamp("2020-06-15"),
                                         used_comp_keys_in = samples_dict['used_comp_keys'])
@@ -110,12 +110,12 @@ def test_window_expand_extract_temporal_sample():
                     'spatial_sample_comp_key' : [],
                     'used_comp_keys'          : set()}
              
-    sample_short = sf.extract_temporal_sample(df_fire_in=df_fire,
+    sample_short = sf.extract_temporal_sample(df_all_in=df_fire,
                                               current_grid_id_in="B",
                                               current_date_in=pd.Timestamp("2020-06-15"),
                                               used_comp_keys_in = samples_dict['used_comp_keys'],
                                               span_limit_days = 10)
-    sample_long = sf.extract_temporal_sample(df_fire_in=df_fire,
+    sample_long = sf.extract_temporal_sample(df_all_in=df_fire,
                                               current_grid_id_in="B",
                                               current_date_in=pd.Timestamp("2020-06-15"),
                                               used_comp_keys_in = samples_dict['used_comp_keys'])
