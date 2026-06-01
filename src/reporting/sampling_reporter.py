@@ -55,5 +55,6 @@ def desc_stats_spatial_samples(dist_values_list: list) -> dict:
 
 
 if __name__ == "__main__":
-    d = {'fire_lbl_comp_key': []}
-    print(basic_desc_sampled(d, 'spatial'))
+
+    test_desc = [10, None, 22, 100, 40, None, 22]
+    print(desc_stats_spatial_samples(test_desc))
