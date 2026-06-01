@@ -31,7 +31,7 @@ Criteria:
 
     Args:
         df_all_in (pd.DataFrame): Data set containing all of the candidate observations (fire and no fire)
-        current_grid_id_in (str): Grid identifier of the target observation
+        current_grid_id_in (int): Grid identifier of the target observation
         current_date_in (pd.Timestamp): Date of target observation
         used_comp_keys_in (set[str]): Set of composite keys that have already been selected and should therefore be excluded 
         temporal_gap_months (int, optional): Number of months prior to current_date_in around which the search is centred. Defaults to 6.
@@ -41,6 +41,9 @@ Criteria:
     Returns:
         str | None: A composite_id value of the selected sample, or None if no sample is available
     """    
+    # Filter dataset 
+    df_candidates     = df_all_in[df_all_in['fire_lbl'] == False]
+    # Initialise working span variable
     working_span_days = date_span_days
     # Calculate date to extract samples from
     sample_date_centroid = current_date_in - pd.DateOffset(months = temporal_gap_months)
@@ -51,11 +54,10 @@ Criteria:
         min_date = sample_date_centroid - pd.DateOffset(days = working_span_days)  
         max_date = sample_date_centroid + pd.DateOffset(days = working_span_days) 
         # Extract potential set of samples 
-        df_potential_samples = df_all_in[  (df_all_in['grid_id'] == current_grid_id_in) 
-                                          & (df_all_in['fire_lbl'] == False)
-                                          & (~df_all_in['composite_key'].isin(used_comp_keys_in))
-                                          & (df_all_in['date'] >= min_date)
-                                          & (df_all_in['date'] <= max_date)]
+        df_potential_samples = df_candidates[  (df_candidates['grid_id'] == current_grid_id_in) 
+                                             & (~df_candidates['composite_key'].isin(used_comp_keys_in))
+                                             & (df_candidates['date'] >= min_date)
+                                             & (df_candidates['date'] <= max_date)]
         # Get total number of potential samples
         int_potential_samples = df_potential_samples.shape[0]
         # If no potential samples are identified
