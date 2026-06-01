@@ -7,6 +7,7 @@ import scripts.validation_checks as vc
 import pipelines.tabular_load_pipeline as lp
 import transforms.preprocessing_transforms as pp
 import reporting.data_profiler as dp
+import reporting.sampling_reporter as sr
 import pipelines.sampling_pipeline as sp
 
 
@@ -37,17 +38,22 @@ def run_tabular():
     # ------------------------
     # SAMPLE DATA
     # ------------------------
-    dict_samples = sp.create_samples_dict(df_composite_key)
-    # TODO Summary stats for sampling: None entries for both types of samples, desc stats for spatial samples
+    dict_samples  = sp.create_samples_dict(df_composite_key)
+    samples_stats = sr.create_sampling_statistics(dict_samples)
+    # TODO Create function to write samples_stats to json file
+    # TODO Write function that generates histogram of distances from sampled
+    # TODO Write wrapper function that calls create_sampling_statistics + json writer + histogram create + histogram saver
+    
     # TODO Function that transforms sample dict into a single column of composite ids which become the Y values
     # TODO Extract t-1 as the observations used for prediction X values
     # TODO Build final data set with X and Y values where Y is only the fire lbl (leave composite Key for ref)
     #       Please note Composite Key value in Y cannot exist in X
-    return dict_samples
+    return samples_stats
 
 if __name__ == "__main__":
 
     x = run_tabular()
+    print(x)
     #data_profile = dp.extract_dataset_metadata(x, 'fulldata', True)
     #print(x['fire_lbl'].unique())
     
