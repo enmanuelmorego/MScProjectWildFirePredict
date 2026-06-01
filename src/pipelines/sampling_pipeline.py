@@ -1,6 +1,6 @@
 import pandas as pd
 import geopandas as gdp
-import src.sampling.sampling_functions as sf
+import sampling.sampling_functions as sf
 from typing import cast 
 
 def create_samples_dict(df_in: gdp.GeoDataFrame) -> dict:
@@ -18,6 +18,8 @@ def create_samples_dict(df_in: gdp.GeoDataFrame) -> dict:
                     'spatial_sample_comp_key' : [],
                     'spatial_sample_dist'     : [],
                     'used_comp_keys'          : set()}
+    c_sample = 1
+    total_r  = df_fire.shape[0]
     
     # Extract samples
     for row in df_fire.itertuples():
@@ -34,7 +36,7 @@ def create_samples_dict(df_in: gdp.GeoDataFrame) -> dict:
         # Find samples
         temp_sample                 = sf.extract_temporal_sample(df_to_sample_temporal, grid_tgt, date_tgt, used_comp_key)
         spatial_sample, sample_dist = sf.extract_spatial_sample(df_to_sample_spatial, x_tgt, y_tgt)
-        # SAve results in dictionary 
+        # Save results in dictionary 
         samples_dict['fire_lbl_comp_key'].append(composite_tgt)
         samples_dict['temporal_sample_comp_key'].append(temp_sample)
         samples_dict['spatial_sample_comp_key'].append(spatial_sample)
@@ -43,5 +45,8 @@ def create_samples_dict(df_in: gdp.GeoDataFrame) -> dict:
             samples_dict['used_comp_keys'].add(temp_sample)
         if spatial_sample is not None:
             samples_dict['used_comp_keys'].add(spatial_sample)
+
+        print(f"\rSampling... Progress: {c_sample}/{total_r}", end = "")
+        c_sample += 1
     
     return samples_dict
