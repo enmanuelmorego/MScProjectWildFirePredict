@@ -52,6 +52,7 @@ Criteria:
         max_date = sample_date_centroid + pd.DateOffset(days = working_span_days) 
         # Extract potential set of samples 
         df_potential_samples = df_all_in[  (df_all_in['grid_id'] == current_grid_id_in) 
+                                          & (df_all_in['fire_lbl'] == False)
                                           & (~df_all_in['composite_key'].isin(used_comp_keys_in))
                                           & (df_all_in['date'] >= min_date)
                                           & (df_all_in['date'] <= max_date)]
@@ -116,7 +117,16 @@ def extract_spatial_sample(df_nofire_in: gpd.GeoDataFrame,
 
     return sample_key, sample_dist
 
+def create_sampled_dataset(dict_sampled_dict: dict, df_all_in: gpd.GeoDataFrame): 
 
+    """
+    Takes the sampled dataframe, and combines all types of values: Fire obs, spatial, and temporal composite_ids
+    into a single list, which is transformed into a single column dataframe.
+    This is used to left join fire_lbl, date from df_all_in as the y values 
+
+    Then t-1 day for each sample is extracted and all values are kept (only y columns will have prefix y if no y then assume is x)
+    """
+    pass
 if __name__ == '__main__':
     import pandas as pd
 
