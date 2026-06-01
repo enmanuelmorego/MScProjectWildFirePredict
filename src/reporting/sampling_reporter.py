@@ -53,6 +53,21 @@ def desc_stats_spatial_samples(dist_values_list: list) -> dict:
             'min_dist'   : round(np.min(distance_values)),
             'max_dist'   : round(np.max(distance_values))}
 
+def create_sampling_statistics(sampled_dict_in: dict) -> dict:
+    """Wrapper functiont that calls the statistics generating functions
+
+    Args:
+        sampled_dict_in (dict): Dictionary with sampled values
+
+    Returns:
+        dict: Dicitonary with sampling statistics
+    """    
+    temp_basic    = basic_desc_sampled(sampled_dict_in, 'temporal')
+    spatial_basic = basic_desc_sampled(sampled_dict_in, 'spatial')
+    spatial_spec  = desc_stats_spatial_samples(sampled_dict_in['spatial_sample_dist'])
+    return {'spatial_samples_stats': spatial_basic | spatial_spec,
+            'temporal_samples_stats':  temp_basic}
+
 
 if __name__ == "__main__":
 
