@@ -4,7 +4,23 @@ import sampling.sampling_functions as sf
 from typing import cast 
 
 def create_samples_dict(df_in: gdp.GeoDataFrame) -> dict:
+    """Calls the relevant sampling procedures and creates a dictionary with the target
+    values and resulting samples based on the sampling methodology of the project
 
+    Args:
+        df_in (gdp.GeoDataFrame): Pre processed tabular data
+
+    Returns:
+        dict: Returns a dictionary of lists and set of the target and results sample values 
+
+    Example:
+      {'fire_lbl_comp_key'   : [],
+                    'temporal_sample_comp_key': [],
+                    'spatial_sample_comp_key' : [],
+                    'spatial_sample_dist'     : [],
+                    'used_comp_keys'          : set()
+                    }
+    """    
     # Create subsets of dataframes
     df      = df_in.copy()
     df_fire = df[df['fire_lbl'] == True]
