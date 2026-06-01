@@ -1,5 +1,4 @@
-
-
+import numpy as np
 def basic_desc_sampled(sampled_dict_in: dict, sampling_type: str) -> dict:
     """Calculates basic descriptives values from the sampled data set
     Allows to get an overview of the sampling procedure results
@@ -37,6 +36,23 @@ def basic_desc_sampled(sampled_dict_in: dict, sampling_type: str) -> dict:
             'n_sampled'  : n_sampled,
             'n_missing'  : n_missing,
             'pct_missing': pct_missing}
+
+def desc_stats_spatial_samples(dist_values_list: list) -> dict: 
+    """Calculates basic descriptive statistics on the distance values for the sampled observations
+
+    Args:
+        sampled_dict_in (dict): Dicti
+
+    Returns:
+        dict: _description_
+    """
+    distance_values = [d for d in dist_values_list if d is not None]
+    return {'mean_dist'  : round(np.mean(distance_values)),
+            'median_dist': round(np.median(distance_values)),
+            'std_dist'   : round(np.std(distance_values)),
+            'min_dist'   : round(np.min(distance_values)),
+            'max_dist'   : round(np.max(distance_values))}
+
 
 if __name__ == "__main__":
     d = {'fire_lbl_comp_key': []}
