@@ -1,13 +1,14 @@
 """
 Module to run all the data load, and transformations to prepare all tabular data for transformations
 """
+from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
 
 import scripts.validation_checks as vc
 import pipelines.tabular_load_pipeline as lp
-from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
-
 import transforms.preprocessing_transforms as pp
 import reporting.data_profiler as dp
+import pipelines.sampling_pipeline as sp
+
 
 def run_tabular():
     # ------------------------
@@ -33,12 +34,16 @@ def run_tabular():
     df_combined          = pp.build_tabular_dataset(df_viirs_w_grid, dict_tabular_data)
     df_combined_filtered = pp.remove_na_fwi_grid1(df_combined)
     df_composite_key     = pp.create_composite_key(df_combined_filtered)
-
-    return df_composite_key
+    # ------------------------
+    # SAMPLE DATA
+    # ------------------------
+    dict_samples = sp.create_samples_dict(df_composite_key)
+    
+    return dict_samples
 
 if __name__ == "__main__":
 
     x = run_tabular()
-    data_profile = dp.extract_dataset_metadata(x, 'fulldata', True)
-    print(x['fire_lbl'].unique())
+    #data_profile = dp.extract_dataset_metadata(x, 'fulldata', True)
+    #print(x['fire_lbl'].unique())
     
