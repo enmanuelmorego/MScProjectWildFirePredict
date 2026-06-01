@@ -38,13 +38,13 @@ def basic_desc_sampled(sampled_dict_in: dict, sampling_type: str) -> dict:
             'pct_missing': pct_missing}
 
 def desc_stats_spatial_samples(dist_values_list: list) -> dict: 
-    """Calculates basic descriptive statistics on the distance values for the sampled observations
+    """Calculates the basic descriptive statistics on the distance from sample to fire observation
 
     Args:
-        sampled_dict_in (dict): Dicti
+        dist_values_list (list): List of the distance (in meters) of the sample taken for each fire observation
 
     Returns:
-        dict: _description_
+        dict: Dictionary containing the basic descriptive stats
     """
     distance_values = [d for d in dist_values_list if d is not None]
     return {'mean_dist'  : round(np.mean(distance_values)),
