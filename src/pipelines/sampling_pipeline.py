@@ -3,16 +3,14 @@ import geopandas as gdp
 import src.sampling.sampling_functions as sf
 from typing import cast 
 
-def create_samples_dict(df_in: gdp.GeoDataFrame):
+def create_samples_dict(df_in: gdp.GeoDataFrame) -> dict:
 
     # Create subsets of dataframes
     df      = df_in.copy()
-    df_fire = df_in.copy()
-    df_fire = df_fire[df_fire['fire_lbl'] == True]
+    df_fire = df[df['fire_lbl'] == True]
 
     # Extract dataset that has never seen a fire 
-    df_nofire = df_in.copy()
-    df_nofire = df_nofire[~df_nofire['grid_id'].isin(df_fire['grid_id'])]
+    df_nofire = df[~df['grid_id'].isin(df_fire['grid_id'])]
 
     # Initialise dictionary to store samples
     samples_dict = {'fire_lbl_comp_key'       : [],
@@ -41,7 +39,9 @@ def create_samples_dict(df_in: gdp.GeoDataFrame):
         samples_dict['temporal_sample_comp_key'].append(temp_sample)
         samples_dict['spatial_sample_comp_key'].append(spatial_sample)
         samples_dict['spatial_sample_dist'].append(sample_dist)
-        samples_dict['used_comp_keys'].add(temp_sample)
-        samples_dict['used_comp_keys'].add(spatial_sample)
+        if temp_sample is not None:
+            samples_dict['used_comp_keys'].add(temp_sample)
+        if spatial_sample is not None:
+            samples_dict['used_comp_keys'].add(spatial_sample)
     
     return samples_dict
