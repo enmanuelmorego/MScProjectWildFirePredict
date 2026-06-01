@@ -38,7 +38,11 @@ def run_tabular():
     # SAMPLE DATA
     # ------------------------
     dict_samples = sp.create_samples_dict(df_composite_key)
-    
+    # TODO Summary stats for sampling: None entries for both types of samples, desc stats for spatial samples
+    # TODO Function that transforms sample dict into a single column of composite ids which become the Y values
+    # TODO Extract t-1 as the observations used for prediction X values
+    # TODO Build final data set with X and Y values where Y is only the fire lbl (leave composite Key for ref)
+    #       Please note Composite Key value in Y cannot exist in X
     return dict_samples
 
 if __name__ == "__main__":
