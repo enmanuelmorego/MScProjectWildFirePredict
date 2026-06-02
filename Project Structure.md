@@ -20,6 +20,7 @@ The project is divided into modules, which have specific responsibilities. An ov
 |   |   |- data_io
 |   |   |- pipelines
 |   |   |- reporting
+|   |   |- sampling
 |   |   |- scripts
 |   |   |- transforms
 |   |   |- utils
@@ -46,6 +47,8 @@ MScProjectWildFirePredict/
 |   |- preprocessing_general.py
 |   |- reporting
 |   |   |- data_profiler.py
+|   |- sampling
+|   |   |- sampling_functions.py
 |   |- scripts
 |   |   |- __init__.py
 |   |   |- run_tabular.py
