@@ -138,7 +138,6 @@ def create_y_target_sampled_df(dict_sampled_dict: dict, df_all_in: gpd.GeoDataFr
     fire_ls =    [x for x in dict_sampled_dict["fire_lbl_comp_key"]        if x is not None]
     temp_ls =    [x for x in dict_sampled_dict['temporal_sample_comp_key'] if x is not None]
     spatial_ls = [x for x in dict_sampled_dict['spatial_sample_comp_key']  if x is not None]
-    print("db")
     # Combine into a single dataframe
     df_comp_key_y = pd.concat([pd.DataFrame({'composite_key': fire_ls,
                                              'sample_type': 'fire'}),
