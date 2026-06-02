@@ -158,7 +158,9 @@ def create_sampled_df(df_all_in: gpd.GeoDataFrame, df_sampled: pd.DataFrame) -> 
     """Creates sampled dataset by combining the sampled target variables with their respective t-1 observations
     and preditor variables. 
     It creates a `bridge_composite_key` by taking the date of teh tgt value - 1 day, the composite key is created and 
-    joined with `df_all_in` dataset to create the final sampled data set from which sentinel 2 data is fetched for
+    joined with `df_all_in` dataset to create the final sampled data set from which sentinel 2 data is fetched for.
+
+    Sampled values without corresponding t-1 observations are excluded from dataset
 
     Args:
         df_all_in (gpd.GeoDataFrame): Tabular data set containing day x grid + predictors
@@ -172,6 +174,8 @@ def create_sampled_df(df_all_in: gpd.GeoDataFrame, df_sampled: pd.DataFrame) -> 
     df_tgt_y_values["bridge_composite_key_y"] = df_tgt_y_values["grid_id_y"].astype(str) + (df_tgt_y_values["date_y"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
     # Join sampled df with df_all_in to create sampled dataset
     df_sampled = pd.merge(df_tgt_y_values, df_all_in, how = 'left', left_on = 'bridge_composite_key_y', right_on = 'composite_key')
+    # Exclude dates where no predictor values are available
+    df_sampled = df_sampled[~df_sampled['grid_id'].isna()]
     return df_sampled
 
 if __name__ == '__main__':
