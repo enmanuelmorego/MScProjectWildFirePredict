@@ -119,15 +119,44 @@ def extract_spatial_sample(df_nofire_in: gpd.GeoDataFrame,
 
     return sample_key, sample_dist
 
-def create_sampled_dataset(dict_sampled_dict: dict, df_all_in: gpd.GeoDataFrame): 
+def create_y_target_sampled_df(dict_sampled_dict: dict, df_all_in: gpd.GeoDataFrame) -> pd.DataFrame: 
+    """Takes the sampled composite keys stored in the dictionary and combines them into a single 
+    data frame.
+    Data frame is then left joined with `df_all_in` to extract relevant values to aid the creation
+    of the final sampled dataset. All columns are suffixed with '_y' to show distinction when
+    joining with the main dataset later
 
-    """
-    Takes the sampled dataframe, and combines all types of values: Fire obs, spatial, and temporal composite_ids
-    into a single list, which is transformed into a single column dataframe.
-    This is used to left join fire_lbl, date from df_all_in as the y values 
+    Args:
+        dict_sampled_dict (dict): Dictionary containing the composite_keys of the sampled observations
+        df_all_in (gpd.GeoDataFrame): Df containing pre processed tabular data
 
-    Then t-1 day for each sample is extracted and all values are kept (only y columns will have prefix y if no y then assume is x)
+    Returns:
+        pd.DataFrame: Data frame with composite keys of sampled values along with relevant columns. See below
+        Columns: `{composite_key_y, sample_type_y, date_y, fire_lbl_y}`
     """
+    # Extract values into lists
+    fire_ls =    [x for x in dict_sampled_dict["fire_lbl_comp_key"]        if x is not None]
+    temp_ls =    [x for x in dict_sampled_dict['temporal_sample_comp_key'] if x is not None]
+    spatial_ls = [x for x in dict_sampled_dict['spatial_sample_comp_key']  if x is not None]
+    print("db")
+    # Combine into a single dataframe
+    df_comp_key_y = pd.concat([pd.DataFrame({'composite_key': fire_ls,
+                                             'sample_type': 'fire'}),
+                               pd.DataFrame({'composite_key': temp_ls,
+                                             'sample_type': 'temporal'}),
+                               pd.DataFrame({'composite_key': spatial_ls,
+                                             'sample_type': 'spatial'})],
+                            ignore_index = True)
+    # Extract variables from main df
+    df_y = pd.merge(df_comp_key_y, df_all_in, how = 'left', on = 'composite_key')
+    # # Select relevant columns 
+    df_y = df_y[['composite_key', 'sample_type', 'date', 'fire_lbl']]
+    df_y = df_y.add_suffix("_y")
+
+    return df_y
+
+def create_sampled_df():
+    """Function that takes the y target and calculates t-1 and extract the releant data"""
     pass
 if __name__ == '__main__':
     import pandas as pd
