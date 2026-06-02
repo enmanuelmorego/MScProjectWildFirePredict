@@ -149,14 +149,31 @@ def create_y_target_sampled_df(dict_sampled_dict: dict, df_all_in: gpd.GeoDataFr
     # Extract variables from main df
     df_y = pd.merge(df_comp_key_y, df_all_in, how = 'left', on = 'composite_key')
     # # Select relevant columns 
-    df_y = df_y[['composite_key', 'sample_type', 'date', 'fire_lbl']]
+    df_y = df_y[['composite_key', 'grid_id', 'sample_type', 'date', 'fire_lbl']]
     df_y = df_y.add_suffix("_y")
 
     return df_y
 
-def create_sampled_df():
-    """Function that takes the y target and calculates t-1 and extract the releant data"""
-    pass
+def create_sampled_df(df_all_in: gpd.GeoDataFrame, df_sampled: pd.DataFrame) -> pd.DataFrame:
+    """Creates sampled dataset by combining the sampled target variables with their respective t-1 observations
+    and preditor variables. 
+    It creates a `bridge_composite_key` by taking the date of teh tgt value - 1 day, the composite key is created and 
+    joined with `df_all_in` dataset to create the final sampled data set from which sentinel 2 data is fetched for
+
+    Args:
+        df_all_in (gpd.GeoDataFrame): Tabular data set containing day x grid + predictors
+        df_sampled (pd.DataFrame): Transformed sampled dataset - Target (y) variable
+
+    Returns:
+        pd.DataFrame: sampled dataframe with both x and y (minus sentinel-2 features)
+    """
+    # Create bridge composite key (1 day before the y observations)
+    df_tgt_y_values = df_sampled.copy()
+    df_tgt_y_values["bridge_composite_key_y"] = df_tgt_y_values["grid_id_y"].astype(str) + (df_tgt_y_values["date_y"]-pd.DateOffset(days=1)).dt.strftime("%Y%m%d")
+    # Join sampled df with df_all_in to create sampled dataset
+    df_sampled = pd.merge(df_tgt_y_values, df_all_in, how = 'left', left_on = 'bridge_composite_key_y', right_on = 'composite_key')
+    return df_sampled
+
 if __name__ == '__main__':
     import pandas as pd
 
