@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 import platform
 import subprocess
+import re
 
 def get_filepaths(data_dir: Path, dir_name: str, file_extension: str) -> list[Path]: 
     """  Function to get all the files in a directory inside the data folder based on the specified file extension
