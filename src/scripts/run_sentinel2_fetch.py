@@ -21,9 +21,10 @@ def run_sentinel2_fetch():
     # ------------------------
     # LOAD SAMPLED DATA
     # ------------------------
-    s = sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR)
+    dict_sampled_tabular = sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR)
+    vc.validate_data_load_dict(dict_sampled_tabular)
 
-    return s
+    return dict_sampled_tabular
     
 if __name__ == "__main__":
     d = run_sentinel2_fetch()
