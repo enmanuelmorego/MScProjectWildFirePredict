@@ -52,7 +52,7 @@ MScProjectWildFirePredict/
 |   |- scripts/
 {fu.build_dir_tree(Path("src")/"scripts", True, indent ="|   ")}
 ```
-## `run_tabular()`
+### `run_tabular()`
 
 - Imports parameters from set_parameters.py.
 - Loads and preprocesses the VIIRS, FWI and UK Grid datasets.
@@ -60,8 +60,9 @@ MScProjectWildFirePredict/
 - Creates the predictor (X) and target (Y) tabular dataset (excluding Sentinel-2 features).
 - Generates sampling reports and descriptive statistics.
 - Splits the sampled dataset by year and saves .csv files to disk for later processing.
+---
 
-## `run_setinel2_fetch()`
+### `run_setinel2_fetch()`
 - Imports parameters from `set_parameters.py`
 - Uses `YEAR_FILTER` to identify which sampled datasets to process
     - If any of the requested years do not have a corresponding dataset, the function stops, and notifies the user of what is missing and what needs to be run
@@ -69,7 +70,7 @@ MScProjectWildFirePredict/
 - Split the data into batches suitable for GEE requests (see `sampled_to_batch`, `sampled_to_batch_df`)
 - For each row of the sampled batch df, a request is sent to GEE for Sentinel2 data 
 - Saves downlaoded data as `npz` files to disk for later use
-
+---
 
 ## Data Files
 This module contains files and objects used to build the different components of the program. It is further split by type of data, i.e., raw inputs, preprocessed, etc. 
