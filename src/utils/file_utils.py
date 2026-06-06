@@ -31,6 +31,30 @@ def open_file(filename):
         os.startfile(filename) #type: ignore
     elif current_system == "Darwin":
         subprocess.call(["open","-a", "Visual Studio Code",  str(filename)])
+
+# -------------------------
+# SENTINEL SPECIFIC UTILS
+# -------------------------
+def fetch_max_batch_num(available_sentinel_files: list[Path])-> int:
+    """Takes a list of available npz files in disk and fetches the max batch number of the files
+    If there is no files available, then the function returns 1 to be used as the first batch, 
+    Else, +1 is added to the latest existing batch to avoid duplication of batches
+
+    Args:
+        available_sentinel_files (list[Path]): Availble npz files in disk 
+
+    Returns:
+        int: Integer representing the current max batch number 
+    """
+    max_batch = 0
+    for f in available_sentinel_files:
+        batch_str = re.search(r"[B]\d{3}", str(f)).group() # type: ignore
+        batch_int = int(batch_str[1:])
+        if batch_int > max_batch:
+            max_batch = batch_int
+    max_batch = int(max_batch) + 1
+    return max_batch 
+
 # -------------------------
 # ARCHITECTURE FUNCTIONS
 # ------------------------- 
