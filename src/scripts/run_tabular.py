@@ -7,8 +7,6 @@ from data_io.sampling_writter import write_sampled_pre_sentinel
 import scripts.validation_checks as vc
 import pipelines.tabular_load_pipeline as lp
 import transforms.preprocessing_transforms as pp
-import reporting.data_profiler as dp
-import reporting.sampling_reporter as sr
 import pipelines.sampling_pipeline as sp
 import sampling.sampling_functions as sf
 
@@ -42,7 +40,7 @@ def run_tabular():
     # SAMPLE DATA
     # ------------------------
     dict_samples  = sp.create_samples_dict(df_composite_key)
-    samples_stats = sr.create_sampling_statistics(dict_samples)
+    #samples_stats = sr.create_sampling_statistics(dict_samples)
     # TODO Create function to write samples_stats to json file
     # TODO Write function that generates histogram of distances from sampled
     # TODO Write wrapper function that calls create_sampling_statistics + json writer + histogram create + histogram saver
