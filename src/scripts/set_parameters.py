@@ -9,7 +9,7 @@ PROJ_HOME = Path(__file__).resolve().parents[2]
 # Enter date as yyyy, m, d
 VALIDATION_DATE = date(2026, 6, 6)
 
-PARAMETERS = {"YEAR_FILTER"      : [2018],
+PARAMETERS = {"YEAR_FILTER"      : [2018, 2019],
               "CRS"              : "EPSG: 4326",          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
               "SATELLITE_IMAGES" : "COPERNICUS/S2_SR_HARMONIZED",
               "SATELLITE_BANDS"  : ["B3","B4","B8"],

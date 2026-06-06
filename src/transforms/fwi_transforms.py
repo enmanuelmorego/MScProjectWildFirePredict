@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime
 import pandas as pd
 import geopandas as gpd
+import pygrib
 
 def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_grid, crs_val: str) -> None:
     """
