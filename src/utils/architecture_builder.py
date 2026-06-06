@@ -40,7 +40,7 @@ If the configuration date does not match the current run date, a warning is rais
 
 `run_tabular.py` = Loads and processes all tabular data in the project. It also performs preprocessing steps and sampling. The output are `.csv` files with the preprocessed and sampled data
 
-`run_satellite_fetch.py` = Loads the `.csv` preprocessed and sampled data and fetches the Sentinel-2 data from GEE. Stores Sentinel2-2 data as `.npz` files to local disk.
+`run_sentinel2_fetch.py` = Loads the `.csv` preprocessed and sampled data and fetches the Sentinel-2 data from GEE. Stores Sentinel2-2 data as `.npz` files to local disk.
 
 `run_feature_extraction.py` = Loads the `.npz` files and uses a CNN architecture to extract the features to be used in the analysis. This module also loads the sampled `.csv` files and joins them. It saves `.csv` per year containing all data ready for modelling. 
 
@@ -52,6 +52,24 @@ MScProjectWildFirePredict/
 |   |- scripts/
 {fu.build_dir_tree(Path("src")/"scripts", True, indent ="|   ")}
 ```
+## `run_tabular()`
+
+- Imports parameters from set_parameters.py.
+- Loads and preprocesses the VIIRS, FWI and UK Grid datasets.
+- Performs the sampling procedure to generate fire and non-fire observations.
+- Creates the predictor (X) and target (Y) tabular dataset (excluding Sentinel-2 features).
+- Generates sampling reports and descriptive statistics.
+- Splits the sampled dataset by year and saves .csv files to disk for later processing.
+
+## `run_setinel2_fetch()`
+- Imports parameters from `set_parameters.py`
+- Uses `YEAR_FILTER` to identify which sampled datasets to process
+    - If any of the requested years do not have a corresponding dataset, the function stops, and notifies the user of what is missing and what needs to be run
+- Takes the list of loaded files, and combines them into a single dataframe
+- Split the data into batches suitable for GEE requests (see `sampled_to_batch`, `sampled_to_batch_df`)
+- For each row of the sampled batch df, a request is sent to GEE for Sentinel2 data 
+- Saves downlaoded data as `npz` files to disk for later use
+
 
 ## Data Files
 This module contains files and objects used to build the different components of the program. It is further split by type of data, i.e., raw inputs, preprocessed, etc. 
