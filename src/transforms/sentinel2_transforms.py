@@ -4,10 +4,8 @@ from typing import Generator, Any
 from skimage.transform import resize
 from skimage import img_as_float32
 
-def _split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
+def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
-    Works as an internal helper for `sampled_to_batch()`
-
 
     Args:
         date_obj (pd.Timestamp): The current date object from the main dataframe
@@ -36,10 +34,10 @@ def _split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: 
 
     return results, batch_num
 
-def _close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
+def close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
     """Function to close the current working batches. This is applicable when the sum of concurrent group batches hits the 
     batch size limit.
-    Works as an internal helper for `sampled_to_batch()`
+
     The funcion performs the following actions:
     - Extracts the earliest date and latest date from the working list (`group_list`) and format the values as strings
     - Generates the batch name
@@ -133,17 +131,17 @@ def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: 
         if current_group_size > batch_size:
             # If there is a batch that had been building, finalise/close that batch
             if group_buffer:
-                  batch_dict, batch_num = _close_current_batch(group_buffer, batch_num)
+                  batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
                   groups_dict.update(batch_dict)
                   group_buffer = []
             # Split large group into smaller batches
-            large_batch_dict, batch_num = _split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
+            large_batch_dict, batch_num = split_batch_greater_than_limit(date, current_group_size, batch_size, batch_num)
             groups_dict.update(large_batch_dict)
             continue
 
         # When the group_buffer surpasses size limit
         if len(group_buffer) + current_group_size > batch_size:
-            batch_dict, batch_num = _close_current_batch(group_buffer, batch_num)
+            batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
             groups_dict.update(batch_dict)
             group_buffer = []
         
@@ -152,7 +150,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: 
 
     # Cases where the last group was not added to the dict inside the loop
     if group_buffer:
-        batch_dict, batch_num = _close_current_batch(group_buffer, batch_num)
+        batch_dict, batch_num = close_current_batch(group_buffer, batch_num)
         groups_dict.update(batch_dict)
 
     return groups_dict
