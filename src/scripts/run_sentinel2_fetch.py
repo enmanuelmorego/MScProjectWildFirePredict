@@ -3,11 +3,13 @@ Module that fetches the Sentinel2 data from GEE
 """
 from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
 
+import ee
 import pandas as pd
 import scripts.validation_checks as vc
 import data_io.sampled_loader as sl
 import utils.file_utils as fu
-
+import transforms.sentinel2_transforms as st
+import pipelines.sentinel2_fetch_pipeline as sp
 
 
 def run_sentinel2_fetch():
@@ -18,25 +20,31 @@ def run_sentinel2_fetch():
     # ------------------------
     # EXTRACT PARAMETERS 
     # ------------------------
-    YEAR_FILTER = PARAMETERS['YEAR_FILTER']
-    DATA_DIR    = PARAMETERS['DATA_DIR']
+    YEAR_FILTER   = PARAMETERS['YEAR_FILTER']
+    DATA_DIR      = PARAMETERS['DATA_DIR']
     # -------------------------------
     # LOAD SAMPLED DATA
     # -------------------------------
-    dict_sampled_tabular = sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR)
+    dict_sampled_tabular   = sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR)
     vc.validate_data_load_dict(dict_sampled_tabular)
-    df_sampled_all       = pd.concat(dict_sampled_tabular.values(), ignore_index = True)
+    df_sampled_all         = pd.concat(dict_sampled_tabular.values(), ignore_index = True)
+    df_sampled_all['date'] = pd.to_datetime(df_sampled_all['date'])
+    df_sampled_all = df_sampled_all.head()
     # -------------------------------
     # LOAD SENTINEL2 CURRENT STATE
     # -------------------------------
     avialable_sentinel_files = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
     sentinel_max_batch_num   = fu.fetch_max_batch_num(avialable_sentinel_files)
+    dict_sentinel_batches      = st.sampled_to_batch(df_sampled_all, sentinel_max_batch_num)
 
-    return sentinel_max_batch_num
+    # -------------------------------
+    # REQUEST DATA
+    # -------------------------------
+    sp.request_sentinel2_data(df_sampled_all, dict_sentinel_batches, PARAMETERS)
     
 if __name__ == "__main__":
     d = run_sentinel2_fetch()
-    print(d)
+    #print(d)
     # d['date'] = pd.to_datetime(d['date'])
     # d['year'] = d['date'].dt.year
     # print(d['year'].unique())

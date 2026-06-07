@@ -1,5 +1,8 @@
 import pandas as pd
+import numpy as np
 from typing import Generator, Any
+from skimage.transform import resize
+from skimage import img_as_float32
 
 def _split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
@@ -179,3 +182,32 @@ def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generato
             df_filtered = df_filtered.iloc[start_i:end_i]
 
         yield batch_name, df_filtered
+
+def transform_sentinel_data(sentinel_npyarray: np.ndarray) -> np.ndarray:
+    """Transforms the downloaded raw pixels array into a format that is suitable for CNN processing
+    The function replaces all `nan` with `0` values, it organises the order of the bands to `(H, W, 4)`, and resizes the data to 128 x 128
+
+    Args:
+        sentinel_npyarray (np.ndarray): Sentinel2 data as pixel array
+
+    Returns:
+        np.ndarray: resized and transformed numpy array
+    """
+
+    # Handle NA values
+    pixel_data = np.nan_to_num(sentinel_npyarray, nan = 0.0)
+    # Adjust axis: Expected format (H, W, 4)
+    if pixel_data.shape[0] == 4:
+        pixel_data = np.moveaxis(pixel_data, 0, -1)
+    elif pixel_data.shape[1] == 4:
+        pixel_data = np.moveaxis(pixel_data, 1, -1)
+    # Scale the pixel data
+    pixel_data = pixel_data / 10000.0
+    # Clip outlier values (pixels where birightness might be too much, and due to data quality issues)
+    pixel_data = np.clip(pixel_data, 0, 1)
+    # Resize data
+    pixel_data_resized = resize(pixel_data, (128,128), anti_aliasing = True)
+    pixel_data_resized = img_as_float32(pixel_data_resized)
+
+    return pixel_data_resized
+
