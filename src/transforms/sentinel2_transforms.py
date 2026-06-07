@@ -64,9 +64,6 @@ def _close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
 
     return results, batch_num
 
-
-
-
 def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
@@ -156,3 +153,29 @@ def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: 
         groups_dict.update(batch_dict)
 
     return groups_dict
+
+def sampled_to_batch_dfs(batch_dict: dict, df_sampled: pd.DataFrame) -> Generator[tuple[str, pd.DataFrame], None, None]:
+    """The function takes the batch_dict containing the batch name and the dates corresponding to each batch
+    It iterates thru the values of the dictionary and filters the data frame to only contain the rows relevant to the batch
+
+    Args:
+        batch_dict (dict):  Dictionary containing batch name and the dates correspoding to each batch
+        df_sampled (pd.DataFrame): Data frame containing the sampled data, preprocessed
+
+    Yields:
+        Generator[tuple[str, pd.DataFrame], None, None]:  The name of the processed batch. Filtered data frame meeting the batch requirements
+
+    Note:
+        This function yields the results rather tahn returning a dataframe to save memory and keeping computer from freezing
+    """
+    df_sampled = df_sampled.sort_values('date').reset_index(drop = True)
+    for batch_name, batch_df in batch_dict.items():
+        split_indeces = batch_df.get('split_group', None)
+        group_dates   = batch_df.get('date',        None)
+        df_filtered   = df_sampled[df_sampled['date'].isin(group_dates)].copy()
+
+        if split_indeces is not None:
+            start_i, end_i = split_indeces 
+            df_filtered = df_filtered.iloc[start_i:end_i]
+
+        yield batch_name, df_filtered
