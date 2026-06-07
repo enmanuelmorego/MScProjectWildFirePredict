@@ -6,7 +6,7 @@ from typing import Any
 
 def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, parameters: dict):
 
-    gee_proj_name = parameters["GEE_PORJ_NAME"]
+    gee_proj_name = parameters["GEE_PROJECT"]
     data_dir      = parameters['DATA_DIR']
     try:
         ee.Initialize(project = gee_proj_name)
