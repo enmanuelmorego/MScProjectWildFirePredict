@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 import ee
 import numpy as np
 import requests
