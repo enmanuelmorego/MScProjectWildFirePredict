@@ -3,7 +3,6 @@ Module that fetches the Sentinel2 data from GEE
 """
 from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
 from typing import cast
-import ee
 import pandas as pd
 import scripts.validation_checks as vc
 import data_io.sampled_loader as sl
