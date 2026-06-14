@@ -29,14 +29,15 @@ def run_sentinel2_fetch():
     vc.validate_data_load_dict(dict_sampled_tabular)
     dict_sampled_tabular = cast(dict[int, pd.DataFrame], dict_sampled_tabular)
     df_sampled_all       = du.combine_dict_to_geodf(dict_sampled_tabular, PARAMETERS['CRS'])
+    # TODO remove line below after testing
+    df_sampled_all = df_sampled_all.head(50)
 
-    df_sampled_all = df_sampled_all.head()
     # -------------------------------
     # LOAD SENTINEL2 CURRENT STATE
     # -------------------------------
     available_sentinel_files = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
     sentinel_max_batch_num   = fu.fetch_max_batch_num(available_sentinel_files)
-    dict_sentinel_batches      = st.sampled_to_batch(df_sampled_all, sentinel_max_batch_num)
+    dict_sentinel_batches    = st.sampled_to_batch(df_sampled_all, sentinel_max_batch_num)
 
     # -------------------------------
     # REQUEST DATA
