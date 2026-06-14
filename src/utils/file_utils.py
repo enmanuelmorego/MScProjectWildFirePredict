@@ -47,6 +47,7 @@ def write_df_to_csv(df_in: pd.DataFrame, file_path: Path, fname: str)-> None:
     """
     if not fname.endswith(".csv"):
         fname = f"{fname}.csv"
+    os.makedirs(file_path, exist_ok = True)
     write_to = file_path/fname
     df_in.to_csv(write_to, index = False)
 
