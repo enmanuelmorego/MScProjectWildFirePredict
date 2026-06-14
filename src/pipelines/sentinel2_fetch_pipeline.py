@@ -9,9 +9,10 @@ from typing import Any
 def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, parameters: dict) -> None:
 
     gee_proj_name = parameters["GEE_PROJECT"]
+    proj_home     = parameters['PROJ_HOME']
     data_dir      = parameters['DATA_DIR']
     run_timestamp = parameters['RUN_TIMESTAMP']
-    logs_dir      = data_dir / "outputs" / "logs"
+    logs_dir      = proj_home / "outputs" / "logs"
     
     # Initiliase list to save composite keys with no image(s) found
     missing_composite_keys = []
