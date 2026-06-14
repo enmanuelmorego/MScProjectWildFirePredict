@@ -56,21 +56,27 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
 
 def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str, data_dir: Path) -> None:
     """Saves Sentinel2 data to disk as compressed `.npz` file
-
+    
     The functions converts the downloaded image, label and composite key into numpy arrays and stores them in a single compressed file
     The resulting file contains three arrays:
 
     - `x`: Sentinel-2 image data
     - `y`: Labels associated with each image
     - `composite_key`: Composite keys corresponding to each observation
-
     Args:
         image_list (list): List containing the Sentinel-2 image arrays
         label_list (list): List containing the target labels associated with each image
         composite_key_list (list): List containing the composite keys corresponding to each observation
         batch_name (str): Name of the current batch. This value is used to generate the output filename
         data_dir (Path): Root data directory where the `Sentinel2` subdirectory is located
+
+    Raises:
+        ValueError: If the image list is emtpy, return value error to avoid falsely commiting empty files to disk
     """
+    # VALIDATE
+    if len(image_list) == 0:
+        raise ValueError(f"❌ No observations found for batch {batch_name}")
+    # SAVE DATA
     x     = np.array(image_list)
     y     = np.array(label_list)
     ids   = np.array(composite_key_list)
