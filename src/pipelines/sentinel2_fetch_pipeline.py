@@ -31,12 +31,12 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
         image_list, label_list, composite_key_list = [], [], []
         for row in batch_df.itertuples():
             row: Any
-            i = row.Index
+            i             = row.Index
+            date          = row.date
+            fire_lbl      = row.fire_lbl
+            composite_key = row.composite_key
             try:
                 geom          = ee.Geometry(row.geometry.__geo_interface__)
-                date          = row.date
-                fire_lbl      = row.fire_lbl
-                composite_key = row.composite_key
                 # Request Sentinel data
                 sentinel_data = sio.fetch_sentinel_data(geom, date, parameters)
                 sentinel_data = st.transform_sentinel_data(sentinel_data)
@@ -46,7 +46,8 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
                     missing_composite_keys.append({"date": run_timestamp,
                                                    "batch": batch_name,
                                                    "composite_key": composite_key,
-                                                   "missing_sentinel2_data": True})
+                                                   "missing_sentinel2_data": True,
+                                                   "error_msg": None})
                     continue
                 # Generate objects to save
                 image_list.append(sentinel_data)
@@ -54,6 +55,11 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
                 composite_key_list.append(composite_key)
                 print(f"\t✅ Downloaded & Resized {i+1}: {sentinel_data.shape}")
             except Exception as e:
+                missing_composite_keys.append({"date": run_timestamp,
+                                               "batch": batch_name,
+                                               "composite_key": composite_key,
+                                               "missing_sentinel2_data": True,
+                                               "error_msg": str(e)})
                 print(f"\t❌ Error on row {i}: {e}")
         # Generate batch statistics 
         batch_statistics.append({"date": run_timestamp,
