@@ -6,6 +6,7 @@ import os
 import platform
 import subprocess
 import re
+import pandas as pd
 
 def get_filepaths(data_dir: Path, dir_name: str, file_extension: str) -> list[Path]: 
     """  Function to get all the files in a directory inside the data folder based on the specified file extension
@@ -32,6 +33,22 @@ def open_file(filename):
         os.startfile(filename) #type: ignore
     elif current_system == "Darwin":
         subprocess.call(["open","-a", "Visual Studio Code",  str(filename)])
+
+# -------------------------
+# WRITER UTILS
+# -------------------------
+def write_df_to_csv(df_in: pd.DataFrame, file_path: Path, fname: str)-> None:
+    """ Writes a dataframe to disk as a csv file
+
+    Args:
+        df_in (pd.DataFrame): Dataframe to write
+        file_path (Path): Directory where the file will be written
+        fname (str): Output file name
+    """
+    if not fname.endswith(".csv"):
+        fname = f"{fname}.csv"
+    write_to = file_path/fname
+    df_in.to_csv(write_to, index = False)
 
 # -------------------------
 # SENTINEL SPECIFIC UTILS
