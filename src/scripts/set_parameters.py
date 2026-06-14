@@ -7,7 +7,7 @@ from pathlib import Path
 # Project Root
 PROJ_HOME = Path(__file__).resolve().parents[2]
 # Enter date as yyyy, m, d
-VALIDATION_DATE = date(2026, 6, 7)
+VALIDATION_DATE = date(2026, 6, 14)
 
 PARAMETERS = {"YEAR_FILTER"      : [2018, 2019],
               "CRS"              : "EPSG: 4326",          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
@@ -19,7 +19,8 @@ PARAMETERS = {"YEAR_FILTER"      : [2018, 2019],
               "DATA_DIR"         : Path(PROJ_HOME)/"data",
               "RUN_ID"           : f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}",
               "RANDOM_SEED"      : 42,
-              
+              "RUN_TIMESTAMP"    : datetime.today().strftime('%Y-%m-%d'),
+
               "VIIRS_DIR"                : "VIIRS",
               "FWI_DIR"                  : "FWI",
               "FIRENOFIRE_SAMPLED_DIR"   : "SampledFireNoFire",
