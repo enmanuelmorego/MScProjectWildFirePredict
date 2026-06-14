@@ -2,12 +2,13 @@
 Module that fetches the Sentinel2 data from GEE
 """
 from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
-
+from typing import cast
 import ee
 import pandas as pd
 import scripts.validation_checks as vc
 import data_io.sampled_loader as sl
 import utils.file_utils as fu
+import utils.datasets_utils as du
 import transforms.sentinel2_transforms as st
 import pipelines.sentinel2_fetch_pipeline as sp
 
@@ -25,16 +26,17 @@ def run_sentinel2_fetch():
     # -------------------------------
     # LOAD SAMPLED DATA
     # -------------------------------
-    dict_sampled_tabular   = sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR)
+    dict_sampled_tabular = sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR)
     vc.validate_data_load_dict(dict_sampled_tabular)
-    df_sampled_all         = pd.concat(dict_sampled_tabular.values(), ignore_index = True)
-    df_sampled_all['date'] = pd.to_datetime(df_sampled_all['date'])
+    dict_sampled_tabular = cast(dict[int, pd.DataFrame], dict_sampled_tabular)
+    df_sampled_all       = du.combine_dict_to_geodf(dict_sampled_tabular, PARAMETERS['CRS'])
+
     df_sampled_all = df_sampled_all.head()
     # -------------------------------
     # LOAD SENTINEL2 CURRENT STATE
     # -------------------------------
-    avialable_sentinel_files = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
-    sentinel_max_batch_num   = fu.fetch_max_batch_num(avialable_sentinel_files)
+    available_sentinel_files = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
+    sentinel_max_batch_num   = fu.fetch_max_batch_num(available_sentinel_files)
     dict_sentinel_batches      = st.sampled_to_batch(df_sampled_all, sentinel_max_batch_num)
 
     # -------------------------------
