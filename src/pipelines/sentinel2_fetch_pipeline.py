@@ -6,7 +6,7 @@ import utils.file_utils as fu
 from typing import Any
 
 
-def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, parameters: dict):
+def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, parameters: dict) -> None:
 
     gee_proj_name = parameters["GEE_PROJECT"]
     data_dir      = parameters['DATA_DIR']
@@ -51,7 +51,7 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
                 image_list.append(sentinel_data)
                 label_list.append(fire_lbl)
                 composite_key_list.append(composite_key)
-                print(f"\t✅ Downloaded & Resized {i+1}: sentinel_data.shape")
+                print(f"\t✅ Downloaded & Resized {i+1}: {sentinel_data.shape}")
             except Exception as e:
                 print(f"\t❌ Error on row {i}: {e}")
         # Generate batch statistics 
