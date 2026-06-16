@@ -118,6 +118,7 @@ MScProjectWildFirePredict/
 - Takes the list of loaded files, and combines them into a single data frame
 - Split the data into batches suitable for GEE requests (see `sampled_to_batch`, `sampled_to_batch_df`)
 - For each row of the sampled batch df, a request is sent to GEE for Sentinel2 data 
+- The fetching process is done using multithreading. As the operation is I/O bound, the program can issue additional requests while waiting for responses from GEE, thus reducing processing time
 - Saves downloaded data as `npz` files to disk for later use
 ---
 
