@@ -1,13 +1,16 @@
+from typing import Any
+from concurrent.futures import ThreadPoolExecutor
 import ee
 import pandas as pd
 import transforms.sentinel2_transforms as st
 import data_io.sentinel2_io as sio
 import utils.file_utils as fu
-from typing import Any
+import time
 
 
 def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, parameters: dict) -> None:
 
+    tstart        = time.perf_counter()
     gee_proj_name = parameters["GEE_PROJECT"]
     proj_home     = parameters['PROJ_HOME']
     data_dir      = parameters['DATA_DIR']
@@ -29,38 +32,50 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
         print(f"\t📦 STARTING BATCH: {batch_name} [SIZE]: {batch_size}")
         # Initialise objects for batch
         image_list, label_list, composite_key_list = [], [], []
-        for row in batch_df.itertuples():
-            row: Any
-            i             = row.Index
-            date          = row.date
-            fire_lbl      = row.fire_lbl
-            composite_key = row.composite_key
-            try:
-                geom          = ee.Geometry(row.geometry.__geo_interface__)
-                # Request Sentinel data
-                sentinel_data = sio.fetch_sentinel_data(geom, date, parameters)
-                sentinel_data = st.transform_sentinel_data(sentinel_data)
-                # Check that image was found
-                if sentinel_data.size == 0:
-                    print(f"⚠️ No sentinel2 data found for {composite_key}")
-                    missing_composite_keys.append({"date": run_timestamp,
-                                                   "batch": batch_name,
-                                                   "composite_key": composite_key,
-                                                   "missing_sentinel2_data": True,
-                                                   "error_msg": None})
-                    continue
-                # Generate objects to save
-                image_list.append(sentinel_data)
-                label_list.append(fire_lbl)
-                composite_key_list.append(composite_key)
-                print(f"\t✅ Downloaded & Resized {i+1}: {sentinel_data.shape}")
-            except Exception as e:
-                missing_composite_keys.append({"date": run_timestamp,
-                                               "batch": batch_name,
-                                               "composite_key": composite_key,
-                                               "missing_sentinel2_data": True,
-                                               "error_msg": str(e)})
-                print(f"\t❌ Error on row {i}: {e}")
+
+        with ThreadPoolExecutor(max_workers = 6) as executor:
+            sentinel2_results = executor.map(lambda row: sio.fetch_sentinel_data_observation(row, batch_name, run_timestamp, parameters),
+                                             batch_df.itertuples())
+        for d in sentinel2_results:
+            if d['success']:
+                image_list.append(d["image"])
+                label_list.append(d["fire_lbl"])
+                composite_key_list.append(d["composite_key"])
+            else:
+                missing_composite_keys.append(d)
+
+        # for row in batch_df.itertuples():
+        #     # row: Any
+        #     # i             = row.Index
+        #     # date          = row.date
+        #     # fire_lbl      = row.fire_lbl
+        #     # composite_key = row.composite_key
+        #     # try:
+        #     #     geom          = ee.Geometry(row.geometry.__geo_interface__)
+        #     #     # Request Sentinel data
+        #     #     sentinel_data = sio.fetch_sentinel_data(geom, date, parameters)
+        #     #     sentinel_data = st.transform_sentinel_data(sentinel_data)
+        #     #     # Check that image was found
+        #     #     if sentinel_data.size == 0:
+        #     #         print(f"⚠️ No sentinel2 data found for {composite_key}")
+        #     #         missing_composite_keys.append({"date": run_timestamp,
+        #     #                                        "batch": batch_name,
+        #     #                                        "composite_key": composite_key,
+        #     #                                        "missing_sentinel2_data": True,
+        #     #                                        "error_msg": None})
+        #     #         continue
+        #     #     # Generate objects to save
+        #     #     image_list.append(sentinel_data)
+        #     #     label_list.append(fire_lbl)
+        #     #     composite_key_list.append(composite_key)
+        #     #     print(f"\t✅ Downloaded & Resized {i+1}: {sentinel_data.shape}")
+        #     # except Exception as e:
+        #     #     missing_composite_keys.append({"date": run_timestamp,
+        #     #                                    "batch": batch_name,
+        #     #                                    "composite_key": composite_key,
+        #     #                                    "missing_sentinel2_data": True,
+        #     #                                    "error_msg": str(e)})
+        #     #     print(f"\t❌ Error on row {i}: {e}")
         # Generate batch statistics 
         batch_statistics.append({"date": run_timestamp,
                                  "batch": batch_name,
@@ -79,6 +94,11 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
     # Create df to write to csv for batch statics
     df_batch_statistics       = pd.DataFrame(batch_statistics)
     fu.write_df_to_csv(df_batch_statistics, logs_dir, f"{run_timestamp}_sentinel2_download_stats")
+
+    tend = time.perf_counter()
+    duration = tend - tstart
+    print("=======================")
+    print(f"Total Duration: {duration//60}mins {duration%60}secs")
 
 
 
