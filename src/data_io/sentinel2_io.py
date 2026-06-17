@@ -88,7 +88,6 @@ def fetch_sentinel_data_observation(row: Any, batch_name: str, run_timestamp: st
         sentinel_data = fetch_sentinel_data(geom, date, parameters) 
         sentinel_data = st.transform_sentinel_data(sentinel_data)
         if sentinel_data.size == 0:
-
             return {"success": False,
                     "date": run_timestamp,
                     "batch": batch_name,
@@ -100,9 +99,7 @@ def fetch_sentinel_data_observation(row: Any, batch_name: str, run_timestamp: st
                 "image": sentinel_data,
                 "fire_lbl": fire_lbl,
                 "composite_key": composite_key}
-
     except Exception as e:
-
         return {"success": False,
                 "date": run_timestamp,
                 "batch": batch_name,
