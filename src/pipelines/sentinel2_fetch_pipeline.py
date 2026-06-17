@@ -1,4 +1,3 @@
-from typing import Any
 from concurrent.futures import ThreadPoolExecutor
 import ee
 import pandas as pd
@@ -44,39 +43,6 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
             else:
                 missing_composite_keys.append(d)
 
-        # for row in batch_df.itertuples():
-        #     # row: Any
-        #     # i             = row.Index
-        #     # date          = row.date
-        #     # fire_lbl      = row.fire_lbl
-        #     # composite_key = row.composite_key
-        #     # try:
-        #     #     geom          = ee.Geometry(row.geometry.__geo_interface__)
-        #     #     # Request Sentinel data
-        #     #     sentinel_data = sio.fetch_sentinel_data(geom, date, parameters)
-        #     #     sentinel_data = st.transform_sentinel_data(sentinel_data)
-        #     #     # Check that image was found
-        #     #     if sentinel_data.size == 0:
-        #     #         print(f"⚠️ No sentinel2 data found for {composite_key}")
-        #     #         missing_composite_keys.append({"date": run_timestamp,
-        #     #                                        "batch": batch_name,
-        #     #                                        "composite_key": composite_key,
-        #     #                                        "missing_sentinel2_data": True,
-        #     #                                        "error_msg": None})
-        #     #         continue
-        #     #     # Generate objects to save
-        #     #     image_list.append(sentinel_data)
-        #     #     label_list.append(fire_lbl)
-        #     #     composite_key_list.append(composite_key)
-        #     #     print(f"\t✅ Downloaded & Resized {i+1}: {sentinel_data.shape}")
-        #     # except Exception as e:
-        #     #     missing_composite_keys.append({"date": run_timestamp,
-        #     #                                    "batch": batch_name,
-        #     #                                    "composite_key": composite_key,
-        #     #                                    "missing_sentinel2_data": True,
-        #     #                                    "error_msg": str(e)})
-        #     #     print(f"\t❌ Error on row {i}: {e}")
-        # Generate batch statistics 
         batch_statistics.append({"date": run_timestamp,
                                  "batch": batch_name,
                                  "n_requested": batch_size,
@@ -95,7 +61,7 @@ def request_sentinel2_data(df_sampled: pd.DataFrame, dict_batches: dict, paramet
     df_batch_statistics       = pd.DataFrame(batch_statistics)
     fu.write_df_to_csv(df_batch_statistics, logs_dir, f"{run_timestamp}_sentinel2_download_stats")
 
-    tend = time.perf_counter()
+    tend     = time.perf_counter()
     duration = tend - tstart
     print("=======================")
     print(f"Total Duration: {duration//60}mins {duration%60}secs")
