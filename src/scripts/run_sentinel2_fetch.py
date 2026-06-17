@@ -29,8 +29,6 @@ def run_sentinel2_fetch():
     vc.validate_data_load_dict(dict_sampled_tabular)
     dict_sampled_tabular = cast(dict[int, pd.DataFrame], dict_sampled_tabular)
     df_sampled_all       = du.combine_dict_to_geodf(dict_sampled_tabular, PARAMETERS['CRS'])
-    # TODO remove line below after testing
-    df_sampled_all = df_sampled_all.head(50)
 
     # -------------------------------
     # LOAD SENTINEL2 CURRENT STATE
