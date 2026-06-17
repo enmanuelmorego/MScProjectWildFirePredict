@@ -83,6 +83,6 @@ def transform_grib_to_csv(fwi_path: Path, grib_fname: str, grb_name: str, df_uk_
                 .groupby(["grid_id", "date"], as_index=False)
                 .agg(fwi_max=("fwi", "max"),
                     fwi_mean=("fwi", "mean")))
-    fname_out = Path(fwi_path)/grib_fname.replace(".grib", ".csv")
+    fname_out = Path(fwi_path)/Path(grib_fname).with_suffix(".csv")
     df_fwi.to_csv(fname_out, index = False)
     print(f"\n\t...✅  Succesfully processed {grib_fname}")
