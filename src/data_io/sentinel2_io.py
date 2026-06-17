@@ -72,27 +72,13 @@ def fetch_sentinel_data_observation(row: Any, batch_name: str, run_timestamp: st
 
     Example:
         On success:
-            `{"success": False,
-             "date": run_timestamp,
-             "batch": batch_name,
-             "composite_key": composite_key,
-             "missing_sentinel2_data": True,
-             "error_msg": None}`
+            `{"success": False, "date": run_timestamp,"batch": batch_name,"composite_key": composite_key,"missing_sentinel2_data": True,"error_msg": None}`
 
         On emtpy return
-            `{"success": True,
-              "image": sentinel_data,
-              "fire_lbl": fire_lbl,
-              "composite_key": composite_key}`
+            `{"success": True,"image": sentinel_data,"fire_lbl": fire_lbl,"composite_key": composite_key}`
 
         On failure
-            `{"success": False,
-              "date": run_timestamp,
-              "batch": batch_name,
-              "composite_key": composite_key,
-              "missing_sentinel2_data": True,
-              "error_msg": str(e)}`
-
+            `{"success": False,"date": run_timestamp,"batch": batch_name,"composite_key": composite_key,"missing_sentinel2_data": True,"error_msg": str(e)}`
     """
     date          = row.date
     fire_lbl      = row.fire_lbl
