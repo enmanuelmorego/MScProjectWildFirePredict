@@ -1,10 +1,11 @@
 from pathlib import Path
+from typing import Any
+import transforms.sentinel2_transforms as st
 import ee
 import numpy as np
 import requests
 import tifffile
 import io
-
 
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict ) -> np.ndarray: 
@@ -52,7 +53,76 @@ def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict 
     with io.BytesIO(response.content) as f:
         raw_data = tifffile.imread(f)
         return raw_data
-    
+
+def fetch_sentinel_data_observation(row: Any, batch_name: str, run_timestamp: str, parameters: dict) -> dict:
+    """Fetch sentinel2 wrapper function that takes a row of data from `sampled_df` and calls the relevant funcitons
+    to make the GEE request.
+    It returns a dictionary when the request is succesful (no error and not empty)
+    When emtpy, the dictionary records the relevant data points and returns False as success
+    If an error occurs, this is caught by Try, Except block and a dictionary is generated in the Except block to record issue(s)
+
+    Args:
+        row (Any): Row from `itertuples()` fetched from `sampled_df`
+        batch_name (str): Name of current working batch
+        run_timestamp (str): Timestamp label for current run
+        parameters (dict): Dictionary containing program's parameters. Fetched from `set_parameters.py` script
+
+    Returns:
+        _type_: Dictionary with relevant details of fetch process
+
+    Example:
+        On success:
+            `{"success": False,
+             "date": run_timestamp,
+             "batch": batch_name,
+             "composite_key": composite_key,
+             "missing_sentinel2_data": True,
+             "error_msg": None}`
+
+        On emtpy return
+            `{"success": True,
+              "image": sentinel_data,
+              "fire_lbl": fire_lbl,
+              "composite_key": composite_key}`
+
+        On failure
+            `{"success": False,
+              "date": run_timestamp,
+              "batch": batch_name,
+              "composite_key": composite_key,
+              "missing_sentinel2_data": True,
+              "error_msg": str(e)}`
+
+    """
+    date          = row.date
+    fire_lbl      = row.fire_lbl
+    composite_key = row.composite_key
+    try:
+        geom = ee.Geometry(row.geometry.__geo_interface__) 
+        sentinel_data = fetch_sentinel_data(geom, date, parameters) 
+        sentinel_data = st.transform_sentinel_data(sentinel_data)
+        if sentinel_data.size == 0:
+
+            return {"success": False,
+                    "date": run_timestamp,
+                    "batch": batch_name,
+                    "composite_key": composite_key,
+                    "missing_sentinel2_data": True,
+                    "error_msg": None}
+        # When sentinel_data/size is > 0
+        return {"success": True,
+                "image": sentinel_data,
+                "fire_lbl": fire_lbl,
+                "composite_key": composite_key}
+
+    except Exception as e:
+
+        return {"success": False,
+                "date": run_timestamp,
+                "batch": batch_name,
+                "composite_key": composite_key,
+                "missing_sentinel2_data": True,
+                "error_msg": str(e)}
 
 def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str, data_dir: Path) -> None:
     """Saves Sentinel2 data to disk as compressed `.npz` file
