@@ -77,17 +77,34 @@ def fetch_max_batch_num(available_sentinel_files: list[Path])-> int:
     return max_batch 
 
 def fetch_max_sentinel_batch_date(available_sentinel_files: list[Path], max_batch: int) -> date:
+    """Takes a list of available npz files in disk and fetched max_batch value and fetches the max date from the file name
+    The date is used to resume GEE requests and avoid requesting data that already exists in disk 
 
-        # Undo the +1 from fetch_max_batch_num
-        max_batch = max_batch - 1
-        # Recreate batch string to match search
-        max_batch_str = f"B{max_batch:03}"
-        max_date = date(1900,1,1)
-        if available_sentinel_files:
-            current_batch = [f for f in available_sentinel_files if re.search(r"B\d{3}", f.stem).group() == max_batch_str] # type: ignore
-            batch_max_date = str(current_batch).split("_")[3]
-            max_date = datetime.strptime(batch_max_date, "%Y%m%d") + timedelta(days=1) # type: ignore
-        return max_date
+    If there is no files available, then the function returns date(1900, 1, 1) which is then used to send the request of sampled data
+    later than this date. 
+
+    To align with fetch_max_batch_num convention, +1 is added to allow filtering to use >= rather than = alone
+
+    The +1 operation from fetch_max_batch_num  is undone by -1 to the value 
+
+    Args:
+        available_sentinel_files (list[Path]): Availble npz files in disk 
+
+        max_batch (int): Identified Max batch number on disk 
+
+    Returns:
+        date: Date to sample data from (>=)
+    """
+    # Undo the +1 from fetch_max_batch_num
+    max_batch = max_batch - 1
+    # Recreate batch string to match search
+    max_batch_str = f"B{max_batch:03}"
+    max_date = date(1900,1,1)
+    if available_sentinel_files:
+        current_batch = [f for f in available_sentinel_files if re.search(r"B\d{3}", f.stem).group() == max_batch_str] # type: ignore
+        batch_max_date = str(current_batch).split("_")[3]
+        max_date = datetime.strptime(batch_max_date, "%Y%m%d") + timedelta(days=1) # type: ignore
+    return max_date
 
 # -------------------------
 # ARCHITECTURE FUNCTIONS
