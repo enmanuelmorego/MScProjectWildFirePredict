@@ -3,6 +3,7 @@ import numpy as np
 from typing import Generator, Any
 from skimage.transform import resize
 from skimage import img_as_float32
+from datetime import date
 
 def split_batch_greater_than_limit(date_obj: pd.Timestamp, current_group_size: int, batch_size: int, start_batch_num: int) -> tuple[dict, int]:
     """Function to split a group of dates that are greater than the batch limit into subgroups of size appropiate for sentinel fetch process 
@@ -65,7 +66,7 @@ def close_current_batch(group_list: list, batch_num: int) -> tuple[dict, int]:
 
     return results, batch_num
 
-def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: int = 800) -> dict:
+def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, next_batch_date: date, batch_size: int = 800) -> dict:
     """
     Function that takes the sampled data and splits it into batches manageable for `Sentinel` download
 
@@ -117,6 +118,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, batch_size: 
     
     df_batches = df_sampled.copy()
     df_batches = df_batches.sort_values('date').reset_index(drop = True)
+    df_batches = df_batches[df_batches['date'] >= next_batch_date ]
     # Generate counts for each date object 
     df_batches   = df_batches.groupby('date')['date'].count().reset_index(name = "count")
     batch_num    = next_batch_num
