@@ -35,7 +35,8 @@ def run_sentinel2_fetch():
     # -------------------------------
     available_sentinel_files = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
     sentinel_max_batch_num   = fu.fetch_max_batch_num(available_sentinel_files)
-    dict_sentinel_batches    = st.sampled_to_batch(df_sampled_all, sentinel_max_batch_num)
+    sentinel_max_date        = fu.fetch_max_sentinel_batch_date(available_sentinel_files, sentinel_max_batch_num)
+    dict_sentinel_batches    = st.sampled_to_batch(df_sampled_all, sentinel_max_batch_num, sentinel_max_date)
 
     # -------------------------------
     # REQUEST DATA
