@@ -2,6 +2,7 @@
 Module to manage and interact with files and directory
 """
 from pathlib import Path
+from datetime import date, datetime, timedelta
 import os
 import platform
 import subprocess
@@ -66,6 +67,7 @@ def fetch_max_batch_num(available_sentinel_files: list[Path])-> int:
         int: Integer representing the current max batch number 
     """
     max_batch = 0
+
     for f in available_sentinel_files:
         batch_str = re.search(r"[B]\d{3}", str(f)).group() # type: ignore
         batch_int = int(batch_str[1:])
@@ -73,6 +75,19 @@ def fetch_max_batch_num(available_sentinel_files: list[Path])-> int:
             max_batch = batch_int
     max_batch = int(max_batch) + 1
     return max_batch 
+
+def fetch_max_sentinel_batch_date(available_sentinel_files: list[Path], max_batch: int) -> date:
+
+        # Undo the +1 from fetch_max_batch_num
+        max_batch = max_batch - 1
+        # Recreate batch string to match search
+        max_batch_str = f"B{max_batch:03}"
+        max_date = date(1900,1,1)
+        if available_sentinel_files:
+            current_batch = [f for f in available_sentinel_files if re.search(r"B\d{3}", f.stem).group() == max_batch_str] # type: ignore
+            batch_max_date = str(current_batch).split("_")[3]
+            max_date = datetime.strptime(batch_max_date, "%Y%m%d") + timedelta(days=1) # type: ignore
+        return max_date
 
 # -------------------------
 # ARCHITECTURE FUNCTIONS
