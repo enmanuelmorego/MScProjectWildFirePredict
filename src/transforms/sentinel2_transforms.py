@@ -90,6 +90,7 @@ def sampled_to_batch(df_sampled: pd.DataFrame, next_batch_num: int, next_batch_d
     Args:
         - df_sampled (df): Data frame containing the sampled data, preprocessed
         - next_batch_num (int): Batch number value to act as the starting point. Takes into account existing batches on disk
+        - next_batch_date (date): Date of the latest existing Sentinel2 record on disk 
         - batch_size (int): Set to 800 as max as default. But can be adjusted if needed
 
     Raises:
