@@ -99,11 +99,11 @@ def fetch_max_sentinel_batch_date(available_sentinel_files: list[Path], max_batc
     max_batch = max_batch - 1
     # Recreate batch string to match search
     max_batch_str = f"B{max_batch:03}"
-    max_date = date(1900,1,1)
+    max_date = datetime(1900,1,1)
     if available_sentinel_files:
         current_batch = [f for f in available_sentinel_files if re.search(r"B\d{3}", f.stem).group() == max_batch_str] # type: ignore
         batch_max_date = str(current_batch).split("_")[3]
-        max_date = datetime.strptime(batch_max_date, "%Y%m%d") + timedelta(days=1) # type: ignore
+        max_date = datetime.strptime(batch_max_date, "%Y%m%d") + timedelta(days=1)
     return max_date
 
 # -------------------------
