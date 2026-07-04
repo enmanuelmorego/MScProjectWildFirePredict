@@ -1,7 +1,4 @@
-import utils.file_utils as fu
-from pathlib import Path
 
-markdown = f"""
 # MScProjectWildFirePredict Architecture
 
 The project is divided into modules, which have specific responsibilities. An overview of the modules is shown here, and below, each of the sections is expanded with further details
@@ -9,14 +6,63 @@ The project is divided into modules, which have specific responsibilities. An ov
 ## Overview
 ```
 | MScProjectWildFirePredict/
-{fu.build_dir_tree(Path(Path(__file__).resolve().parents[2]), False)}
+|   |- data
+|   |   |- FWI
+|   |   |   |- Archive
+|   |   |- SampledFireNoFire
+|   |   |- Sentinel2
+|   |   |   |- Archive
+|   |   |- UKGrid
+|   |   |- VIIRS
+|   |- outputs
+|   |   |- maps
+|   |- src
+|   |   |- data_io
+|   |   |- pipelines
+|   |   |- reporting
+|   |   |- sampling
+|   |   |- scripts
+|   |   |- transforms
+|   |   |- utils
+|   |- tests
 ```
 
 ## Codebase
 ```
 MScProjectWildFirePredict/
 |- src/
-{fu.build_dir_tree(Path("src"), True)}
+|   |- __init__.py
+|   |- data_io
+|   |   |- fwi_loader.py
+|   |   |- sampling_writter.py
+|   |   |- ukgrid_loader.py
+|   |   |- viirs_loader.py
+|   |- pipelines
+|   |   |- architecture_doc_pipeline.py
+|   |   |- fwi_pipeline.py
+|   |   |- sampling_pipeline.py
+|   |   |- tabular_load_pipeline.py
+|   |   |- ukgrid_pipeline.py
+|   |   |- viirs_pipeline.py
+|   |- reporting
+|   |   |- data_profiler.py
+|   |   |- sampling_reporter.py
+|   |- sampling
+|   |   |- sampling_functions.py
+|   |- scripts
+|   |   |- __init__.py
+|   |   |- run_tabular.py
+|   |   |- set_parameters.py
+|   |   |- validation_checks.py
+|   |- transforms
+|   |   |- fwi_transforms.py
+|   |   |- preprocessing_transforms.py
+|   |   |- viirs_transforms.py
+|   |- utils
+|   |   |- __init__.py
+|   |   |- architecture_builder.py
+|   |   |- datasets_utils.py
+|   |   |- file_utils.py
 ```
 
 ### Notes:
@@ -50,7 +96,10 @@ If the configuration date does not match the current run date, a warning is rais
 MScProjectWildFirePredict/
 |- src/
 |   |- scripts/
-{fu.build_dir_tree(Path("src")/"scripts", True, indent ="|   ")}
+|   |   |- __init__.py
+|   |   |- run_tabular.py
+|   |   |- set_parameters.py
+|   |   |- validation_checks.py
 ```
 ### `run_tabular()`
 
@@ -62,14 +111,15 @@ MScProjectWildFirePredict/
 - Splits the sampled dataset by year and saves .csv files to disk for later processing.
 ---
 
-### `run_setinel2_fetch()`
+### `run_sentinel2_fetch()`
 - Imports parameters from `set_parameters.py`
 - Uses `YEAR_FILTER` to identify which sampled datasets to process
     - If any of the requested years do not have a corresponding dataset, the function stops, and notifies the user of what is missing and what needs to be run
-- Takes the list of loaded files, and combines them into a single dataframe
+- Takes the list of loaded files, and combines them into a single data frame
 - Split the data into batches suitable for GEE requests (see `sampled_to_batch`, `sampled_to_batch_df`)
 - For each row of the sampled batch df, a request is sent to GEE for Sentinel2 data 
-- Saves downlaoded data as `npz` files to disk for later use
+- The fetching process is done using multithreading. As the operation is I/O bound, the program can issue additional requests while waiting for responses from GEE, thus reducing processing time
+- Saves downloaded data as `npz` files to disk for later use
 ---
 
 ## Data Files
@@ -78,7 +128,13 @@ This module contains files and objects used to build the different components of
 ```
 MScProjectWildFirePredict/
 |- data/
-{fu.build_dir_tree(Path("data"), False)}
+|   |- FWI
+|   |   |- Archive
+|   |- SampledFireNoFire
+|   |- Sentinel2
+|   |   |- Archive
+|   |- UKGrid
+|   |- VIIRS
 ```
 **Raw inputs:**
 - FWI = `.grib` files for each year
@@ -90,4 +146,3 @@ MScProjectWildFirePredict/
 - SampledFireNoFire = `.csv` of sampled data, per year
 
 **ML Model Input:**
-"""

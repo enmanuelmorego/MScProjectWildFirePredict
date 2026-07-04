@@ -2,6 +2,7 @@
 Module that contains helper files and functions to transform datasets 
 """
 import pandas as pd
+import geopandas as gpd
 
 def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
     """  Generate a daily date range covering full calendar years based on the
@@ -37,3 +38,13 @@ def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
     dates_df = pd.DataFrame({'date': dates_covered})
     dates_df['join_key'] = 1
     return dates_df
+
+def combine_dict_to_geodf(dict_in: dict[int, pd.DataFrame], crs: str) -> gpd.GeoDataFrame: 
+
+    df_sampled_all             = pd.concat(dict_in.values(), ignore_index = True)
+    df_sampled_all['date']     = pd.to_datetime(df_sampled_all['date'])
+    df_sampled_all['geometry'] = gpd.GeoSeries.from_wkt(df_sampled_all['geometry'])
+    df_sampled_geodf = gpd.GeoDataFrame(df_sampled_all,
+                                        geometry = 'geometry',
+                                        crs = crs)
+    return df_sampled_geodf

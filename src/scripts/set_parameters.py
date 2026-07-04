@@ -7,18 +7,21 @@ from pathlib import Path
 # Project Root
 PROJ_HOME = Path(__file__).resolve().parents[2]
 # Enter date as yyyy, m, d
-VALIDATION_DATE = date(2026, 6, 3)
+VALIDATION_DATE = date(2026, 6, 19)
 
-PARAMETERS = {"YEAR_FILTER"      : [2018],
+PARAMETERS = {"YEAR_FILTER"      : [2018, 2019, 2020, 2021, 2022, 2023, 2024],
               "CRS"              : "EPSG: 4326",          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
               "SATELLITE_IMAGES" : "COPERNICUS/S2_SR_HARMONIZED",
               "SATELLITE_BANDS"  : ["B3","B4","B8"],
               "SATELLITE_SCALE"  : 80,
+              "SATELLITE_FORMAT" : 'GEO_TIFF',
               "GRB_NAME"         : "Forest fire weather index (as defined by the Canadian Forest Service)",
+              "PROJ_HOME"        : PROJ_HOME,
               "DATA_DIR"         : Path(PROJ_HOME)/"data",
               "RUN_ID"           : f"{datetime.strftime(datetime.now(), '%Y%m%d%H%M')}",
               "RANDOM_SEED"      : 42,
-              
+              "RUN_TIMESTAMP"    : datetime.today().strftime('%Y-%m-%d'),
+
               "VIIRS_DIR"                : "VIIRS",
               "FWI_DIR"                  : "FWI",
               "FIRENOFIRE_SAMPLED_DIR"   : "SampledFireNoFire",
