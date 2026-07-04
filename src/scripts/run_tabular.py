@@ -4,7 +4,7 @@ Module to run all the data load, and transformations to prepare all tabular data
 from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
 from data_io.sampling_writter import write_sampled_pre_sentinel
 
-import scripts.validation_checks as vc
+import utils.validation_checks as vc
 import pipelines.tabular_load_pipeline as lp
 import transforms.preprocessing_transforms as pp
 import pipelines.sampling_pipeline as sp
