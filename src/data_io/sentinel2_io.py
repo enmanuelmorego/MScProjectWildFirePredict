@@ -80,9 +80,18 @@ def fetch_sentinel_data_observation(row: Any, batch_name: str, run_timestamp: st
         On failure
             `{"success": False,"date": run_timestamp,"batch": batch_name,"composite_key": composite_key,"missing_sentinel2_data": True,"error_msg": str(e)}`
     """
+    idx           = row.Index
     date          = row.date
     fire_lbl      = row.fire_lbl
     composite_key = row.composite_key
+
+    
+    if idx % 10 == 0:
+        print(f" 📡 🌐 💾      ", end = "\r", flush = True)
+    else:
+        print(f" . . .      ", end = "\r", flush = True)
+
+
     try:
         geom = ee.Geometry(row.geometry.__geo_interface__) 
         sentinel_data = fetch_sentinel_data(geom, date, parameters) 
