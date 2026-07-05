@@ -1,6 +1,5 @@
 import pandas as pd
 import transforms.sentinel2_transforms as psent
-import pytest
 
 
 # -------------------------------------
