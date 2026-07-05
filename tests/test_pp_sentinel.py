@@ -94,97 +94,97 @@ def test_sampled_to_batch_unsorted_input():
     dict_test = psent.sampled_to_batch(df, 0, pd.Timestamp(1900, 1, 1), batch_size = 2)
     assert dict_expect == dict_test
 
-# # -------------------------------------
-# # TEST sampled_to_batch_dfs
-# # -------------------------------------
-# def test_sampled_to_batch_dfs_small_days():
+# -------------------------------------
+# TEST sampled_to_batch_dfs
+# -------------------------------------
+def test_sampled_to_batch_dfs_small_days():
 
-#     df = pd.DataFrame({'date': pd.to_datetime(['2023-01-01', '2023-01-01', '2023-01-02']),
-#                        'id': [1, 2, 3]})
-#     batch_dict = {"batch_1": {'date': [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')], 'split_group': None}}
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-01-01', '2023-01-01', '2023-01-02']),
+                       'id': [1, 2, 3]})
+    batch_dict = {"batch_1": {'date': [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')], 'split_group': None}}
     
-#     test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
+    test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
     
-#     assert len(test["batch_1"]) == 3
-#     assert list(test["batch_1"]['id']) == [1, 2, 3]
+    assert len(test["batch_1"]) == 3
+    assert list(test["batch_1"]['id']) == [1, 2, 3]
 
-# def test_sampled_to_batch_dfs_large_day_split():
+def test_sampled_to_batch_dfs_large_day_split():
 
-#     df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05']*4),
-#                        'id': [10, 20, 30, 40]})
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05']*4),
+                       'id': [10, 20, 30, 40]})
     
-#     batch_dict = {"batch_0": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
-#                   "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]}}
+    batch_dict = {"batch_0": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
+                  "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]}}
     
-#     test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
+    test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
-#     assert len( test["batch_0"]) == 2
-#     assert list(test["batch_0"]['id']) == [10, 20] 
+    assert len( test["batch_0"]) == 2
+    assert list(test["batch_0"]['id']) == [10, 20] 
 
-#     assert len( test["batch_1"]) == 2
-#     assert list(test["batch_1"]['id']) == [30, 40] 
+    assert len( test["batch_1"]) == 2
+    assert list(test["batch_1"]['id']) == [30, 40] 
 
-# def test_sampled_to_batch_dfs_combined():
+def test_sampled_to_batch_dfs_combined():
 
-#     df = pd.DataFrame({'date': pd.to_datetime(['2023-06-01', '2023-06-02', '2023-08-01', '2023-08-01',
-#                                                '2023-05-05','2023-05-05','2023-05-05','2023-05-05',
-#                                                ]),
-#                        'id':                  [1, 2, 3, 4, 5, 6, 7, 8]})
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-06-01', '2023-06-02', '2023-08-01', '2023-08-01',
+                                               '2023-05-05','2023-05-05','2023-05-05','2023-05-05',
+                                               ]),
+                       'id':                  [1, 2, 3, 4, 5, 6, 7, 8]})
     
-#     batch_dict = {"batch_0": {'date':   [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
-#                     "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]},
-#                     "batch_2": {'date': [pd.Timestamp('2023-06-01'),pd.Timestamp('2023-06-02')],  'split_group': None},
-#                     "batch_3": {'date': [pd.Timestamp('2023-08-01')], 'split_group': None}}
+    batch_dict = {"batch_0": {'date':   [pd.Timestamp('2023-05-05')], 'split_group': [0, 2]},
+                    "batch_1": {'date': [pd.Timestamp('2023-05-05')], 'split_group': [2, 4]},
+                    "batch_2": {'date': [pd.Timestamp('2023-06-01'),pd.Timestamp('2023-06-02')],  'split_group': None},
+                    "batch_3": {'date': [pd.Timestamp('2023-08-01')], 'split_group': None}}
     
-#     test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
+    test = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
-#     assert len( test["batch_0"])           == 2
-#     assert list(test["batch_0"]['id'])     == [5, 6] 
+    assert len( test["batch_0"])           == 2
+    assert list(test["batch_0"]['id'])     == [5, 6] 
 
-#     assert len( test["batch_1"])           == 2
-#     assert list(test["batch_1"]['id'])     == [7, 8] 
+    assert len( test["batch_1"])           == 2
+    assert list(test["batch_1"]['id'])     == [7, 8] 
 
-#     assert len(test["batch_2"])            == 2
-#     assert list(test["batch_2"]['id'])     == [1, 2]
-#     assert test["batch_2"]['date'].iloc[0] == pd.Timestamp('2023-06-01')
-#     assert test["batch_2"]['date'].iloc[1] == pd.Timestamp('2023-06-02')
+    assert len(test["batch_2"])            == 2
+    assert list(test["batch_2"]['id'])     == [1, 2]
+    assert test["batch_2"]['date'].iloc[0] == pd.Timestamp('2023-06-01')
+    assert test["batch_2"]['date'].iloc[1] == pd.Timestamp('2023-06-02')
 
-#     assert len(test["batch_3"])            == 2
-#     assert list(test["batch_3"]['id'])     == [3, 4] 
+    assert len(test["batch_3"])            == 2
+    assert list(test["batch_3"]['id'])     == [3, 4] 
 
-# def test_sampled_to_batch_pipeline_large_group():
-#     df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05','2023-05-05','2023-05-05','2023-05-05', '2023-05-05']),
-#                        'id':                  [1, 2, 3, 4, 5]})
+def test_sampled_to_batch_pipeline_large_group():
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-05-05','2023-05-05','2023-05-05','2023-05-05', '2023-05-05']),
+                       'id':                  [1, 2, 3, 4, 5]})
 
-#     batch_dict = psent.sampled_to_batch(df, 0, date(1900, 1, 1))
-#     test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
+    batch_dict = psent.sampled_to_batch(df, 0, pd.Timestamp(1900, 1, 1), batch_size = 2)
+    test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
-#     assert len(test_dict["2023_B000_20230505_20230505_sentinel_batch"])        == 2
-#     assert list(test_dict["2023_B000_20230505_20230505_sentinel_batch"]['id']) == [1,2]
+    assert len(test_dict["2023_B000_20230505_20230505_sentinel_batch"])        == 2
+    assert list(test_dict["2023_B000_20230505_20230505_sentinel_batch"]['id']) == [1,2]
 
-#     assert len(test_dict["2023_B001_20230505_20230505_sentinel_batch"])        == 2
-#     assert list(test_dict["2023_B001_20230505_20230505_sentinel_batch"]['id']) == [3,4]
+    assert len(test_dict["2023_B001_20230505_20230505_sentinel_batch"])        == 2
+    assert list(test_dict["2023_B001_20230505_20230505_sentinel_batch"]['id']) == [3,4]
 
-#     assert len(test_dict["2023_B002_20230505_20230505_sentinel_batch"])        == 1
-#     assert list(test_dict["2023_B002_20230505_20230505_sentinel_batch"]['id']) == [5]
+    assert len(test_dict["2023_B002_20230505_20230505_sentinel_batch"])        == 1
+    assert list(test_dict["2023_B002_20230505_20230505_sentinel_batch"]['id']) == [5]
 
-# def test_sampled_to_batch_pipeline_small_group_poly():
-#     df = pd.DataFrame({'date': pd.to_datetime(['2023-05-15','2023-05-15',
-#                                                '2023-05-05','2023-05-05','2023-05-06','2023-05-06']),
-#                        'id':                  ['a','b',
-#                                                'c','d','e','f']})
+def test_sampled_to_batch_pipeline_small_group_poly():
+    df = pd.DataFrame({'date': pd.to_datetime(['2023-05-15','2023-05-15',
+                                               '2023-05-05','2023-05-05','2023-05-06','2023-05-06']),
+                       'id':                  ['a','b',
+                                               'c','d','e','f']})
 
-#     batch_dict = psent.sampled_to_batch(df, 0, date(1900, 1, 1))
-#     test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
+    batch_dict = psent.sampled_to_batch(df, 0, pd.Timestamp(1900, 1, 1), batch_size = 4)
+    test_dict = dict(psent.sampled_to_batch_dfs(batch_dict, df))
 
-#     assert len( test_dict["2023_B000_20230505_20230506_sentinel_batch"])         == 4
-#     assert list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['id'])   == ['c','d','e','f']
-#     assert list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['date']) == [pd.Timestamp('2023-05-05'),
-#                                                                                      pd.Timestamp('2023-05-05'),
-#                                                                                      pd.Timestamp('2023-05-06'),
-#                                                                                      pd.Timestamp('2023-05-06')]
+    assert len( test_dict["2023_B000_20230505_20230506_sentinel_batch"])         == 4
+    assert list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['id'])   == ['c','d','e','f']
+    assert list(test_dict["2023_B000_20230505_20230506_sentinel_batch"]['date']) == [pd.Timestamp('2023-05-05'),
+                                                                                     pd.Timestamp('2023-05-05'),
+                                                                                     pd.Timestamp('2023-05-06'),
+                                                                                     pd.Timestamp('2023-05-06')]
 
-#     assert len( test_dict["2023_B001_20230515_20230515_sentinel_batch"])         == 2
-#     assert list(test_dict["2023_B001_20230515_20230515_sentinel_batch"]['id'])   == ['a','b']
-#     assert list(test_dict["2023_B001_20230515_20230515_sentinel_batch"]['date']) == [pd.Timestamp('2023-05-15'),
-#                                                                                      pd.Timestamp('2023-05-15')]
+    assert len( test_dict["2023_B001_20230515_20230515_sentinel_batch"])         == 2
+    assert list(test_dict["2023_B001_20230515_20230515_sentinel_batch"]['id'])   == ['a','b']
+    assert list(test_dict["2023_B001_20230515_20230515_sentinel_batch"]['date']) == [pd.Timestamp('2023-05-15'),
+                                                                                     pd.Timestamp('2023-05-15')]
