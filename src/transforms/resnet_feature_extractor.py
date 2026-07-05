@@ -162,8 +162,10 @@ def extract_resnet_features(sentinel_files: list[Path],
 
             with torch.no_grad():
                 features = resnet_model(images).cpu().numpy()
+            # Generate feature columns
+            feature_columns =  [f"feat_{i:03d}" for i in range(features.shape[1])]
             # Create a Data frame containing the extracted feature vectors and retain the corresponding composite key 
-            df_batch_features = pd.DataFrame(features, columns = [f"feat_{i:03d}" for i in range(features.shape[1])])
+            df_batch_features = pd.DataFrame(features, columns = feature_columns)
             df_batch_features.insert(0, "composite_key", keys)
             batch_features_dfs.append(df_batch_features)
         
