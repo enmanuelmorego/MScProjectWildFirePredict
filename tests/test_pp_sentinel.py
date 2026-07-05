@@ -64,20 +64,6 @@ def test_sampled_to_batch_within_limit_batches_multidate():
     dict_test = psent.sampled_to_batch(df, 0, pd.Timestamp(1900, 1, 1), batch_size = 3)
     assert dict_expect == dict_test
 
-# def test_sampled_to_batch_above_limit_batches():
-#     df = pd.DataFrame({'date': ['2023-01-01','2023-01-01','2023-01-01','2023-01-01','2023-01-01','2023-01-01','2023-01-01',
-#                                 '2023-02-01','2023-02-01','2023-02-01',
-#                                 '2023-03-01','2023-02-01','2023-02-02','2023-02-02']})
-#     df['date']  = pd.to_datetime(df['date'])
-#     dict_expect = {"2023_B000_20230101_20230101_sentinel_batch": {'date': [pd.Timestamp('2023-01-01')],'split_group': [0, 4]},
-#                    "2023_B001_20230101_20230101_sentinel_batch": {'date': [pd.Timestamp('2023-01-01')],'split_group': [4, 7]},
-#                    "2023_B002_20230201_20230201_sentinel_batch": {'date': [pd.Timestamp('2023-02-01')],'split_group': None},
-#                    "2023_B003_20230202_20230301_sentinel_batch": {'date': [pd.Timestamp('2023-02-02'),pd.Timestamp('2023-03-01')],'split_group': None}}
-                   
-                   
-#     dict_test = psent.sampled_to_batch(df, 0, pd.Timestamp("1900-01-01"), batch_size = 4)
-#     assert dict_expect == dict_test
-
 def test_sampled_to_batch_unsorted_input():
     df = pd.DataFrame({'date': ['2025-01-01',  # B001   
                                 '2023-02-12',  # B000 
