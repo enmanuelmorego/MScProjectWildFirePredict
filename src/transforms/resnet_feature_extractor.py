@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import pandas as pd
 
 
 from torch.utils.data import Dataset, DataLoader
@@ -8,6 +9,7 @@ from pathlib import Path
 from torchvision.models import (resnet18, ResNet18_Weights)
 from torchvision.models.feature_extraction import create_feature_extractor
 from pathlib import Path
+
 
 
 class SentinelData(Dataset):
@@ -123,15 +125,37 @@ class ResNetFeatExtractor(nn.Module):
         features = self.extractor(x)
         return features['features'].flatten(1)
     
-def extract_resnet_features(sentinel_files: list[Path], batch_size: int = 32, shuffle: bool = False):
+def extract_resnet_features(sentinel_files: list[Path], 
+                            resnet_model: ResNetFeatExtractor, 
+                            batch_size: int = 32, 
+                            shuffle: bool = False):
 
     total_files = len(sentinel_files)
+    # Initialise list of data frames
+    batch_features_dfs = []
     for idx, f in enumerate(sentinel_files):
 
         currently_at = f"[{idx}/{total_files}]"
-        print(f"{currently_at} | Loaded Sentinel Data:  Features Extracted  ", end = "\r", flush = True)
+        print(f"{currently_at} | Loaded Sentinel Data:  Features Extracted: []", end = "\r", flush = True)
         sentinel_data = SentinelData(f)
         loader = DataLoader(sentinel_data, batch_size = batch_size, shuffle = shuffle)
-        print(f"{idx}/{total_files} - Loaded Sentinel Data: ✅ Features Extracted  ", end = "\r", flush = True)
+        print(f"{currently_at} | Loaded Sentinel Data: ✅ Features Extracted: []", end = "\r", flush = True)
+        
+        total_l = len(loader)
+        for l_idx, batch in enumerate(loader):
+            curr_loader = f"[{l_idx+1}/{total_l}]"
+            images = batch["pixel_data"]
+            keys = batch['composite_key']
+
+            with torch.no_grad():
+                features = resnet_model(images).cpu().numpy()
+            df_batch_features = pd.DataFrame(features, columns = [f"feat_{i:03d}" for i in range(features.shape[1])])
+            df_batch_features.insert(0, "composite_key", keys)
+            batch_features_dfs.append(df_batch_features)
+            print(f"{currently_at} | Loaded Sentinel Data: ✅ Features Extracted  {curr_loader}", end = "\r", flush = True)
+        
+        
+    df_features = pd.concat(batch_features_dfs, ignore_index = True)
+
 
 
