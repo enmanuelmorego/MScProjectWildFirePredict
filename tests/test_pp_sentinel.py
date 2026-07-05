@@ -75,30 +75,24 @@ def test_sampled_to_batch_within_limit_batches_multidate():
 #                    "2023_B003_20230202_20230301_sentinel_batch": {'date': [pd.Timestamp('2023-02-02'),pd.Timestamp('2023-03-01')],'split_group': None}}
                    
                    
-#     dict_test = psent.sampled_to_batch(df, 0, date(1900, 1, 1))
+#     dict_test = psent.sampled_to_batch(df, 0, pd.Timestamp("1900-01-01"), batch_size = 4)
 #     assert dict_expect == dict_test
 
-# def test_sampled_to_batch_unsorted_input():
-#     df = pd.DataFrame({'date': ['2025-01-01',  # B001   
-#                                 '2023-02-12',  # B000 
-#                                 '2025-01-01',  # B001 
-#                                 '2023-10-11',  # B000 
-#                                 '2025-01-01']  # B002
-#                                 })
-#     df['date']  = pd.to_datetime(df['date'])
-#     dict_expect = {"2023_B000_20230212_20231011_sentinel_batch": {'date': [pd.Timestamp('2023-02-12'),pd.Timestamp('2023-10-11')],'split_group': None},
-#                    "2025_B001_20250101_20250101_sentinel_batch": {'date': [pd.Timestamp('2025-01-01')],'split_group': [0, 2]},
-#                    "2025_B002_20250101_20250101_sentinel_batch": {'date': [pd.Timestamp('2025-01-01')],'split_group': [2,3]}}
+def test_sampled_to_batch_unsorted_input():
+    df = pd.DataFrame({'date': ['2025-01-01',  # B001   
+                                '2023-02-12',  # B000 
+                                '2025-01-01',  # B001 
+                                '2023-10-11',  # B000 
+                                '2025-01-01']  # B002
+                                })
+    df['date']  = pd.to_datetime(df['date'])
+    dict_expect = {"2023_B000_20230212_20231011_sentinel_batch": {'date': [pd.Timestamp('2023-02-12'),pd.Timestamp('2023-10-11')],'split_group': None},
+                   "2025_B001_20250101_20250101_sentinel_batch": {'date': [pd.Timestamp('2025-01-01')],'split_group': [0, 2]},
+                   "2025_B002_20250101_20250101_sentinel_batch": {'date': [pd.Timestamp('2025-01-01')],'split_group': [2,3]}}
                    
                    
-#     dict_test = psent.sampled_to_batch(df, 0, date(1900, 1, 1))
-#     assert dict_expect == dict_test
-
-# def test_sampled_to_batch_raise_valuerror():
-#     df = pd.DataFrame({'date': ['2025-01-01','2023-02-12','2025-01-01','2023-10-11','2025-01-01']})
-#     df['date']  = pd.to_datetime(df['date'])
-#     with pytest.raises(ValueError):  
-#         psent.sampled_to_batch(df, 0, date(1900, 1, 1))
+    dict_test = psent.sampled_to_batch(df, 0, pd.Timestamp(1900, 1, 1), batch_size = 2)
+    assert dict_expect == dict_test
 
 # # -------------------------------------
 # # TEST sampled_to_batch_dfs
