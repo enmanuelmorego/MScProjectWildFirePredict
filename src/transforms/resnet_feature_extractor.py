@@ -3,10 +3,12 @@ import torch
 import torch.nn as nn
 
 
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
 from torchvision.models import (resnet18, ResNet18_Weights)
 from torchvision.models.feature_extraction import create_feature_extractor
+from pathlib import Path
+
 
 class SentinelData(Dataset):
     '''
@@ -120,3 +122,16 @@ class ResNetFeatExtractor(nn.Module):
         """        
         features = self.extractor(x)
         return features['features'].flatten(1)
+    
+def extract_resnet_features(sentinel_files: list[Path], batch_size: int = 32, shuffle: bool = False):
+
+    total_files = len(sentinel_files)
+    for idx, f in enumerate(sentinel_files):
+
+        currently_at = f"[{idx}/{total_files}]"
+        print(f"{currently_at} | Loaded Sentinel Data:  Features Extracted  ", end = "\r", flush = True)
+        sentinel_data = SentinelData(f)
+        loader = DataLoader(sentinel_data, batch_size = batch_size, shuffle = shuffle)
+        print(f"{idx}/{total_files} - Loaded Sentinel Data: ✅ Features Extracted  ", end = "\r", flush = True)
+
+
