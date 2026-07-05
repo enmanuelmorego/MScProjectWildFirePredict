@@ -128,7 +128,7 @@ class ResNetFeatExtractor(nn.Module):
 def extract_resnet_features(sentinel_files: list[Path], 
                             resnet_model: ResNetFeatExtractor, 
                             batch_size: int = 32, 
-                            shuffle: bool = False):
+                            shuffle: bool = False) -> pd.DataFrame:
 
     # Initialise list of data frames
     batch_features_dfs = []
@@ -148,6 +148,7 @@ def extract_resnet_features(sentinel_files: list[Path],
             batch_features_dfs.append(df_batch_features)
         
     df_features = pd.concat(batch_features_dfs, ignore_index = True)
+    return df_features
 
 
 
