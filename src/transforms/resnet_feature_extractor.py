@@ -16,6 +16,11 @@ class SentinelData(Dataset):
     Images are transformed from Height Width Channels to Channels Height Width to match PyTorch requirements and later perform feature extraction 
     '''
     def __init__(self, npz_file: Path):
+        """Initialise the class object by first loading the data from the `npz` file
+
+        Args:
+            npz_file (Path): Path to the `npz` file to load the img data along wiht fire label and composite keys
+        """        
         data      = np.load(npz_file)
         self.x    = data['x']
         self.y    = data['y']
