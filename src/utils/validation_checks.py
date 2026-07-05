@@ -38,3 +38,29 @@ def validate_data_load_dict(dict_dfs: dict[int, pd.DataFrame | None]) -> None:
         raise FileNotFoundError(f"\n❌ Missing csv files for year(s) {missing_years}"
                                 "\nPlease add the missing year(s) value(s) to [YEAR_FILTER] list in [src/scripts/set_parameters.py]"
                                 "\nand run script [src/scripts/run_tabular.py] to create the missing file(s)")
+    
+def validate_resnet_feature_extractor(df_features: pd.DataFrame):
+
+    # Find duplicated composite keys
+    df_duplicated_keys = df_features.loc[df_features.duplicated(subset='composite_key'),
+                                         'composite_key']
+    int_duplicated_keys = df_duplicated_keys.shape[0]
+    if int_duplicated_keys > 0:
+        print(f"⚠️  Total [{int_duplicated_keys}] duplicated composite keys...")
+    # Check that all of the duplicated composite_keys contain the same features (real duplicated)
+    df_to_check = df_features[df_features['composite_key'].isin(df_duplicated_keys)]
+    # Check for real duplicates
+    df_checked  = df_to_check[df_to_check.duplicated()]
+    print("=== Checked ===")
+    print(df_checked)
+    if df_checked.shape[0] != df_duplicated_keys.shape[0]:
+        print(f"❌  ERROR  [{df_duplicated_keys.shape[0] - df_checked.shape[0]}] duplicated composite keys WITH DIFFERENT FEATURE VALUES...")
+
+
+
+
+if __name__ == "__main__":
+    df_test = pd.DataFrame({'composite_key': ['001','001', '002','003'],
+                            'feat_01': [0,1,2,3],
+                            'feat_02': [0,110,10,1]})
+    validate_resnet_feature_extractor(df_test)
