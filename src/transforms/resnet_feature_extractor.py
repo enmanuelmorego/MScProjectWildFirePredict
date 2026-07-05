@@ -129,20 +129,40 @@ def extract_resnet_features(sentinel_files: list[Path],
                             resnet_model: ResNetFeatExtractor, 
                             batch_size: int = 32, 
                             shuffle: bool = False) -> pd.DataFrame:
+    """Extracts the features embeddings from Sentinel2 images using ResNet 18
+    The function iterates thru each of the `.npz` files containing the Satellite images 
+    Loads the datasets into a pytorch `DataLoader` and performs feature extraction using a pretrained ResNet-18 model.
+    The extracted features are combined into a single data frame, along with the correspoding composite key and all is 
+    returned as a single data frame
+
+    Args:
+        sentinel_files (list[Path]): List of file paths to the Sentinel-2 data
+        resnet_model (ResNetFeatExtractor): PreTrained ResNet18 feature extractor used to extract image features
+        batch_size (int, optional): Number of images processed simultaneously during feature extraction. Defaults to 32.
+        shuffle (bool, optional): Whether to shuffle the dataset before loading batches. This is set to `False` to preserve the ordering of
+            observations and their composite keys. Defaults to False.
+
+    Returns:
+        pd.DataFrame: Data frame containing one row per observation. Each observation contains the composite key and teh etracted ResNet features of the satellite imagery
+        (fea_000, ..., feat_511)
+    """    
 
     # Initialise list of data frames
     batch_features_dfs = []
+    # iterate thru each of the npz files
     for f in tqdm(sentinel_files, desc = "files  ", ncols = 160):
-
+        # Load sentinel2 data
         sentinel_data = SentinelData(f)
+        # Create PyTorch data loader for processing the data efficiently 
         loader = DataLoader(sentinel_data, batch_size = batch_size, shuffle = shuffle)
-        
+        # Process one batch at the time
         for batch in tqdm(loader, desc = "batches", ncols = 160, leave = False):
             images = batch["pixel_data"]
             keys = batch['composite_key']
 
             with torch.no_grad():
                 features = resnet_model(images).cpu().numpy()
+            # Create a Data frame containing the extracted feature vectors and retain the corresponding composite key 
             df_batch_features = pd.DataFrame(features, columns = [f"feat_{i:03d}" for i in range(features.shape[1])])
             df_batch_features.insert(0, "composite_key", keys)
             batch_features_dfs.append(df_batch_features)
