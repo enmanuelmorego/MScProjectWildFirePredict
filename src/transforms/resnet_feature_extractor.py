@@ -132,12 +132,12 @@ def extract_resnet_features(sentinel_files: list[Path],
 
     # Initialise list of data frames
     batch_features_dfs = []
-    for f in tqdm(sentinel_files, desc = "files", ncols = 160):
+    for f in tqdm(sentinel_files, desc = "files  ", ncols = 160):
 
         sentinel_data = SentinelData(f)
         loader = DataLoader(sentinel_data, batch_size = batch_size, shuffle = shuffle)
         
-        for batch in tqdm(loader, desc = "batches", ncols = 80):
+        for batch in tqdm(loader, desc = "batches", ncols = 160, leave = False):
             images = batch["pixel_data"]
             keys = batch['composite_key']
 
