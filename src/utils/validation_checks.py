@@ -3,6 +3,7 @@ Module containing functions to manage and control the run process
 """
 from datetime import date
 from pathlib import Path
+from datetime import datetime 
 import utils.file_utils as u
 import pandas as pd
 
@@ -90,7 +91,42 @@ def validate_composite_keys(df_features: pd.DataFrame, df_sampled: pd.DataFrame,
     if len(extra_keys):
         print(f"⚠️  {len(extra_keys)} composite keys in [extracted features] not in [sampled]")
 
+def valid_composite_key(comp_key: str) -> bool:
+    """Validates that composite keys are generated correctly
+    It transforms the input into string format, and validates:
+    - Lenght of string (expect at least 9 characters, as its date (8) + grid_id)
+    - Splits string into date component and grid id component
+    - Validates that the grid_id component is only digits
+    - Validates that the date component is a valid date
 
+    Args:
+        comp_key (str): String/Value Composite key to test
+
+    Returns:
+        bool: True when the input is a valid composite key
+    """
+
+    # Ensure that the input key is a string
+    key_str = str(comp_key)
+
+    # Test string length - expect 8 (date) + 1 (smallest grid_id)
+    if len(key_str) < 9:
+        return False
+    
+    # Extract grid_id and date components
+    date_id_str = key_str[-8:]
+    grid_id_str = key_str[:-8]
+
+    # Ensure that grid_id component is a digit
+    if not grid_id_str.isdigit():
+        return False
+    
+    # Ensure date component is actually a date 
+    try:
+        datetime.strptime(date_id_str, "%Y%m%d")
+    except ValueError:
+        return False
+    return True
 
 if __name__ == "__main__":
     df_feat = pd.DataFrame({'composite_key': ['001','001','005', '002','003'],
@@ -99,4 +135,5 @@ if __name__ == "__main__":
     df_sampled = pd.DataFrame({'composite_key': ['001','001','001', '002','003'],
                             'feat_01': [0,11,1,3 ,2],
                             'feat_02': [0,11,1,8,110]})
-    validate_composite_keys(df_feat, df_sampled)
+    comp_key = ['00120260101']
+    print(valid_composite_key('a00120260101'))
