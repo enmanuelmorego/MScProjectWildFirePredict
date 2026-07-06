@@ -75,10 +75,28 @@ def validate_resnet_feature_extractor(df_features: pd.DataFrame) -> None:
                          f"Inspect values {non_real_duplicated}")
 
 
+def validate_composite_keys(df_features: pd.DataFrame, df_sampled: pd.DataFrame, primary_key: str = 'composite_key'):
+
+    # Extract primary key values
+    keys_features = df_features[primary_key]
+    keys_sampled = df_sampled[primary_key] 
+
+    # Find values in features not in sampled
+    missing_keys = set(keys_sampled)  - set(keys_features)
+    extra_keys   = set(keys_features) - set(keys_sampled) 
+
+    if len(missing_keys):
+        print(f"⚠️  {len(missing_keys)} composite keys in [sampled] not in [extracted features]")
+    if len(extra_keys):
+        print(f"⚠️  {len(extra_keys)} composite keys in [extracted features] not in [sampled]")
+
 
 
 if __name__ == "__main__":
-    df_test = pd.DataFrame({'composite_key': ['001','001','001', '002','003'],
+    df_feat = pd.DataFrame({'composite_key': ['001','001','005', '002','003'],
                             'feat_01': [0,11,1,3 ,2],
                             'feat_02': [0,11,1,8,110]})
-    validate_resnet_feature_extractor(df_test)
+    df_sampled = pd.DataFrame({'composite_key': ['001','001','001', '002','003'],
+                            'feat_01': [0,11,1,3 ,2],
+                            'feat_02': [0,11,1,8,110]})
+    validate_composite_keys(df_feat, df_sampled)
