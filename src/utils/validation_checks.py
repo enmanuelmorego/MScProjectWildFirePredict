@@ -78,7 +78,17 @@ def validate_resnet_feature_extractor(df_features: pd.DataFrame) -> None:
 
 def validate_composite_keys(df_features: pd.DataFrame, 
                             df_sampled: pd.DataFrame, 
+                            df_missing_sentinel: pd.DataFrame,
                             primary_key: str = 'composite_key') -> None:
+    """Takes two dataframes as inputs (df containing features from ResNet18 and sampled data) and compares their
+    composite keys to ensure that no data was missed in the processing of features
+
+    Args:
+        df_features (pd.DataFrame): Dataframe resulting from feature extraction process - ResNet18 
+        df_sampled (pd.DataFrame): Dataframe containing sampled, preprocessed data
+        df_missing_sentinel (pd.DataFrame): Dataframe (from outputs/log) containing the composite keys that were not able to be downloaded
+        primary_key (str, optional): Name of the column containing the values to compare. Defaults to 'composite_key'
+    """    
 
     # Extract primary key values
     keys_features = set(df_features[primary_key].astype(str))
