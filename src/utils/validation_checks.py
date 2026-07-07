@@ -90,18 +90,22 @@ def validate_composite_keys(df_features: pd.DataFrame,
         primary_key (str, optional): Name of the column containing the values to compare. Defaults to 'composite_key'
     """    
 
+    # Extract values that were not able to be downloaded
+    set_missed_download = set(df_missing_sentinel[primary_key])
+    df_cleaned_sampled  = df_sampled[~df_sampled[primary_key].isin(set_missed_download)]
+
     # Extract primary key values
     keys_features = set(df_features[primary_key].astype(str))
-    keys_sampled  = set(df_sampled[primary_key].astype(str))
+    keys_sampled  = set(df_cleaned_sampled[primary_key].astype(str))
 
     # Find values in features not in sampled
     missing_keys = keys_sampled  - keys_features
     extra_keys   = keys_features - keys_sampled 
 
     if len(missing_keys):
-        print(f"⚠️  {len(missing_keys)} composite keys in [sampled] not in [extracted features]")
+        print(f"⚠️  {len(missing_keys)} composite keys in [sampled] not in [extracted features]\n{missing_keys}")
     if len(extra_keys):
-        print(f"⚠️  {len(extra_keys)} composite keys in [extracted features] not in [sampled]")
+        print(f"⚠️  {len(extra_keys)} composite keys in [extracted features] not in [sampled]\n{extra_keys}")
 
 def valid_composite_key(comp_key: str) -> bool:
     """Validates that composite keys are generated correctly
@@ -154,8 +158,10 @@ if __name__ == "__main__":
     df_feat = pd.DataFrame({'composite_key': ['00120200501', '512202050101','512202050101','512202050231', '512202050101'],#['001','001','005', '002','003'],
                             'feat_01': [0,11,1,3 ,2],
                             'feat_02': [0,11,1,8,110]})
-    df_sampled = pd.DataFrame({'composite_key': ['001','001','001', '002','003'],
+    df_sampled = pd.DataFrame({'composite_key': ['00120200501','512202050101','00120260231', 
+                                                 '512202050231','003'],
                             'feat_01': [0,11,1,3 ,2],
                             'feat_02': [0,11,1,8,110]})
-    comp_key = ['00120260101', '00120260231']
-    print(validate_composite_keys_structure(df_feat))
+    df_missed = pd.DataFrame({'composite_key': ['001202601011', '1003', '100120260231'],
+                              'some_var': ['a','b','c']})
+    print(validate_composite_keys(df_feat, df_sampled, df_missed))
