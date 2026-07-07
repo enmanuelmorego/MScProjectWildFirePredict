@@ -4,6 +4,7 @@ Module containing functions to manage and control the run process
 from datetime import date
 from pathlib import Path
 from datetime import datetime 
+from typing import Any
 import utils.file_utils as u
 import pandas as pd
 
@@ -76,15 +77,17 @@ def validate_resnet_feature_extractor(df_features: pd.DataFrame) -> None:
                          f"Inspect values {non_real_duplicated}")
 
 
-def validate_composite_keys(df_features: pd.DataFrame, df_sampled: pd.DataFrame, primary_key: str = 'composite_key'):
+def validate_composite_keys(df_features: pd.DataFrame, 
+                            df_sampled: pd.DataFrame, 
+                            primary_key: str = 'composite_key') -> None:
 
     # Extract primary key values
-    keys_features = df_features[primary_key]
-    keys_sampled = df_sampled[primary_key] 
+    keys_features = set(df_features[primary_key].astype(str))
+    keys_sampled  = set(df_sampled[primary_key].astype(str))
 
     # Find values in features not in sampled
-    missing_keys = set(keys_sampled)  - set(keys_features)
-    extra_keys   = set(keys_features) - set(keys_sampled) 
+    missing_keys = keys_sampled  - keys_features
+    extra_keys   = keys_features - keys_sampled 
 
     if len(missing_keys):
         print(f"⚠️  {len(missing_keys)} composite keys in [sampled] not in [extracted features]")
@@ -128,12 +131,22 @@ def valid_composite_key(comp_key: str) -> bool:
         return False
     return True
 
+def validate_composite_keys_structure(df_in: pd.DataFrame, col: str = "composite_key") -> None:
+
+    invalid_keys = {ck for ck in df_in[col] if not valid_composite_key(ck)}
+    
+    total_invalid_leys = len(invalid_keys)
+    if total_invalid_leys > 0:
+        raise ValueError(f"\n❌  ERROR  \nFound {total_invalid_leys} invalid composite keys.\n"
+                         f"Examples: {invalid_keys}")
+
+
 if __name__ == "__main__":
-    df_feat = pd.DataFrame({'composite_key': ['001','001','005', '002','003'],
+    df_feat = pd.DataFrame({'composite_key': ['00120200501', '512202050101','512202050101','512202050231', '512202050101'],#['001','001','005', '002','003'],
                             'feat_01': [0,11,1,3 ,2],
                             'feat_02': [0,11,1,8,110]})
     df_sampled = pd.DataFrame({'composite_key': ['001','001','001', '002','003'],
                             'feat_01': [0,11,1,3 ,2],
                             'feat_02': [0,11,1,8,110]})
-    comp_key = ['00120260101']
-    print(valid_composite_key('a00120260101'))
+    comp_key = ['00120260101', '00120260231']
+    print(validate_composite_keys_structure(df_feat))
