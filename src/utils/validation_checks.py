@@ -4,7 +4,6 @@ Module containing functions to manage and control the run process
 from datetime import date
 from pathlib import Path
 from datetime import datetime 
-from typing import Any
 import utils.file_utils as u
 import pandas as pd
 
