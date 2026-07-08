@@ -92,7 +92,6 @@ def validate_composite_keys(df_features: pd.DataFrame,
     Returns:
         bool: True when the composite key validation passes 
     """    
-
     # Extract values that were not able to be downloaded
     set_missed_download = set(df_missing_sentinel[primary_key])
     df_cleaned_sampled  = df_sampled[~df_sampled[primary_key].isin(set_missed_download)]
@@ -161,13 +160,15 @@ def validate_composite_keys_structure(df_in: pd.DataFrame, col: str = "composite
 
 
 if __name__ == "__main__":
-    df_feat = pd.DataFrame({'composite_key': ['00120200501', '512202050101','512202050101','512202050231', '512202050101'],#['001','001','005', '002','003'],
-                            'feat_01': [0,11,1,3 ,2],
-                            'feat_02': [0,11,1,8,110]})
-    df_sampled = pd.DataFrame({'composite_key': ['00120200501','512202050101','00120260231', 
-                                                 '512202050231','003'],
-                            'feat_01': [0,11,1,3 ,2],
-                            'feat_02': [0,11,1,8,110]})
-    df_missed = pd.DataFrame({'composite_key': ['001202601011', '1003', '100120260231'],
-                              'some_var': ['a','b','c']})
+    df_feat = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101'],
+                            'feat_01': [0,11],
+                            'feat_02': [0,11]})
+    df_sampled = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              '512202061201',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    df_missed = pd.DataFrame({'composite_key': [],
+                              'some_var': []})
     print(validate_composite_keys(df_feat, df_sampled, df_missed))
