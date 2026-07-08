@@ -130,3 +130,30 @@ def test_validate_composite_keys_non_valid_with_wrong_missed():
                               'some_var': [1]})
     with pytest.raises(ValueError):
         vc.validate_composite_keys(df_feat, df_sampled, df_missed)
+
+# ==========================================
+# TEST valid_composite_key()
+# ==========================================
+def test_valid_composite_key_valid_date_single_digit_compoosite_key():
+    assert vc.valid_composite_key('120261009') == True
+
+def test_valid_composite_key_valid_date_mutiple_digits_compoosite_key():
+    assert vc.valid_composite_key('1020261009') == True
+    assert vc.valid_composite_key('001020261009') == True
+    assert vc.valid_composite_key('99920261009') == True
+
+def test_valid_composite_key_nonvalid_date_single():
+    assert vc.valid_composite_key('1202261009') == False
+    assert vc.valid_composite_key('120260230') == False
+    assert vc.valid_composite_key('120261301') == False
+
+def test_valid_composite_key_nondidigts():
+    assert vc.valid_composite_key('1a202261009') == False
+    assert vc.valid_composite_key('1_20226/10/09') == False
+    assert vc.valid_composite_key('1_20226_10_09') == False
+    assert vc.valid_composite_key('1 202261009') == False
+
+
+
+
+
