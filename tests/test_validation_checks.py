@@ -2,6 +2,9 @@ import utils.validation_checks as vc
 import pandas as pd 
 import pytest
 
+# ==========================================
+# TEST validate_resnet_feature_extractor()
+# ==========================================
 def test_validate_resnet_feature_extractor_no_duplicates():
     df_test = pd.DataFrame({'composite_key': ['001', '002','003'],
                             'feat_01': [0,1,2],
@@ -43,3 +46,38 @@ def test_validate_resnet_feature_extractor_unsorted_duplicates():
                             "feat_02": [4, 2, 4, 2]})
 
     assert vc.validate_resnet_feature_extractor(df_test) is None
+
+# ==========================================
+# TEST validate_composite_keys()
+# ==========================================
+def test_validate_composite_keys_all_valid_empty_missed():
+    df_feat = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              '512202050101',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    df_sampled = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              '512202050101',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    df_missed = pd.DataFrame({'composite_key': [],
+                              'some_var': []})
+    assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == True
+
+def test_validate_composite_keys_all_valid_with_missed():
+    # Feature extraction contains 2 composite keys only
+    df_feat = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202061201',],
+                            'feat_01': [0,11],
+                            'feat_02': [0,11]})
+    # Sampled data expects 3 coposite keys 
+    df_sampled = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              '512202061201',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    # 1 composiote key was not found in Sentinel 2
+    df_missed = pd.DataFrame({'composite_key': ['512202050101'],
+                              'some_var': [1]})
+    assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == True
