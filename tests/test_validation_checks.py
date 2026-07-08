@@ -81,3 +81,32 @@ def test_validate_composite_keys_all_valid_with_missed():
     df_missed = pd.DataFrame({'composite_key': ['512202050101'],
                               'some_var': [1]})
     assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == True
+
+def test_validate_composite_keys_non_valid_empty_missed():
+    df_feat = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              'notsampled',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    df_sampled = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              '512202050101',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    df_missed = pd.DataFrame({'composite_key': [],
+                              'some_var': []})
+    assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == False
+
+def test_validate_composite_keys_size_missmatch_empty_missed():
+    df_feat = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101'],
+                            'feat_01': [0,11],
+                            'feat_02': [0,11]})
+    df_sampled = pd.DataFrame({'composite_key': ['00120200501', 
+                                              '512202050101',
+                                              '512202061201',],
+                            'feat_01': [0,11,1],
+                            'feat_02': [0,11,1]})
+    df_missed = pd.DataFrame({'composite_key': [],
+                              'some_var': []})
+    assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == False
