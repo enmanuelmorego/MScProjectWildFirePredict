@@ -1,6 +1,7 @@
 import utils.validation_checks as vc
 import pandas as pd 
 import pytest
+from typing import Any
 
 # ==========================================
 # TEST validate_resnet_feature_extractor()
@@ -148,10 +149,14 @@ def test_valid_composite_key_nonvalid_date_single():
     assert vc.valid_composite_key('120261301') == False
 
 def test_valid_composite_key_nondidigts():
-    assert vc.valid_composite_key('1a202261009') == False
-    assert vc.valid_composite_key('1_20226/10/09') == False
-    assert vc.valid_composite_key('1_20226_10_09') == False
-    assert vc.valid_composite_key('1 202261009') == False
+    assert vc.valid_composite_key('1a20261009') == False
+    assert vc.valid_composite_key('1_2026/10/09') == False
+    assert vc.valid_composite_key('1_2026_10_09') == False
+    assert vc.valid_composite_key('1 20261009') == False
+
+def test_valid_composite_key_wrong_datatype():
+        assert vc.valid_composite_key(120261009) == False   # type: ignore[arg-type]
+
 
 
 
