@@ -7,7 +7,7 @@ from datetime import datetime
 import utils.file_utils as u
 import pandas as pd
 
-def validate_params_update(validation_date: date, params_file: str = "set_parameters.py"):
+def validate_params_update(validation_date: date, params_file: str = "set_parameters.py") -> None:
     """Function to validate and check user have updated parameters before running pipeline
 
     Args:
@@ -79,7 +79,7 @@ def validate_resnet_feature_extractor(df_features: pd.DataFrame) -> None:
 def validate_composite_keys(df_features: pd.DataFrame, 
                             df_sampled: pd.DataFrame, 
                             df_missing_sentinel: pd.DataFrame,
-                            primary_key: str = 'composite_key') -> None:
+                            primary_key: str = 'composite_key') -> bool:
     """Takes two dataframes as inputs (df containing features from ResNet18 and sampled data) and compares their
     composite keys to ensure that no data was missed in the processing of features
 
@@ -88,6 +88,9 @@ def validate_composite_keys(df_features: pd.DataFrame,
         df_sampled (pd.DataFrame): Dataframe containing sampled, preprocessed data
         df_missing_sentinel (pd.DataFrame): Dataframe (from outputs/log) containing the composite keys that were not able to be downloaded
         primary_key (str, optional): Name of the column containing the values to compare. Defaults to 'composite_key'
+
+    Returns:
+        bool: True when the composite key validation passes 
     """    
 
     # Extract values that were not able to be downloaded
@@ -104,8 +107,11 @@ def validate_composite_keys(df_features: pd.DataFrame,
 
     if len(missing_keys):
         print(f"⚠️  {len(missing_keys)} composite keys in [sampled] not in [extracted features]\n{missing_keys}")
+        return False
     if len(extra_keys):
         print(f"⚠️  {len(extra_keys)} composite keys in [extracted features] not in [sampled]\n{extra_keys}")
+        return False
+    return True
 
 def valid_composite_key(comp_key: str) -> bool:
     """Validates that composite keys are generated correctly
