@@ -149,7 +149,8 @@ def valid_composite_key(comp_key: str) -> bool:
     
     # Ensure date component is actually a date 
     # Require date to be at least 1900s
-    if int(date_id_str[0:1]) <  19:
+    century = int(date_id_str[0:2])
+    if century <  19:
         return False
     try:
         datetime.strptime(date_id_str, "%Y%m%d")
@@ -180,4 +181,4 @@ if __name__ == "__main__":
     df_missed = pd.DataFrame({'composite_key': [],
                               'some_var': []})
     input_test = "12"+"0226"+"10"+"09"
-    print(valid_composite_key(input_test))
+    print(valid_composite_key("120261009"))
