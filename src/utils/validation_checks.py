@@ -133,15 +133,16 @@ def valid_composite_key(comp_key: str) -> bool:
     """
 
     # Ensure that the input key is a string
-    key_str = str(comp_key)
+    if not isinstance(comp_key, str):
+        return False
 
     # Test string length - expect 8 (date) + 1 (smallest grid_id)
-    if len(key_str) < 9:
+    if len(comp_key) < 9:
         return False
     
     # Extract grid_id and date components
-    date_id_str = key_str[-8:]
-    grid_id_str = key_str[:-8]
+    date_id_str = comp_key[-8:]
+    grid_id_str = comp_key[:-8]
 
     # Ensure that grid_id component is a digit
     if not grid_id_str.isdigit():
@@ -181,4 +182,4 @@ if __name__ == "__main__":
     df_missed = pd.DataFrame({'composite_key': [],
                               'some_var': []})
     input_test = "12"+"0226"+"10"+"09"
-    print(valid_composite_key("120261009"))
+    print(valid_composite_key(input_test))
