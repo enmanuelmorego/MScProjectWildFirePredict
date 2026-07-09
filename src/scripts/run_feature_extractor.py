@@ -24,6 +24,8 @@ def run_feature_extractor():
     # -------------------------------
     files_sentinel = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
     df_sampled     = pd.concat(sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR))
+    vc.validate_composite_keys_structure(df_sampled)
+
     # -------------------------------
     # RESNET-18 MODEL
     # -------------------------------
