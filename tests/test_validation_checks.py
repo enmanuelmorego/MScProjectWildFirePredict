@@ -49,9 +49,9 @@ def test_validate_resnet_feature_extractor_unsorted_duplicates():
     assert vc.validate_resnet_feature_extractor(df_test) is None
 
 # ==========================================
-# TEST validate_composite_keys()
+# TEST validate_composite_keys_mapping()
 # ==========================================
-def test_validate_composite_keys_all_valid_empty_missed():
+def test_validate_composite_keys_mapping_all_valid_empty_missed():
     df_feat = pd.DataFrame({'composite_key': ['00120200501', 
                                               '512202050101',
                                               '512202050101',],
@@ -64,9 +64,9 @@ def test_validate_composite_keys_all_valid_empty_missed():
                             'feat_02': [0,11,1]})
     df_missed = pd.DataFrame({'composite_key': [],
                               'some_var': []})
-    assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == None
+    assert vc.validate_composite_keys_mapping(df_feat, df_sampled, df_missed) == None
 
-def test_validate_composite_keys_all_valid_with_missed():
+def test_validate_composite_keys_mapping_all_valid_with_missed():
     # Feature extraction contains 2 composite keys only
     df_feat = pd.DataFrame({'composite_key': ['00120200501', 
                                               '512202061201',],
@@ -81,9 +81,9 @@ def test_validate_composite_keys_all_valid_with_missed():
     # 1 composiote key was not found in Sentinel 2
     df_missed = pd.DataFrame({'composite_key': ['512202050101'],
                               'some_var': [1]})
-    assert vc.validate_composite_keys(df_feat, df_sampled, df_missed) == None
+    assert vc.validate_composite_keys_mapping(df_feat, df_sampled, df_missed) == None
 
-def test_validate_composite_keys_non_valid_empty_missed():
+def test_validate_composite_keys_mapping_non_valid_empty_missed():
     df_feat = pd.DataFrame({'composite_key': ['00120200501', 
                                               '512202050101',
                                               'notsampled',],
@@ -97,9 +97,9 @@ def test_validate_composite_keys_non_valid_empty_missed():
     df_missed = pd.DataFrame({'composite_key': [],
                               'some_var': []})
     with pytest.raises(ValueError):
-        vc.validate_composite_keys(df_feat, df_sampled, df_missed)
+        vc.validate_composite_keys_mapping(df_feat, df_sampled, df_missed)
 
-def test_validate_composite_keys_size_missmatch_empty_missed():
+def test_validate_composite_keys_mapping_size_missmatch_empty_missed():
     df_feat = pd.DataFrame({'composite_key': ['00120200501', 
                                               '512202050101'],
                             'feat_01': [0,11],
@@ -112,9 +112,9 @@ def test_validate_composite_keys_size_missmatch_empty_missed():
     df_missed = pd.DataFrame({'composite_key': [],
                               'some_var': []})
     with pytest.raises(ValueError):
-        vc.validate_composite_keys(df_feat, df_sampled, df_missed)
+        vc.validate_composite_keys_mapping(df_feat, df_sampled, df_missed)
 
-def test_validate_composite_keys_non_valid_with_wrong_missed():
+def test_validate_composite_keys_mapping_non_valid_with_wrong_missed():
     """This is testing two things in the same place. Consider splitting the test to ensure we know whats
     failing/passing if failure were to happenb"""
     df_feat = pd.DataFrame({'composite_key': ['00120200501', 
@@ -130,7 +130,7 @@ def test_validate_composite_keys_non_valid_with_wrong_missed():
     df_missed = pd.DataFrame({'composite_key': ['512202050101'],
                               'some_var': [1]})
     with pytest.raises(ValueError):
-        vc.validate_composite_keys(df_feat, df_sampled, df_missed)
+        vc.validate_composite_keys_mapping(df_feat, df_sampled, df_missed)
 
 # ==========================================
 # TEST valid_composite_key()
