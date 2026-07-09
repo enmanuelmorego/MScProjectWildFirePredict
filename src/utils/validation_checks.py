@@ -75,10 +75,10 @@ def validate_resnet_feature_extractor(df_features: pd.DataFrame) -> None:
         raise ValueError(f"\n❌  ERROR  \nFound [{df_duplicated_keys.shape[0] - df_checked.shape[0]}] duplicated composite keys WITH DIFFERENT FEATURE VALUES...\n"
                          f"Inspect values {non_real_duplicated}")
 
-def validate_composite_keys(df_features: pd.DataFrame, 
-                            df_sampled: pd.DataFrame, 
-                            df_missing_sentinel: pd.DataFrame,
-                            primary_key: str = 'composite_key') -> None:
+def validate_composite_keys_mapping(df_features: pd.DataFrame, 
+                                    df_sampled: pd.DataFrame, 
+                                    df_missing_sentinel: pd.DataFrame,
+                                    primary_key: str = 'composite_key') -> None:
     """Validate that all successfully downloaded sampled observations have a
     corresponding extracted feature vector, and vice versa
 
@@ -161,11 +161,13 @@ def valid_composite_key(comp_key: str) -> bool:
 
 def validate_composite_keys_structure(df_in: pd.DataFrame, col: str = "composite_key") -> None:
 
+    composite_keys_data_types =  df_in[col].dtype
     invalid_keys = {ck for ck in df_in[col] if not valid_composite_key(ck)}
     
     total_invalid_leys = len(invalid_keys)
     if total_invalid_leys > 0:
         raise ValueError(f"\n❌  ERROR  \nFound {total_invalid_leys} invalid composite keys.\n"
+                         f"Composite key data type: {composite_keys_data_types}\n"
                          f"Examples: {invalid_keys}")
 
 
