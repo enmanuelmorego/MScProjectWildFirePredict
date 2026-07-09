@@ -1,7 +1,6 @@
 import utils.validation_checks as vc
 import pandas as pd 
 import pytest
-from typing import Any
 
 # ==========================================
 # TEST validate_resnet_feature_extractor()
