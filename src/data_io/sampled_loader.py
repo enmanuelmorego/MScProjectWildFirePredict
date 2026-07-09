@@ -27,7 +27,7 @@ def load_sampled_pre_sentinel(requested_years: list, data_dir: Path, file_name: 
         # Initialise None df 
         df = None
         if os.path.exists(fload):
-            df    = pd.read_csv(fload)
+            df    = pd.read_csv(fload, dtype={"composite_key": "string"})
         dict_sampled_year[y] = df
     return dict_sampled_year
 
