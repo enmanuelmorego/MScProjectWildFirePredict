@@ -1,11 +1,18 @@
 from pathlib import Path
 from typing import Any
+
 import transforms.sentinel2_transforms as st
-import ee
+import utils.file_utils as fu
+import utils.datasets_utils as du
+import utils.validation_checks as vc
+import pandas as pd
 import numpy as np
+
+import ee
 import requests
 import tifffile
 import io
+
 
 
 def fetch_sentinel_data(geom: ee.Geometry, date_str: str, satelite_params: dict ) -> np.ndarray: 
@@ -115,6 +122,22 @@ def fetch_sentinel_data_observation(row: Any, batch_name: str, run_timestamp: st
                 "composite_key": composite_key,
                 "missing_sentinel2_data": True,
                 "error_msg": str(e)}
+
+def load_missing_sentinel2_from_log(base_dir: Path, data_dir: str) -> pd.DataFrame: 
+    """Loads the Sentinel-2 Missing Download log as data frame
+
+    Args:
+        base_dir (Path): Directory of project
+        data_dir (str): Directory of location of setinel2 download log
+
+    Returns:
+        pd.DataFrame: Latest/most recent sentinel2 download log containing any missing composite keys (ie composite keys for which sentinel-2 data was not found)
+    """    
+    files = fu.get_filepaths(base_dir, data_dir, 'csv') 
+    file  = du.get_latest_missing_sentinel_log_filepath(files)
+    df_missing_sentinel2 = pd.read_csv(file, dtype={"composite_key": "string"})
+    vc.validate_composite_keys_structure(df_missing_sentinel2)
+    return df_missing_sentinel2
 
 def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str, data_dir: Path) -> None:
     """Saves Sentinel2 data to disk as compressed `.npz` file
