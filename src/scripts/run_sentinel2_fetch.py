@@ -45,6 +45,9 @@ def run_sentinel2_fetch():
     
 if __name__ == "__main__":
     d = run_sentinel2_fetch()
+    # for k, v in d.items():
+    #     split_indeces = v.get('split_group', None)
+    #     print(k)
     #print(d)
     # d['date'] = pd.to_datetime(d['date'])
     # d['year'] = d['date'].dt.year
