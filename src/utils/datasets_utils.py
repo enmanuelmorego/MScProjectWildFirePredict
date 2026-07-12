@@ -89,7 +89,7 @@ def get_latest_missing_sentinel_log_filepath(files_paths: list[Path], file_name_
         raise FileNotFoundError(f"\n❌  ERROR  \nCould not find a Sentinel-2 missing files log file to load")
     
     # Return succesfully found file path
-    print(f"📂 Loading Failed Sentinel-2 log from: {file_date}\nFile Name: {file_to_load}")
+    print(f"📂 Loaded Failed Sentinel-2 log from: {file_date}\nFile Name: {file_to_load}")
     return file_to_load 
 
 def combine_dict_to_geodf(dict_in: dict[int, pd.DataFrame], crs: str) -> gpd.GeoDataFrame: 
