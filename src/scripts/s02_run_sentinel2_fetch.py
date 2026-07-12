@@ -1,7 +1,7 @@
 """
 Module that fetches the Sentinel2 data from GEE
 """
-from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
+from scripts.s00_set_parameters import VALIDATION_DATE, PARAMETERS
 from typing import cast
 import pandas as pd
 import utils.validation_checks as vc
