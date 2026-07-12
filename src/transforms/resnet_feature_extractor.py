@@ -150,13 +150,15 @@ def extract_resnet_features(sentinel_files: list[Path],
     # Initialise list of data frames
     batch_features_dfs = []
     # iterate thru each of the npz files
-    for f in tqdm(sentinel_files, desc = "files  ", ncols = 160):
+    for f in tqdm(sentinel_files, desc = "files  ", dynamic_ncols = True, position = 0):
+    
         # Load sentinel2 data
         sentinel_data = SentinelData(f)
         # Create PyTorch data loader for processing the data efficiently 
         loader = DataLoader(sentinel_data, batch_size = batch_size, shuffle = shuffle)
         # Process one batch at the time
-        for batch in tqdm(loader, desc = "batches", ncols = 160, leave = False):
+        for batch in tqdm(loader, desc = "batches", dynamic_ncols = True, position = 1, leave = False):
+
             images = batch["pixel_data"]
             keys = batch['composite_key']
 
@@ -171,6 +173,7 @@ def extract_resnet_features(sentinel_files: list[Path],
         
     df_features = pd.concat(batch_features_dfs, ignore_index = True)
     return df_features
+
 
 
 
