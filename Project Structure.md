@@ -9,12 +9,14 @@ The project is divided into modules, which have specific responsibilities. An ov
 |   |- data
 |   |   |- FWI
 |   |   |   |- Archive
+|   |   |- MLInputs
 |   |   |- SampledFireNoFire
 |   |   |- Sentinel2
 |   |   |   |- Archive
 |   |   |- UKGrid
 |   |   |- VIIRS
 |   |- outputs
+|   |   |- logs
 |   |   |- maps
 |   |- src
 |   |   |- data_io
@@ -34,13 +36,16 @@ MScProjectWildFirePredict/
 |   |- __init__.py
 |   |- data_io
 |   |   |- fwi_loader.py
+|   |   |- sampled_loader.py
 |   |   |- sampling_writter.py
+|   |   |- sentinel2_io.py
 |   |   |- ukgrid_loader.py
 |   |   |- viirs_loader.py
 |   |- pipelines
 |   |   |- architecture_doc_pipeline.py
 |   |   |- fwi_pipeline.py
 |   |   |- sampling_pipeline.py
+|   |   |- sentinel2_fetch_pipeline.py
 |   |   |- tabular_load_pipeline.py
 |   |   |- ukgrid_pipeline.py
 |   |   |- viirs_pipeline.py
@@ -51,18 +56,22 @@ MScProjectWildFirePredict/
 |   |   |- sampling_functions.py
 |   |- scripts
 |   |   |- __init__.py
+|   |   |- run_feature_extractor.py
+|   |   |- run_sentinel2_fetch.py
 |   |   |- run_tabular.py
 |   |   |- set_parameters.py
-|   |   |- validation_checks.py
 |   |- transforms
 |   |   |- fwi_transforms.py
 |   |   |- preprocessing_transforms.py
+|   |   |- resnet_feature_extractor.py
+|   |   |- sentinel2_transforms.py
 |   |   |- viirs_transforms.py
 |   |- utils
 |   |   |- __init__.py
 |   |   |- architecture_builder.py
 |   |   |- datasets_utils.py
 |   |   |- file_utils.py
+|   |   |- validation_checks.py
 ```
 
 ### Notes:
@@ -97,9 +106,10 @@ MScProjectWildFirePredict/
 |- src/
 |   |- scripts/
 |   |   |- __init__.py
+|   |   |- run_feature_extractor.py
+|   |   |- run_sentinel2_fetch.py
 |   |   |- run_tabular.py
 |   |   |- set_parameters.py
-|   |   |- validation_checks.py
 ```
 ### `run_tabular()`
 
@@ -111,15 +121,14 @@ MScProjectWildFirePredict/
 - Splits the sampled dataset by year and saves .csv files to disk for later processing.
 ---
 
-### `run_sentinel2_fetch()`
+### `run_setinel2_fetch()`
 - Imports parameters from `set_parameters.py`
 - Uses `YEAR_FILTER` to identify which sampled datasets to process
     - If any of the requested years do not have a corresponding dataset, the function stops, and notifies the user of what is missing and what needs to be run
-- Takes the list of loaded files, and combines them into a single data frame
+- Takes the list of loaded files, and combines them into a single dataframe
 - Split the data into batches suitable for GEE requests (see `sampled_to_batch`, `sampled_to_batch_df`)
 - For each row of the sampled batch df, a request is sent to GEE for Sentinel2 data 
-- The fetching process is done using multithreading. As the operation is I/O bound, the program can issue additional requests while waiting for responses from GEE, thus reducing processing time
-- Saves downloaded data as `npz` files to disk for later use
+- Saves downlaoded data as `npz` files to disk for later use
 ---
 
 ## Data Files
@@ -130,6 +139,7 @@ MScProjectWildFirePredict/
 |- data/
 |   |- FWI
 |   |   |- Archive
+|   |- MLInputs
 |   |- SampledFireNoFire
 |   |- Sentinel2
 |   |   |- Archive
