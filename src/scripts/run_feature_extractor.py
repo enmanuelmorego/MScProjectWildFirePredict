@@ -7,6 +7,7 @@ from transforms.resnet_feature_extractor import ResNetFeatExtractor, extract_res
 import utils.validation_checks as vc
 import utils.file_utils as fu
 import data_io.sampled_loader as sl
+import data_io.sentinel2_io as s2l
 import pandas as pd
 
 def run_feature_extractor():
@@ -17,15 +18,16 @@ def run_feature_extractor():
     # ------------------------
     # EXTRACT PARAMETERS 
     # ------------------------
+    PROJ_HOME     = PARAMETERS['PROJ_HOME']
     DATA_DIR      = PARAMETERS['DATA_DIR']
     YEAR_FILTER   = PARAMETERS['YEAR_FILTER']
     # -------------------------------
     # LOAD DATA
     # -------------------------------
-    files_sentinel = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
-    df_sampled     = pd.concat(sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR))
+    files_sentinel      = fu.get_filepaths(DATA_DIR, "Sentinel2", "npz")
+    df_no_sentinel_data = s2l.load_missing_sentinel2_from_log(PROJ_HOME, "outputs/logs")
+    df_sampled          = pd.concat(sl.load_sampled_pre_sentinel(YEAR_FILTER, DATA_DIR))
     vc.validate_composite_keys_structure(df_sampled)
-
     # -------------------------------
     # RESNET-18 MODEL
     # -------------------------------
@@ -38,9 +40,17 @@ def run_feature_extractor():
     # -------------------------------
     # VALIDATE PROCESSING
     # -------------------------------
+    # Check if there are duplicates, and if composite keys are duplicated, all values in the 512 features should also be duplicated. else error
     vc.validate_resnet_feature_extractor(df_features)
-    #vc.validate_composite_keys(df_features, df_sampled)
-
+    # Ensure that the composite keys were not corrupted in the processing
+    vc.validate_composite_keys_structure(df_features)
+    # Ensure that all composite keys in [df_sampled - non fetched from sentinel] are in the feature extraction dataframe 
+    vc.validate_composite_keys_mapping(df_features, df_sampled, df_no_sentinel_data)
+    # -------------------------------
+    # CREATE ML DATASET 
+    # -------------------------------
+    # If data passes all validation tests, then the data is combined to generate the final dataframe to be used in the ML process
+    #df_ml_data
     return(df_features, df_sampled)
 
 if __name__ == "__main__":
