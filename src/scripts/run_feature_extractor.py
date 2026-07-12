@@ -14,13 +14,14 @@ def run_feature_extractor():
     # ------------------------
     # VALIDATE RUN PARAMETERS
     # ------------------------    
-    #vc.validate_params_update(VALIDATION_DATE)
+    vc.validate_params_update(VALIDATION_DATE)
     # ------------------------
     # EXTRACT PARAMETERS 
     # ------------------------
     PROJ_HOME     = PARAMETERS['PROJ_HOME']
     DATA_DIR      = PARAMETERS['DATA_DIR']
     YEAR_FILTER   = PARAMETERS['YEAR_FILTER']
+    RUN_TIMESTAMP = PARAMETERS['RUN_TIMESTAMP']
     # -------------------------------
     # LOAD DATA
     # -------------------------------
@@ -50,10 +51,14 @@ def run_feature_extractor():
     # CREATE ML DATASET 
     # -------------------------------
     # If data passes all validation tests, then the data is combined to generate the final dataframe to be used in the ML process
-    #df_ml_data
-    return(df_features, df_sampled)
+    # Remove REAL duplicates from dataset
+    df_cleaned_features =  df_features.drop_duplicates()
+    # Create ML dataset
+    df_ml = pd.merge(df_sampled, df_cleaned_features, on = 'composite_key', how = 'inner')
+    # Save data
+    fu.write_df_to_csv(df_in = df_ml, file_path = DATA_DIR/'MLInputs', fname = f'{RUN_TIMESTAMP}_ml_input')
 
 if __name__ == "__main__":
-    test = run_feature_extractor()
+    run_feature_extractor()
 
 
