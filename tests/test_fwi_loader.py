@@ -1,4 +1,4 @@
-import loaders.fwi_loader as fl
+import data_io.fwi_loader as fl
 from pathlib import Path
 
 def test_fwi_select_files_correct_years():

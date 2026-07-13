@@ -25,6 +25,8 @@ scikit-image = "*"
 seaborn = "*"
 mscprojectwildfirepredict = {file = ".", editable = true}
 matplotlib = "*"
+torch = "*"
+torchvision = "*"
 
 [dev-packages]
 pandas-stubs = "*"

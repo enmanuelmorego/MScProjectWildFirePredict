@@ -1,10 +1,10 @@
 """
 Module that fetches the Sentinel2 data from GEE
 """
-from scripts.set_parameters import VALIDATION_DATE, PARAMETERS
+from scripts.s00_set_parameters import VALIDATION_DATE, PARAMETERS
 from typing import cast
 import pandas as pd
-import scripts.validation_checks as vc
+import utils.validation_checks as vc
 import data_io.sampled_loader as sl
 import utils.file_utils as fu
 import utils.datasets_utils as du
@@ -45,6 +45,9 @@ def run_sentinel2_fetch():
     
 if __name__ == "__main__":
     d = run_sentinel2_fetch()
+    # for k, v in d.items():
+    #     split_indeces = v.get('split_group', None)
+    #     print(k)
     #print(d)
     # d['date'] = pd.to_datetime(d['date'])
     # d['year'] = d['date'].dt.year
