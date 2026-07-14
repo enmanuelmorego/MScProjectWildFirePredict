@@ -94,7 +94,7 @@ class ResNetFeatExtractor(nn.Module):
     and doesnt update parameters/weights
 
     """    
-    def __init__(self):
+    def __init__(self, weights_checkpoint: str | None = None):
         """Initiliase the pretrained ResNet18 feature extractor
 
         Loads the default pretrained weights, uses `create_feature_extractor` to skip classification layer, and freezes all the parameters to prevent 
@@ -103,12 +103,22 @@ class ResNetFeatExtractor(nn.Module):
         # Initialize nn.Module class before defining FeatureExtractor
         super().__init__()
 
-        # Load pre trained weights
-        weights = ResNet18_Weights.DEFAULT
-        self.model = resnet18(weights = weights)
+        if weights_checkpoint is None:
+            # Load pre trained weights
+            self.model = resnet18(weights = ResNet18_Weights.DEFAULT)
+        else:
+            # Create emtpy ResNet 18 model
+            self.model = resnet18(weights = None)
+            # Load fine tuned weights
+            weights_dict = torch.load(weights_checkpoint, map_location = "cpu")
+            # Apply loaded weights
+            self.model.load_state_dict(weights_dict)
+
         # Remove final classification layer (as we only need feature extraction)
         self.extractor = create_feature_extractor(self.model, 
                                                   return_nodes = {"avgpool": "features"})
+        # Use as feature extractor
+        self.model.eval()
         # Freeze weights
         for param in self.model.parameters():
             param.requires_grad = False
