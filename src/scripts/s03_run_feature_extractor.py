@@ -35,7 +35,7 @@ def run_feature_extractor():
     # Initialise model
     resnet_model = ResNetFeatExtractor()
     # Disable training behaviour since the model is used only for feature extraction
-    resnet_model.eval()
+   # resnet_model.eval() # Migrated to inside the class 
     # Perform feature extraction
     df_features = extract_resnet_features(files_sentinel, resnet_model)
     # -------------------------------
