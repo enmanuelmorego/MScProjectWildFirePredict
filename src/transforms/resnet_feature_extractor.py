@@ -99,6 +99,8 @@ class ResNetFeatExtractor(nn.Module):
 
         Loads the default pretrained weights, uses `create_feature_extractor` to skip classification layer, and freezes all the parameters to prevent 
         the model from updating these values
+
+        The class also has the option of loading fine-tuned weights from disk, if available. This allows easy comparison and flexibility of models
         """        
         # Initialize nn.Module class before defining FeatureExtractor
         super().__init__()
