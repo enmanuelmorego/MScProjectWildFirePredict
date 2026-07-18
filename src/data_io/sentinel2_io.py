@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import Any
+
+from tqdm import tqdm
 from ml_models.resnet_feature_extractor import SentinelData
 
 import transforms.sentinel2_transforms as st
@@ -8,6 +10,7 @@ import utils.datasets_utils as du
 import utils.validation_checks as vc
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 import ee
 import requests
@@ -161,9 +164,9 @@ def load_sentinel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None)
     all_y = []
     all_dates = []
 
-    for f in sentinel_files:
+    for file in tqdm(sentinel_files, desc="Loading Sentinel2 data from disk", dynamic_ncols = True, position = 0):
         # Load Sentinel2 data from file
-        data = SentinelData(f)
+        data = SentinelData(file)
         # Extract date from composite key
         data.get_dates()
         # Append data to lists
