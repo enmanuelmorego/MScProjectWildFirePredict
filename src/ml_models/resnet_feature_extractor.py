@@ -86,6 +86,10 @@ class SentinelData(Dataset):
         print(f"{'Label':<12} : {str(self.y.dtype):<20} -> {sample['fire_label']} ({type(sample['fire_label']).__name__})")
         print(f"{'Key':<12} : {str(self.keys.dtype):<20} -> {sample['composite_key']} ({type(sample['composite_key']).__name__})")
 
+    def visualise_imgs(self, n_imgs: int = 1, title: str|None = None):
+        pass
+    # TODO create method to visualise loaded images for paper 
+
 class ResNetFeatExtractor(nn.Module):
     """ResNet18 feature extractor, that inherits from `nn.Module` and uses pretrained/existing weights
 
