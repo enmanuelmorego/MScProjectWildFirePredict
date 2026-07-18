@@ -16,6 +16,7 @@ outputs/
 *.csv
 *.bkp
 .idea/
+*.egg-info/
 
 # MacOS
 .DS_Store
