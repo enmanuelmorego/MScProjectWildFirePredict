@@ -162,9 +162,11 @@ def load_sentiniel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None
     all_dates = []
 
     for f in sentinel_files:
+        # Load Sentinel2 data from file
         data = SentinelData(f)
+        # Extract date from composite key
         data.get_dates()
-
+        # Append data to lists
         all_x.append(data.x)
         all_y.append(data.y)
         all_dates.append(data.dates)
