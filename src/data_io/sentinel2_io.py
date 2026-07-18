@@ -140,7 +140,7 @@ def load_missing_sentinel2_from_log(base_dir: Path, data_dir: str) -> pd.DataFra
     vc.validate_composite_keys_structure(df_missing_sentinel2)
     return df_missing_sentinel2
 
-def load_sentiniel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_sentinel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Loads all available Sentinel2 `npz` in `sentinel_files` and combines the data into `np` arrays
 
     Args:
