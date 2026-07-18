@@ -8,8 +8,8 @@ from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
 from torchvision.models import (resnet18, ResNet18_Weights)
 from torchvision.models.feature_extraction import create_feature_extractor
-from pathlib import Path
 from tqdm import tqdm
+from datetime import datetime 
 
 
 class SentinelData(Dataset):
@@ -29,10 +29,37 @@ class SentinelData(Dataset):
         Args:
             npz_file (Path): Path to the `npz` file to load the img data along wiht fire label and composite keys
         """        
-        data      = np.load(npz_file)
-        self.x    = data['x']
-        self.y    = data['y']
-        self.keys = data['composite_key']
+        data       = np.load(npz_file)
+        self.x     = data['x']
+        self.y     = data['y']
+        self.keys  = data['composite_key']
+        # initialise as None, as dates are not always needed to be extracted - reduce unecesary overhead
+        self.dates = None
+
+    def get_dates(self) -> list[datetime]:
+        """Extracts the date from the composite key from the sentinel2 image
+
+        Dates are initialised as None as these are not always needed to be extracted at this point
+        When extraction is needed, this method is explicitly called and the `self.dates` attribute is populated with the extracted dates from the composite key
+
+        If the method is called and `self.dates` IS NOT `None` then the date extraction process is skipped, and existing dates are returned 
+
+        Returns:
+            list[datetime]: List of datetime objects corresponding to the date of the observation/data point
+        """        
+        # check if dates already exist or not
+        if self.dates is None:
+            # initialise empty list of dates
+            dates = []
+            # Extract dates from each composite key 
+            for k in self.keys:
+                comp_key = str(k)
+                date_obj = datetime.strptime(comp_key[-8:], "%Y%m%d")
+                dates.append(date_obj)
+            self.dates = dates
+        return self.dates
+
+
 
     def __len__(self) -> int:
         """Returns the number of samples in the dataset 
