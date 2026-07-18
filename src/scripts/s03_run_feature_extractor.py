@@ -2,7 +2,7 @@
 Module that runs and performs the feature extraction of Sentinel2 data using ResNet18
 """
 from scripts.s00_set_parameters import PARAMETERS, VALIDATION_DATE
-from transforms.resnet_feature_extractor import ResNetFeatExtractor, extract_resnet_features
+from ml_models.resnet_feature_extractor import ResNetFeatExtractor, extract_resnet_features
 
 import utils.validation_checks as vc
 import utils.file_utils as fu
