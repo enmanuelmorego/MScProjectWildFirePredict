@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import f1_score
 import torch
 import torch.nn as nn
 import pandas as pd
@@ -8,6 +9,7 @@ import time
 from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
 
 class FineTuneDataset(Dataset):
     """Class object used to prepare Sentinel-2 data for ResNet18 fine-tuning.
@@ -44,70 +46,87 @@ class FineTuneDataset(Dataset):
         fire_label = torch.tensor(int(self.y[idx]), dtype=torch.long)
         return pixel_data, fire_label
 
-# def fine_tune_resnet18(model, criterion, optimizer, scheduler, num_epochs = 25, weights_fname = "test_resnet18.pt"):
-#     start = time.time()
-#     with TemporaryDirectory() as tempdir:
-#         best_model_params_path = DATA_DIR/"MLModels"/weights_fname
-#         torch.save(model.state_dict(), best_model_params_path)
-#         best_f1 = 0.0
+def fine_tune_resnet18(model: nn.Module, 
+                       criterion: nn.Module, 
+                       optimizer: torch.optim.Optimizer, 
+                       scheduler, 
+                       num_epochs: int = 25, 
+                       
+                       dataloaders: dict[str, DataLoader], # type: ignore
+                       device: str,
 
-#         for epoch in range(num_epochs):
-#             print(f'Epoch {epoch}/{num_epochs - 1}')
-#             print('-' * 10)
+                       data_dir: Path,  
+                       weights_fname: str = "test_resnet18.pt"):
+    start = time.time()
 
-#             # Train and validation phases
-#             for phase in ['train', 'validate']:
-#                 if phase == 'train':
-#                     # Set model to training mode
-#                     model.train() 
-#                 else:
-#                     # Evaluate the model
-#                     model.eval()
-#                 running_loss = 0.0
-#                 running_correct = 0
+    with TemporaryDirectory() as tempdir:
+        best_model_params_path = data_dir/"MLModels"/weights_fname
+        torch.save(model.state_dict(), best_model_params_path)
 
-#                 # Iterate over data.
-#                 for inputs, labels in dataloaders[phase]:
-#                     inputs = inputs.to(device)
-#                     labels = labels.to(device)
+        best_f1 = 0.0
 
-#                     # zero the parameter gradients
-#                     optimizer.zero_grad()
+        for epoch in range(num_epochs):
+            print(f'Epoch {epoch}/{num_epochs - 1}')
+            print('-' * 10)
 
-#                     # forward
-#                     # track history if only in train
-#                     with torch.set_grad_enabled(phase == 'train'):
-#                         outputs = model(inputs)
-#                         _, preds = torch.max(outputs, 1)
-#                         loss = criterion(outputs, labels)
+            # Train and validation phases
+            for phase in ['train', 'val']:
+                if phase == 'train':
+                    # Set model to training mode
+                    model.train() 
+                else:
+                    # Evaluate the model
+                    model.eval()
+            
+                # Initialize variables to track predictions, labels, and loss
+                all_preds    = []
+                all_labels   = []
+                running_loss = 0.0
 
-#                         # backward + optimize only if in training phase
-#                         if phase == 'train':
-#                             loss.backward()
-#                             optimizer.step()
+                # Iterate over data.
+                for inputs, labels in dataloaders[phase]:
+                    inputs = inputs.to(device)
+                    labels = labels.to(device)
 
-#                     # statistics
-#                     running_loss += loss.item() * inputs.size(0)
-#                     running_corrects += torch.sum(preds == labels.data)
-#                 if phase == 'train':
-#                     scheduler.step()
+                    # zero the parameter gradients
+                    optimizer.zero_grad()
 
-#                 epoch_loss = running_loss / dataset_sizes[phase]
-#                 epoch_acc = running_corrects.double() / dataset_sizes[phase]
+                    # forward
+                    # track history if only in train
+                    with torch.set_grad_enabled(phase == 'train'):
+                        outputs = model(inputs)
+                        _, preds = torch.max(outputs, 1)
+                        loss = criterion(outputs, labels)
 
-#                 print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+                        # backward + optimize only if in training phase
+                        if phase == 'train':
+                            loss.backward()
+                            optimizer.step()
 
-#                 # deep copy the model
-#                 if phase == 'val' and epoch_acc > best_f1:
-#                     best_acc = epoch_acc
-#                     torch.save(model.state_dict(), best_model_params_path)
+                    # Accumulate statistics
+                    running_loss += loss.item() * inputs.size(0)
+                    all_preds.extend(preds.cpu().numpy())
+                    all_labels.extend(labels.cpu().numpy())
 
-#             print()
+                if phase == 'train':
+                    scheduler.step()
 
-#         time_elapsed = time.time() - start
-#         print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
-#         print(f'Best val Acc: {best_f1:4f}')
+                # Calcualte average loss across all observations
+                epoch_loss = running_loss / len(dataloaders[phase].dataset)
+                # Calculate F1 score
+                epoch_f1 = f1_score(all_labels, all_preds, average='weighted')
 
-#         # load best model weights
-#         model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
-#     return model
+                print(f'{phase} Loss: {epoch_loss:.4f} F1 Score: {epoch_f1:.4f}')
+
+                # deep copy the model
+                if phase == 'val' and epoch_f1 > best_f1:
+                    best_f1 = epoch_f1
+                    torch.save(model.state_dict(), best_model_params_path)
+
+        time_elapsed = time.time() - start
+        print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
+        print(f'Best val F1 Score: {best_f1:4f}')
+
+        # load best model weights
+        model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
+    return model
