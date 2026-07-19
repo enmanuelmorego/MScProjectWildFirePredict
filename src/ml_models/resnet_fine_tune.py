@@ -40,7 +40,9 @@ class FineTuneDataset(Dataset):
                 - Image data for a single Sentinel-2 observation
                 - Binary wildfire label associated with the image
         """
-        return self.X[idx], self.y[idx]
+        pixel_data = torch.from_numpy(self.X[idx]).permute(2,0,1)
+        fire_label = torch.tensor(int(self.y[idx]), dtype=torch.long)
+        return pixel_data, fire_label
 
 # def fine_tune_resnet18(model, criterion, optimizer, scheduler, num_epochs = 25, weights_fname = "test_resnet18.pt"):
 #     start = time.time()
