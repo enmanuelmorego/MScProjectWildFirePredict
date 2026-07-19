@@ -140,7 +140,7 @@ class ResNetFeatExtractor(nn.Module):
             # Load pre trained weights
             self.model = resnet18(weights = ResNet18_Weights.DEFAULT)
         else:
-            print(f"🔄 Load FineTuned weights {weights_checkpoint}")
+            print(f"🔄 Loaded FineTuned weights {weights_checkpoint}")
             # Create emtpy ResNet 18 model
             self.model = resnet18(weights = None)
             # Adjust model to expected structure 
