@@ -143,7 +143,7 @@ def load_missing_sentinel2_from_log(base_dir: Path, data_dir: str) -> pd.DataFra
     vc.validate_composite_keys_structure(df_missing_sentinel2)
     return df_missing_sentinel2
 
-def load_sentinel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_sentinel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Loads all available Sentinel2 `npz` in `sentinel_files` and combines the data into `np` arrays
 
     Args:
@@ -154,15 +154,17 @@ def load_sentinel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None)
         tuple[np.ndarray, np.ndarray, np.ndarray]: A tuple containing the combined Sentinel2 data as numpy arrays where:
          - `all_x` is the image data 
          - `all_y` is the fire labels 
+         - `all_composite_keys` is the composite keys of the observations (extracted from `composite_key`)
          - `all_dates` is the dates of the observations (extracted from `composite_key`)
     """
     # Limit number of files to load if n_load is specified (this is mainly used for testing purposes)
     if n_load is not None:
         sentinel_files = sentinel_files[:n_load]
     # Initialise emtpy lists to store the data
-    all_x = []
-    all_y = []
-    all_dates = []
+    all_x              = []
+    all_y              = []
+    all_composite_keys = []
+    all_dates          = []
 
     for file in tqdm(sentinel_files, desc="Loading Sentinel2 data from disk", dynamic_ncols = True, position = 0):
         # Load Sentinel2 data from file
@@ -172,14 +174,16 @@ def load_sentinel2_as_arrays(sentinel_files: list[Path],n_load: int|None = None)
         # Append data to lists
         all_x.append(data.x)
         all_y.append(data.y)
+        all_composite_keys.append(data.keys)
         all_dates.append(data.dates)
     
     # Concatenate all observations into single arrays
-    all_x = np.concatenate(all_x, axis = 0)
-    all_y = np.concatenate(all_y, axis = 0)
-    all_dates = np.concatenate(all_dates, axis = 0)
+    all_x              = np.concatenate(all_x, axis = 0)
+    all_y              = np.concatenate(all_y, axis = 0)
+    all_composite_keys = np.concatenate(all_composite_keys, axis = 0)
+    all_dates     = np.concatenate(all_dates, axis = 0)
 
-    return all_x, all_y, all_dates
+    return all_x, all_y, all_composite_keys, all_dates
 
 
 def save_sentinel_nps(image_list: list, label_list: list, composite_key_list: list, batch_name: str, data_dir: Path) -> None:
