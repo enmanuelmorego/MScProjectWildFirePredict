@@ -34,7 +34,7 @@ def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_
     # Notify user of actual proportions
     actual_train_size = len(df_train) / len(df)
     actual_test_size  = len(df_test) / len(df)
-    print(f"ℹ️ INFO Train/Test split based on {sort_col}\n"
+    print(f"\nℹ️  INFO Train/Test split based on {sort_col}\n"
           f"Requested train size : {train_size:.2f}\n"
           f"Actual train size    : {actual_train_size:.2f}\n"
           f"Actual test size     : {actual_test_size:.2f}")
