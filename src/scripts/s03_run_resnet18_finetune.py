@@ -27,10 +27,7 @@ df_train, df_test = mu.train_test_temporal_split(df_metadata, sort_col = 'date',
 train_idx = df_train["idx"].to_numpy()
 test_idx = df_test["idx"].to_numpy()
 
-print(train_idx.dtype)
-print(test_idx.dtype)
+image_dataset = {'train': FineTuneDataset(all_x[train_idx], all_y[train_idx]), # type: ignore
+                 'val': FineTuneDataset(all_x[test_idx],    all_y[test_idx])}  # type: ignore
 
-image_dataset = {'train': FineTuneDataset(all_x[train_idx], all_y[train_idx]),
-                 'val': FineTuneDataset(all_x[test_idx],    all_y[test_idx])
-                 }
 print(image_dataset["train"][0])
