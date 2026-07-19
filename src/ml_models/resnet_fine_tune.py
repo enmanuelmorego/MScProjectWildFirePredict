@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import pandas as pd
 import time
+import os
 
 
 from torch.utils.data import Dataset, DataLoader
@@ -53,18 +54,37 @@ def fine_tune_resnet18(model: nn.Module,
                        num_epochs: int = 25, 
                        
                        dataloaders: dict[str, DataLoader], # type: ignore
-                       device: str,
+                       device: str) -> nn.Module:
+    """Fine-tunes a pre-trained ResNet18 model on Sentinel-2 wildfire data
+    
+    This module and process follows the structure and logic of the PyTorch tutorial on transfer learning:
+    https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html    
+    Some elements and sections of this tutorial were adapted to fit the specific requirements of this project
 
-                       data_dir: Path,  
-                       weights_fname: str = "test_resnet18.pt"):
+    The model uses F1 score instead of Accuracy, given that the dataset is imbalanced 
+
+    Args:
+        model (nn.Module): Pre-trained ResNet18 model to be fine-tuned - Uses defaults weights as starting point
+        criterion (nn.Module): Loss function used for training - Quantifies the difference between the models predictions and true labels
+                               for binary classificaiton, `nn.CrossEntropyLoss()` is typically used
+        optimizer (torch.optim.Optimizer): Optimizer used for updating model parameters
+        scheduler: Learning rate scheduler to adjust the learning rate during training
+        num_epochs (int, optional): Number of epochs to train the model. Defaults to 25.
+        dataloaders (dict[str, DataLoader]): Dictionary containing DataLoaders for training and validation datasets
+        device (str): Device to run the training on ('cuda' or 'cpu')
+    """
+    # Initiliase timer to track how long training takes
     start = time.time()
-
+    # Creates a temporary directory to store the best model parameters during training 
+    # File(s) get deleted when the program exits the with block
     with TemporaryDirectory() as tempdir:
-        best_model_params_path = data_dir/"MLModels"/weights_fname
+        best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
         torch.save(model.state_dict(), best_model_params_path)
 
-        best_f1 = 0.0
+        # Initialise best_f1 variable OUTSIDE the epoch loop to track the best score across all epochs
+        best_f1      = 0.0
 
+        # Loop over epochs for training and validation
         for epoch in range(num_epochs):
             print(f'Epoch {epoch}/{num_epochs - 1}')
             print('-' * 10)
@@ -95,6 +115,7 @@ def fine_tune_resnet18(model: nn.Module,
                     # track history if only in train
                     with torch.set_grad_enabled(phase == 'train'):
                         outputs = model(inputs)
+                        # Obtain predicted class index (0 = No fire, 1 = Fire)
                         _, preds = torch.max(outputs, 1)
                         loss = criterion(outputs, labels)
 
@@ -104,15 +125,16 @@ def fine_tune_resnet18(model: nn.Module,
                             optimizer.step()
 
                     # Accumulate statistics
-                    running_loss += loss.item() * inputs.size(0)
+                    running_loss += loss.item() * inputs.size(0) 
                     all_preds.extend(preds.cpu().numpy())
                     all_labels.extend(labels.cpu().numpy())
 
                 if phase == 'train':
                     scheduler.step()
 
-                # Calcualte average loss across all observations
-                epoch_loss = running_loss / len(dataloaders[phase].dataset)
+                # Accumulate batch loss scaled by batch size so that an average loss
+                # across the entire dataset can be calculated at the end of the epoch
+                epoch_loss = running_loss / len(dataloaders[phase].dataset) # type: ignore
                 # Calculate F1 score
                 epoch_f1 = f1_score(all_labels, all_preds, average='weighted')
 
