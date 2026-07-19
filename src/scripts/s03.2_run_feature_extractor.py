@@ -14,7 +14,7 @@ def run_feature_extractor():
     # ------------------------
     # VALIDATE RUN PARAMETERS
     # ------------------------    
-    #vc.validate_params_update(VALIDATION_DATE)
+    vc.validate_params_update(VALIDATION_DATE)
     # ------------------------
     # EXTRACT PARAMETERS 
     # ------------------------
