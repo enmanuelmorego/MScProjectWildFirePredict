@@ -10,9 +10,17 @@ import ml_models.ml_utils as mu
 
 import pandas as pd
 import numpy as np
+import torch
+
+"""
+This module and process follows the structure and logic of the PyTorch tutorial on transfer learning:
+https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html    
+"""
 
 # Load parameters
 DATA_DIR = PARAMETERS['DATA_DIR']
+dataloaders_batch_size = 4
+
 
 # Load basic model
 model_basic = resnet18(weights = ResNet18_Weights.DEFAULT)
@@ -28,6 +36,22 @@ train_idx = df_train["idx"].to_numpy()
 test_idx = df_test["idx"].to_numpy()
 
 image_dataset = {'train': FineTuneDataset(all_x[train_idx], all_y[train_idx]), # type: ignore
-                 'val': FineTuneDataset(all_x[test_idx],    all_y[test_idx])}  # type: ignore
+                 'val'  : FineTuneDataset(all_x[test_idx],  all_y[test_idx])}  # type: ignore
+dataloaders = {'train': torch.utils.data.DataLoader(image_dataset['train'], batch_size=dataloaders_batch_size, shuffle=True,  num_workers=0),
+               'val'  : torch.utils.data.DataLoader(image_dataset['val'],   batch_size=dataloaders_batch_size, shuffle=False, num_workers=0)}
+dataset_sizes = {x: len(image_dataset[x]) for x in ['train', 'val']}
+class_names = ["No Fire", "Fire"]
+device = ("cuda" if torch.cuda.is_available() else "cpu")
 
-print(image_dataset["train"][0])
+# ===================
+# VALIDATION
+# =================
+inputs, labels = next(iter(dataloaders["train"]))
+
+print(f"Using device: {device}")
+
+print(f"1. Passed Expected format: {inputs.shape == (dataloaders_batch_size, 3, 128, 128)}")
+print(inputs.shape)
+
+print(f"2. Passed Expected format: {labels.shape == (dataloaders_batch_size,)}")
+print(labels.shape)
