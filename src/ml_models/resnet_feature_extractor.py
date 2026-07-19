@@ -140,8 +140,12 @@ class ResNetFeatExtractor(nn.Module):
             # Load pre trained weights
             self.model = resnet18(weights = ResNet18_Weights.DEFAULT)
         else:
+            print(f"🔄 Load FineTuned weights {weights_checkpoint}")
             # Create emtpy ResNet 18 model
             self.model = resnet18(weights = None)
+            # Adjust model to expected structure 
+            num_features = self.model.fc.in_features
+            self.model.fc = nn.Linear(num_features, 2)
             # Load fine tuned weights
             weights_dict = torch.load(weights_checkpoint, map_location = "cpu")
             # Apply loaded weights
