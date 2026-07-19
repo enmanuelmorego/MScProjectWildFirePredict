@@ -1,14 +1,12 @@
-import numpy as np
+
 from sklearn.metrics import f1_score
 import torch
 import torch.nn as nn
-import pandas as pd
 import time
 import os
 
 
 from torch.utils.data import Dataset, DataLoader
-from pathlib import Path
 from tempfile import TemporaryDirectory
 
 
@@ -51,7 +49,7 @@ def fine_tune_resnet18(model: nn.Module,
                        criterion: nn.Module, 
                        optimizer: torch.optim.Optimizer, 
                        scheduler, 
-                       num_epochs: int = 25, 
+                       num_epochs: int, 
                        
                        dataloaders: dict[str, DataLoader], # type: ignore
                        device: str) -> nn.Module:
@@ -69,7 +67,7 @@ def fine_tune_resnet18(model: nn.Module,
                                for binary classificaiton, `nn.CrossEntropyLoss()` is typically used
         optimizer (torch.optim.Optimizer): Optimizer used for updating model parameters
         scheduler: Learning rate scheduler to adjust the learning rate during training
-        num_epochs (int, optional): Number of epochs to train the model. Defaults to 25.
+        num_epochs (int, optional): Number of epochs to train the model.
         dataloaders (dict[str, DataLoader]): Dictionary containing DataLoaders for training and validation datasets
         device (str): Device to run the training on ('cuda' or 'cpu')
     """
