@@ -15,10 +15,17 @@ folium = "*"
 leafmap = "*"
 ee = "*"
 geemap = "*"
-pygrib = "*"
+# pygrib = "*"
+# Required only for:
+# - transform_grib_to_csv()
+# - Initial FWI preprocessing pipeline
+# Not required for:
+# - Sentinel processing
+# - ResNet18 feature extraction
+# - Model training/evaluation
+# Fails to install on Windows.
 xarray = "*"
 cdsapi = "*"
-tensorflow = "*"
 opencv-python = "*"
 tifffile = "*"
 scikit-image = "*"
