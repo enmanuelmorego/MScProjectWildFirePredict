@@ -104,12 +104,21 @@ def combine_dict_to_geodf(dict_in: dict[int, pd.DataFrame], crs: str) -> gpd.Geo
 
 def get_temporal_label(date_obj: pd.Timestamp, split_by: str) -> str:
 
+    # Map of accepted values
     temporal_extract_map = {'year': '%Y',
-                            'quarter': '%Y-%q',
+                            'quarter': '%Y-Q%q',
                             'month': '%Y-%b'}
-
+    # Clean input string
+    split_by = split_by.lower().strip()
+    # Extract date patter
     date_pattern = temporal_extract_map.get(split_by, None)
-    return str(date_obj.strftime(date_pattern)) # type: ignore
+    if date_pattern is None:
+        raise LookupError(f"❌ ERROR\n\tValue [{split_by}] is not a valid date split grouping. Select one of available options:\n\t{temporal_extract_map.keys()}")
+    # Custom transformation is 'quarter' is selected
+    if split_by == 'quarter':
+        return str(date_obj.to_period('Q').strftime(date_pattern)) 
+    # Else apply regular return method
+    return str(date_obj.strftime(date_pattern)) 
 
 if __name__ == "__main__":
     df_test = pd.DataFrame({"date": pd.to_datetime(["2018-01-15", "2018-03-31", "2018-04-01", "2018-06-20",
@@ -118,6 +127,6 @@ if __name__ == "__main__":
 
     for row in df_test.itertuples():
 
-        print(f"Original date: {row.date} Extracted val: {get_temporal_label(row.date, 'quarter')}")
+        print(f"Original date: {row.date} Extracted val: {get_temporal_label(row.date, 'opps')}")
 
     
