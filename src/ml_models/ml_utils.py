@@ -1,4 +1,5 @@
 import pandas as pd 
+import numpy as np
 
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import TimeSeriesSplit
@@ -91,7 +92,7 @@ def model_crossvalidation(model: BaseEstimator,
         model_cv.fit(X_train_cv, y_train_cv)
         # Generate predictions
         y_pred = model_cv.predict(X_test_cv)
-        # Get probabilities
+        # Extract the probabilities of the fire class
         y_prob = model_cv.predict_proba(X_test_cv)[:, 1]
 
         # Evaluate
@@ -110,8 +111,8 @@ def model_crossvalidation(model: BaseEstimator,
             print(f"Fold {i}: \n\t{f1score:.3f}\n\t{auc_score:.3f}")
             print(classification_report(y_test_cv, y_pred))
             print(".....................................")
-    f1_mean_score = sum(f1_scores) / len(f1_scores)
-    auc_mean_score = sum(auc_scores) / len(auc_scores)
+    f1_mean_score = np.mean(f1_scores)
+    auc_mean_score = np.mean(auc_scores) 
 
     avg_report = (pd.concat(reports).groupby(level=0).mean())
     print(f"\n========== Model: {model_name} ==========\nMean F1 Score: {f1_mean_score:.3f}\nMean AUC Score: {auc_mean_score:.3f}\nTotal folds: {n_splits}\nAverage Class Report\n{avg_report}")
