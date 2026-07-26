@@ -103,6 +103,6 @@ def model_crossvalidation(model: BaseEstimator,
             print(".....................................")
     mean_score = sum(scores) / len(scores)
     avg_report = (pd.concat(reports).groupby(level=0).mean())
-    print(f"========== Model: {model_name} ==========\nMean F1 Score: {mean_score:.3f}\nTotal folds: {n_splits}\nAverage Class Report\n{avg_report}")
+    print(f"\n========== Model: {model_name} ==========\nMean F1 Score: {mean_score:.3f}\nTotal folds: {n_splits}\nAverage Class Report\n{avg_report}")
     model_scores[model_name]["F1 Mean Score"] = mean_score
     return model_scores
