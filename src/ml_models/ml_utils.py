@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import classification_report
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_auc_score
 from sklearn.base import clone
 
 def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_size: float = 0.7) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -55,7 +55,7 @@ def model_crossvalidation(model: BaseEstimator,
                            verbose: bool = False) -> dict:
     """Performs crossvalidation on training data for a given ML model.
     A fresh cloned model is supplied to each crossvalidation fold. 
-    The function computes the F1-Score and classification report for every fold along with the 
+    The function computes the F1-Score, ROC AUC score, and classification report for every fold along with the 
     mean performance across all folds
 
     Args:
@@ -67,11 +67,12 @@ def model_crossvalidation(model: BaseEstimator,
         verbose (bool, optional): Boolean flag to choose whether to print details per fold or not. Defaults to False.
 
     Returns:
-        dict: Dictionary containing the F1 score for each fold and the overal mean F1-score
+        dict: Dictionary containing the F1 and ROC AUC score for each fold and the overal mean F1-score along with ROC AUC score
     """    
     # Initialise objects
     tscv = TimeSeriesSplit(n_splits = n_splits)
-    scores = []
+    f1_scores = []
+    auc_scores = []
     reports = []
     model_scores = {model_name: {}}
 
@@ -90,19 +91,32 @@ def model_crossvalidation(model: BaseEstimator,
         model_cv.fit(X_train_cv, y_train_cv)
         # Generate predictions
         y_pred = model_cv.predict(X_test_cv)
+        # Get probabilities
+        y_prob = model_cv.predict_proba(X_test_cv)[:, 1]
 
         # Evaluate
-        score = f1_score(y_test_cv, y_pred)
-        scores.append(score)
-        model_scores[model_name][f"F1 Score fold {i}"] = score
+        f1score = f1_score(y_test_cv, y_pred)
+        f1_scores.append(f1score)
+        model_scores[model_name][f"F1 Score fold {i}"] = f1score
+
+        auc_score = roc_auc_score(y_test_cv, y_prob)
+        auc_scores.append(auc_score)
+        model_scores[model_name][f"AUC Score fold {i}"] = auc_score
+
+
         report = classification_report(y_test_cv, y_pred, output_dict=True)
         reports.append(pd.DataFrame(report).T)
         if verbose:
-            print(f"Fold {i}: {score:.3f}")
+            print(f"Fold {i}: \n\t{f1score:.3f}\n\t{auc_score:.3f}")
             print(classification_report(y_test_cv, y_pred))
             print(".....................................")
-    mean_score = sum(scores) / len(scores)
+    f1_mean_score = sum(f1_scores) / len(f1_scores)
+    auc_mean_score = sum(auc_scores) / len(auc_scores)
+
     avg_report = (pd.concat(reports).groupby(level=0).mean())
-    print(f"\n========== Model: {model_name} ==========\nMean F1 Score: {mean_score:.3f}\nTotal folds: {n_splits}\nAverage Class Report\n{avg_report}")
-    model_scores[model_name]["F1 Mean Score"] = mean_score
+    print(f"\n========== Model: {model_name} ==========\nMean F1 Score: {f1_mean_score:.3f}\nMean AUC Score: {auc_mean_score:.3f}\nTotal folds: {n_splits}\nAverage Class Report\n{avg_report}")
+    model_scores[model_name]["F1 Mean Score"]  = f1_mean_score
+    model_scores[model_name]["AUC Mean Score"] = auc_mean_score
+    model_scores[model_name]["Average Classification Report"] = avg_report
+
     return model_scores
