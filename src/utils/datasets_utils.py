@@ -6,7 +6,7 @@ import geopandas as gpd
 import re
 
 from pathlib import Path 
-from datetime import datetime 
+from datetime import datetime, date
 
 def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
     """  Generate a daily date range covering full calendar years based on the
@@ -101,3 +101,12 @@ def combine_dict_to_geodf(dict_in: dict[int, pd.DataFrame], crs: str) -> gpd.Geo
                                         geometry = 'geometry',
                                         crs = crs)
     return df_sampled_geodf
+
+def get_temporal_label(date_obj: pd.Timestamp, split_by: str) -> str:
+
+    temporal_extract_map = {'year': '%Y',
+                            'quarter': '%Y-Q%q',
+                            'month': '%Y-%b'}
+
+    date_pattern = temporal_extract_map.get(split_by, None)
+    return str(date.strftime(date_pattern))
