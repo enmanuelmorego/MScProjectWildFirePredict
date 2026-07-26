@@ -105,8 +105,19 @@ def combine_dict_to_geodf(dict_in: dict[int, pd.DataFrame], crs: str) -> gpd.Geo
 def get_temporal_label(date_obj: pd.Timestamp, split_by: str) -> str:
 
     temporal_extract_map = {'year': '%Y',
-                            'quarter': '%Y-Q%q',
+                            'quarter': '%Y-%q',
                             'month': '%Y-%b'}
 
     date_pattern = temporal_extract_map.get(split_by, None)
-    return str(date.strftime(date_pattern))
+    return str(date_obj.strftime(date_pattern)) # type: ignore
+
+if __name__ == "__main__":
+    df_test = pd.DataFrame({"date": pd.to_datetime(["2018-01-15", "2018-03-31", "2018-04-01", "2018-06-20",
+                                                    "2018-09-10", "2018-12-25", "2019-02-14", "2019-07-04",
+                                                    "2020-10-30", "2021-11-05"])})
+
+    for row in df_test.itertuples():
+
+        print(f"Original date: {row.date} Extracted val: {get_temporal_label(row.date, 'quarter')}")
+
+    
