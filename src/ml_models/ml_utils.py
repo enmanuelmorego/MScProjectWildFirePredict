@@ -50,7 +50,7 @@ def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_
 
 def model_crossvalidation(model: BaseEstimator,
                            X: pd.DataFrame, 
-                           y: pd.DataFrame, 
+                           y: pd.Series, 
                            model_name: str, 
                            n_splits: int = 8, 
                            verbose: bool = False) -> dict:
