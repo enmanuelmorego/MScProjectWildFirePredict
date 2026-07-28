@@ -4,6 +4,21 @@ from pathlib import Path
 markdown = f"""
 # MScProjectWildFirePredict Architecture
 
+## Table of Contents
+
+- [Getting Started](#getting-started)
+    - [Check if Python 3.11 is Installed](#check-if-python-311-is-installed)
+    - [Install Python 3.11](#install-python-311)
+    - [Install Pipenv](#install-pipenv)
+    - [Install Project Dependencies](#install-project-dependencies)
+    - [Activate Environment](#activate-environment)
+
+- [Project Architecture](#project-architecture)
+    - [Overview](#overview)
+    - [Codebase](#codebase)
+    - [Data Files](#data-files)
+
+
 ## Getting Started
 
 This project requires Python 3.11 and Pipenv
