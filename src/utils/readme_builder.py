@@ -4,26 +4,85 @@ from pathlib import Path
 markdown = f"""
 # MScProjectWildFirePredict Architecture
 
+## Getting Started
+
+This project requires Python 3.11 and Pipenv
+
+### Check if Python 3.11 is installed
+
+Verify that Python 3.11 is installed 
+
+Open the IDE terminal, and run:
+
+Windows:
+```
+py --version
+```
+
+Mac:
+```
+python3 --version
+```
+
+### Install Python 3.11
+
+If Python 3.11 is not installed, download Python 3.11 from:
+
+https://www.python.org/downloads/release/python-3119/
+
+During the installation, make sure to tick: `Add Python to PATH`
+
+Verify that Python 3.11 was succesfully installed 
+
+Windows:
+```
+py -- version
+```
+
+Mac:
+```
+python3 --version
+```
+
+### Install Pipenv
+
+```
+pip install pipenv 
+```
+
+## Install project dependencies
+
+```
+pipenv install
+```
+
+### Activate environment
+```
+pipenv shell
+```
+
+## Project Architecture
+
 The project is divided into modules, which have specific responsibilities. An overview of the modules is shown here, and below, each of the sections is expanded with further details.
 
-## Overview
+### Overview
 ```
 | MScProjectWildFirePredict/
 {fu.build_dir_tree(Path(Path(__file__).resolve().parents[2]), False)}
 ```
 
-## Codebase
+### Codebase
 ```
 MScProjectWildFirePredict/
 |- src/
 {fu.build_dir_tree(Path("src"), True)}
 ```
 
-### Notes:
-#### .../Pipelines/
+#### Notes:
+##### .../Pipelines/
 This folder contains a `.py` for each of the pipelines. The files might contain only one function, and be quite shallow. However, this was a conscious design choice to allow easy testing and debugging of pipeline processes, as it is easier to read than having large scripts with many orchestrators. 
 
-### Scripts
+#### Scripts
 This folder contains the modules that performs specific steps in the program.
 
 These are split into separate, independent components as they are expected to run in isolation. Each file is prefixed with `sXX` where `X` are digits; this stands for `S`cript 00, 01, etc, which indicates the order in which the files are expected to run. 
@@ -55,7 +114,7 @@ MScProjectWildFirePredict/
 |   |- scripts/
 {fu.build_dir_tree(Path("src")/"scripts", True, indent ="|   ")}
 ```
-### `s01_run_tabular.py`
+#### `s01_run_tabular.py`
 
 - Imports parameters from set_parameters.py.
 - Loads and preprocesses the VIIRS, FWI and UK Grid datasets.
@@ -65,7 +124,7 @@ MScProjectWildFirePredict/
 - Splits the sampled dataset by year and saves .csv files to disk for later processing.
 ---
 
-### `s02_run_setinel2_fetch.py`
+#### `s02_run_setinel2_fetch.py`
 
 - Imports parameters from `set_parameters.py`.
 - Uses `YEAR_FILTER` to identify which sampled datasets to process.
@@ -76,7 +135,7 @@ MScProjectWildFirePredict/
 - Saves downlaoded data as `npz` files to disk for later use.
 ---
 
-## `s03_run_feature_extractor.py`
+#### `s03_run_feature_extractor.py`
 
 - Imports parameters from `set_parameters.py`.
 - Loads all Sentinel2 `.npz` files available in disk (assumes that s01 and s02 processes are complete).
@@ -88,7 +147,7 @@ MScProjectWildFirePredict/
 - Complete ML (machine learning) dataset is saved to disk so next process can simply read this file rather than repeat the processing steps.
 ---
 
-## Data Files
+### Data Files
 This module contains files and objects used to build the different components of the program. It is further split by type of data, i.e., raw inputs, preprocessed, etc. 
 
 ```
