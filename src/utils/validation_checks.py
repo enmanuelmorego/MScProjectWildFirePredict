@@ -170,6 +170,59 @@ def validate_composite_keys_structure(df_in: pd.DataFrame, col: str = "composite
                          f"Composite key data type: {composite_keys_data_types}\n"
                          f"Examples: {invalid_keys}")
 
+def validate_composite_keys_intersections(df_1: pd.DataFrame, df_2:pd.DataFrame, col: str = "composite_key") -> None:
+    """Validates that the composite keys in two dataframes have no intersection. This is mainly used to 
+    avoid leakege when splitting data into train and test sets
+
+    Args:
+        df_1 (pd.DataFrame): First dataframe to compare
+        df_2 (pd.DataFrame): Second dataframe to compare
+        col (str, optional): Name of the column containing the composite keys. Defaults to "composite_key".
+
+    Raises:
+        ValueError: If there are any composite keys that exist in both dataframes
+    """
+    set_1 = set(df_1[col])
+    set_2 = set(df_2[col])
+    intersection = set_1.intersection(set_2)
+    
+    if intersection:
+        raise ValueError(f"\n❌  ERROR  \nFound {len(intersection)} composite keys that exist in both dataframes.\n"
+                         f"Examples: {list(intersection)[:5]}")
+    
+def validate_date_leakage(df_1: pd.DataFrame, df_2: pd.DataFrame, date_col: str = "date") -> None:
+    """Validates that there is no date leakage between the train and test sets
+
+    Args:
+        df_1 (pd.DataFrame): First dataframe to compare
+        df_2 (pd.DataFrame): Second dataframe to compare
+        date_col (str, optional): Name of the column containing the dates. Defaults to "date".
+
+    Raises:
+        ValueError: If there is any date leakage between the train and test sets
+    """
+    train_max = df_1[date_col].max()
+    test_min  = df_2[date_col].min()
+
+    if train_max >= test_min:
+        raise ValueError(f"\n❌  ERROR  \nThere is date leakage between train and test sets.\n"
+                         f"Train max date: {train_max}\nTest min date: {test_min}")
+    
+def validate_train_test_split(df_train: pd.DataFrame, df_test: pd.DataFrame) -> None:
+    """Wrapper function that runs a series of checks to ensure that the train/test split was performed correctly
+
+    User is able to add/remove checks as needed
+
+    Args:
+        df_train (pd.DataFrame): Train dataframe
+        df_test (pd.DataFrame): Test dataframe
+
+    """
+    # Check that there is no date leakage between train and test sets
+    validate_date_leakage(df_train, df_test, date_col = "date")
+    # Check that there are no composite keys that exist in both train and test sets
+    validate_composite_keys_intersections(df_train, df_test, col = "composite_key")
+
 
 if __name__ == "__main__":
     df_feat = pd.DataFrame({'composite_key': ['00120200501', 

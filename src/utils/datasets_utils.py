@@ -6,7 +6,7 @@ import geopandas as gpd
 import re
 
 from pathlib import Path 
-from datetime import datetime 
+from datetime import datetime
 
 def extract_year_range(df: pd.DataFrame) -> pd.DataFrame:
     """  Generate a daily date range covering full calendar years based on the
@@ -101,3 +101,43 @@ def combine_dict_to_geodf(dict_in: dict[int, pd.DataFrame], crs: str) -> gpd.Geo
                                         geometry = 'geometry',
                                         crs = crs)
     return df_sampled_geodf
+
+def get_temporal_label(date_obj: pd.Timestamp, 
+                       time_unit: str, 
+                       date_formats: dict[str, str] = {'year': '%Y',
+                                                       'quarter': '%Y-Q%q',
+                                                       'month': '%Y-%b'}) -> str:
+    """Takes a date object and creates a string label based on the specified requirements. This can be a year, month, quarter etc.
+    The format can be adjusted in the parameters
+
+    Args:
+        date_obj (pd.Timestamp):  A date object to create the string label from
+        time_unit (str): Split grouping applied to the date - Inputs are limited to those specified in `date_formats` argument
+        date_formats (str, str): Available formats for the extracted string output. Defaults to {'year': '%Y', 'quarter': '%Y-Q%q', 'month': '%Y-%b'}.
+
+    Raises:
+        LookupError: Raises a LookupError when users passes a `time_unit` which is not present in `date_formats` dictionary
+
+    Returns:
+        str: The date object as a string in the requested format from `time_unit` extracted from `date_formats` dict
+    """    
+    # Clean input string
+    time_unit_c = time_unit.lower().strip()
+    # Extract date patter
+    date_pattern = date_formats.get(time_unit_c, None)
+    if date_pattern is None:
+        raise LookupError(f"❌ ERROR\n\tValue [{time_unit_c}] is not a valid date split grouping. Select one of available options:\n\t{date_formats.keys()}")
+    # Custom transformation is 'quarter' is selected
+    if time_unit_c == 'quarter':
+        return str(date_obj.to_period('Q').strftime(date_pattern)) 
+    # Else apply regular return method
+    return str(date_obj.strftime(date_pattern)) 
+
+if __name__ == "__main__":
+    df_test = pd.DataFrame({"date": pd.to_datetime(["2018-01-15", "2018-03-31", "2018-04-01", "2018-06-20",
+                                                    "2018-09-10", "2018-12-25", "2019-02-14", "2019-07-04",
+                                                    "2020-10-30", "2021-11-05"])})
+
+    for row in df_test.itertuples():
+
+        print(f"Original date: {row.date} Extracted val: {get_temporal_label(row.date, 'notfound')}") # type: ignore

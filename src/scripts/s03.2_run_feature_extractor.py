@@ -2,7 +2,7 @@
 Module that runs and performs the feature extraction of Sentinel2 data using ResNet18
 """
 from scripts.s00_set_parameters import PARAMETERS, VALIDATION_DATE
-from transforms.resnet_feature_extractor import ResNetFeatExtractor, extract_resnet_features
+from ml_models.resnet_feature_extractor import ResNetFeatExtractor, extract_resnet_features
 
 import utils.validation_checks as vc
 import utils.file_utils as fu
@@ -33,9 +33,9 @@ def run_feature_extractor():
     # RESNET-18 MODEL
     # -------------------------------
     # Initialise model
-    resnet_model = ResNetFeatExtractor()
+    resnet_model = ResNetFeatExtractor(DATA_DIR/"MLModels"/'resnet18_layer4_finetuned.pt')
     # Disable training behaviour since the model is used only for feature extraction
-    resnet_model.eval()
+   # resnet_model.eval() # Migrated to inside the class 
     # Perform feature extraction
     df_features = extract_resnet_features(files_sentinel, resnet_model)
     # -------------------------------
@@ -56,7 +56,7 @@ def run_feature_extractor():
     # Create ML dataset
     df_ml = pd.merge(df_sampled, df_cleaned_features, on = 'composite_key', how = 'inner')
     # Save data
-    fu.write_df_to_csv(df_in = df_ml, file_path = DATA_DIR/'MLInputs', fname = f'{RUN_TIMESTAMP}_ml_input')
+    fu.write_df_to_csv(df_in = df_ml, file_path = DATA_DIR/'MLInputs', fname = f'{RUN_TIMESTAMP}_ml_input_layer4_finetuned')
 
 if __name__ == "__main__":
     run_feature_extractor()

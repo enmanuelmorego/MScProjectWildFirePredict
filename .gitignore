@@ -14,9 +14,17 @@ data/
 models/
 outputs/
 *.csv
+*.zip
+*.npz
+*.pt
 *.bkp
 .idea/
+*.egg-info/
 
 # MacOS
 .DS_Store
 **.DS_Store
+
+# Allow for ML data directory to be visible
+!data/
+!data/MLInputs

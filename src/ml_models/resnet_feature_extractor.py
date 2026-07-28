@@ -8,8 +8,8 @@ from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
 from torchvision.models import (resnet18, ResNet18_Weights)
 from torchvision.models.feature_extraction import create_feature_extractor
-from pathlib import Path
 from tqdm import tqdm
+from datetime import datetime 
 
 
 class SentinelData(Dataset):
@@ -29,10 +29,37 @@ class SentinelData(Dataset):
         Args:
             npz_file (Path): Path to the `npz` file to load the img data along wiht fire label and composite keys
         """        
-        data      = np.load(npz_file)
-        self.x    = data['x']
-        self.y    = data['y']
-        self.keys = data['composite_key']
+        data       = np.load(npz_file)
+        self.x     = data['x']
+        self.y     = data['y']
+        self.keys  = data['composite_key']
+        # initialise as None, as dates are not always needed to be extracted - reduce unecesary overhead
+        self.dates = None
+
+    def get_dates(self) -> list[datetime]:
+        """Extracts the date from the composite key from the sentinel2 image
+
+        Dates are initialised as None as these are not always needed to be extracted at this point
+        When extraction is needed, this method is explicitly called and the `self.dates` attribute is populated with the extracted dates from the composite key
+
+        If the method is called and `self.dates` IS NOT `None` then the date extraction process is skipped, and existing dates are returned 
+
+        Returns:
+            list[datetime]: List of datetime objects corresponding to the date of the observation/data point
+        """        
+        # check if dates already exist or not
+        if self.dates is None:
+            # initialise empty list of dates
+            dates = []
+            # Extract dates from each composite key 
+            for k in self.keys:
+                comp_key = str(k)
+                date_obj = datetime.strptime(comp_key[-8:], "%Y%m%d")
+                dates.append(date_obj)
+            self.dates = dates
+        return self.dates
+
+
 
     def __len__(self) -> int:
         """Returns the number of samples in the dataset 
@@ -86,6 +113,10 @@ class SentinelData(Dataset):
         print(f"{'Label':<12} : {str(self.y.dtype):<20} -> {sample['fire_label']} ({type(sample['fire_label']).__name__})")
         print(f"{'Key':<12} : {str(self.keys.dtype):<20} -> {sample['composite_key']} ({type(sample['composite_key']).__name__})")
 
+    def visualise_imgs(self, n_imgs: int = 1, title: str|None = None):
+        pass
+    # TODO create method to visualise loaded images for paper 
+
 class ResNetFeatExtractor(nn.Module):
     """ResNet18 feature extractor, that inherits from `nn.Module` and uses pretrained/existing weights
 
@@ -94,21 +125,37 @@ class ResNetFeatExtractor(nn.Module):
     and doesnt update parameters/weights
 
     """    
-    def __init__(self):
+    def __init__(self, weights_checkpoint: str | None = None):
         """Initiliase the pretrained ResNet18 feature extractor
 
         Loads the default pretrained weights, uses `create_feature_extractor` to skip classification layer, and freezes all the parameters to prevent 
         the model from updating these values
+
+        The class also has the option of loading fine-tuned weights from disk, if available. This allows easy comparison and flexibility of models
         """        
         # Initialize nn.Module class before defining FeatureExtractor
         super().__init__()
 
-        # Load pre trained weights
-        weights = ResNet18_Weights.DEFAULT
-        self.model = resnet18(weights = weights)
+        if weights_checkpoint is None:
+            # Load pre trained weights
+            self.model = resnet18(weights = ResNet18_Weights.DEFAULT)
+        else:
+            print(f"🔄 Loaded FineTuned weights {weights_checkpoint}")
+            # Create emtpy ResNet 18 model
+            self.model = resnet18(weights = None)
+            # Adjust model to expected structure 
+            num_features = self.model.fc.in_features
+            self.model.fc = nn.Linear(num_features, 2)
+            # Load fine tuned weights
+            weights_dict = torch.load(weights_checkpoint, map_location = "cpu")
+            # Apply loaded weights
+            self.model.load_state_dict(weights_dict)
+
         # Remove final classification layer (as we only need feature extraction)
         self.extractor = create_feature_extractor(self.model, 
                                                   return_nodes = {"avgpool": "features"})
+        # Use as feature extractor
+        self.model.eval()
         # Freeze weights
         for param in self.model.parameters():
             param.requires_grad = False
