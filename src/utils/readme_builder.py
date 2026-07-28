@@ -36,7 +36,7 @@ Verify that Python 3.11 was succesfully installed
 
 Windows:
 ```
-py -- version
+py --version
 ```
 
 Mac:
@@ -50,7 +50,7 @@ python3 --version
 pip install pipenv 
 ```
 
-## Install project dependencies
+### Install project dependencies
 
 ```
 pipenv install
