@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 
 from sklearn.base import BaseEstimator
-from sklearn.model_selection import TimeSeriesSplit
+from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
 from sklearn.metrics import classification_report
 from sklearn.metrics import f1_score, roc_auc_score
 from sklearn.base import clone
+
 
 def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_size: float = 0.7) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Splits data into train and test sets based on temporal/date order 
@@ -47,6 +48,31 @@ def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_
           f"Actual test size     : {actual_test_size:.4f}")
     # return the train and test dataframes
     return df_train, df_test
+
+def random_search_cv(model: BaseEstimator,
+                     X: pd.DataFrame,
+                     y: pd.Series,
+                     param_distributions: dict,
+                     n_iter = 50,
+                     n_splits = 8,
+                     scoring = "F1",
+                     random_state = 42) -> dict:
+
+    tscv = TimeSeriesSplit(n_splits = n_splits)
+    search_hyperparams = RandomizedSearchCV(estimator = model,
+                                            param_distributions = param_distributions,
+                                            n_iter = n_iter,
+                                            scoring = scoring,
+                                            cv = tscv,
+                                            random_state = random_state,
+                                            n_jobs = 1,
+                                            refit = True,
+                                            verbose = True)
+    search_hyperparams.fit(X, y)
+    return {"best_model": search_hyperparams.best_estimator_,
+            "best_params": search_hyperparams.best_params_,
+            "best_score": search_hyperparams.best_score_,
+            "cv_results": search_hyperparams.cv_results_}
 
 def model_crossvalidation(model: BaseEstimator,
                            X: pd.DataFrame, 
