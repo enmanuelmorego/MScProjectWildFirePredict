@@ -65,7 +65,7 @@ def random_search_cv(model: BaseEstimator,
                                             scoring = scoring,
                                             cv = tscv,
                                             random_state = random_state,
-                                            n_jobs = 1,
+                                            n_jobs = -1,
                                             refit = True,
                                             verbose = True)
     search_hyperparams.fit(X, y)
