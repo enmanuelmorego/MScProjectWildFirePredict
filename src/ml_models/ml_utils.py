@@ -53,10 +53,10 @@ def random_search_cv(model: BaseEstimator,
                      X: pd.DataFrame,
                      y: pd.Series,
                      param_distributions: dict,
+                     scoring: dict,
                      n_iter = 50,
                      n_splits = 8,
-                     scoring = "F1",
-                     random_state = 42) -> dict:
+                     random_state = 42):
 
     tscv = TimeSeriesSplit(n_splits = n_splits)
     search_hyperparams = RandomizedSearchCV(estimator = model,
@@ -65,14 +65,11 @@ def random_search_cv(model: BaseEstimator,
                                             scoring = scoring,
                                             cv = tscv,
                                             random_state = random_state,
-                                            n_jobs = -1,
-                                            refit = True,
+                                            n_jobs = 1,
+                                            refit = 'f1',
                                             verbose = True)
     search_hyperparams.fit(X, y)
-    return {"best_model": search_hyperparams.best_estimator_,
-            "best_params": search_hyperparams.best_params_,
-            "best_score": search_hyperparams.best_score_,
-            "cv_results": search_hyperparams.cv_results_}
+    return search_hyperparams
 
 def model_crossvalidation(model: BaseEstimator,
                            X: pd.DataFrame, 
