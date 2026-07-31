@@ -54,11 +54,34 @@ def random_search_cv(model: BaseEstimator,
                      y: pd.Series,
                      param_distributions: dict,
                      scoring: dict,
-                     n_iter = 50,
-                     n_splits = 8,
-                     random_state = 42):
+                     n_iter :int,
+                     n_splits: int,
+                     random_state:int = 42) -> RandomizedSearchCV:
+    """Performs `Random Search CV` to find the best possible combination for hyperparameters for the model
+    It uses `TimeSeriesSplit` to ensure that there is no temporal leakage 
 
+    Args:
+        model (BaseEstimator): Classification model - Random Forest, Logicstic Regression, etc
+        X (pd.DataFrame): Predictor variable(s)
+        y (pd.Series): Target label
+        param_distributions (dict): Dictionary containing the possible hyperparameters to test, and for `RandomizedSearchVC` to sample from
+        scoring (dict): Dictionary containing the scoring metrics to be used
+        n_iter (int, optional): Number of hyperparameter combinations to test. For example, if there were `param_distributions = {'n_estimators': [100, 200, 500], 'max_depth': [10, 20, None], 'bootstrap': [True, False]}` there would be 3 x 3 x 2 = 18 parameter combinations to try. Setting `n_iter` = 5 would tell `RandomizedSearchCV` to only select 5 of the possible 18 random combination of these hyperparameters  
+        n_splits (int, optional): Number of folds for TimeSeriesCrossValidation. Defaults to 8.
+        random_state (int, optional): Sets the random seed to a specific value for reproducibility. Defaults to 42.
+
+    Returns:
+        RandomizedSearchCV: A RandomizedSearchCV object containing the results of the best performing model. Commonly used attributes are
+        {best_estimator_ : Best fitted model,
+         best_params_    : Dictionary containing the optimal
+                           hyperparameter combination,
+         best_score_     : Best cross-validation score,
+         cv_results_     : Dictionary containing the results for all
+                           hyperparameter combinations evaluated}
+    """    
+    # Initialise TimeSeriesSplit object to ensure there is no temporal leakage
     tscv = TimeSeriesSplit(n_splits = n_splits)
+    # Perform the RandomizedSearch to find best HyperParameter combination
     search_hyperparams = RandomizedSearchCV(estimator = model,
                                             param_distributions = param_distributions,
                                             n_iter = n_iter,
@@ -68,6 +91,7 @@ def random_search_cv(model: BaseEstimator,
                                             n_jobs = 1,
                                             refit = 'f1',
                                             verbose = True)
+    
     search_hyperparams.fit(X, y)
     return search_hyperparams
 
@@ -87,7 +111,7 @@ def model_crossvalidation(model: BaseEstimator,
         X (pd.DataFrame): Predictor variables
         y (pd.DataFrame): Target labels
         model_name (str): Name to identify the trained model
-        n_splits (int, optional): Number of folds for cross-validation. Defaults to 8.
+        n_splits (int, optional): Number of folds for TimeSeriesCrosValidation. Defaults to 8.
         verbose (bool, optional): Boolean flag to choose whether to print details per fold or not. Defaults to False.
 
     Returns:
