@@ -13,6 +13,7 @@ __pycache__/
 data/
 models/
 outputs/
+*Archive/
 *.csv
 *.zip
 *.npz
