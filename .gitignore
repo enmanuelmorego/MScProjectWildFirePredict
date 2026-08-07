@@ -21,6 +21,7 @@ outputs/
 *.bkp
 .idea/
 *.egg-info/
+*.joblib
 
 # MacOS
 .DS_Store
