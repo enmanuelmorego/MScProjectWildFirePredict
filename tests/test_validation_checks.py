@@ -184,11 +184,28 @@ def test_validate_composite_keys_intersections_no_intersection():
 
     assert vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key') is None
 
-def test_validate_composite_keys_intersections_with_intersection():
+def test_validate_composite_keys_intersections_with_intersection_train_val():
     df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
     df_2 = pd.DataFrame({'composite_key': ['003', '004', '005']})
     df_3 = pd.DataFrame({'composite_key': ['006', '007', '008']})
 
     with pytest.raises(ValueError):
         vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
+
+def test_validate_composite_keys_intersections_with_intersection_train_test():
+    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
+    df_2 = pd.DataFrame({'composite_key': ['004', '005', '006']})
+    df_3 = pd.DataFrame({'composite_key': ['003', '007', '008']})
+
+    with pytest.raises(ValueError):
+        vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
+
+def test_validate_composite_keys_intersections_with_intersection_val_test():
+    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
+    df_2 = pd.DataFrame({'composite_key': ['004', '005', '006']})
+    df_3 = pd.DataFrame({'composite_key': ['006', '007', '008']})
+
+    with pytest.raises(ValueError):
+        vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
+
 
