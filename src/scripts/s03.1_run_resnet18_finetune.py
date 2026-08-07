@@ -41,17 +41,17 @@ all_x, all_y, all_composite_keys, all_dates = load_sentinel2_as_arrays(files_sen
 df_metadata = pd.DataFrame({"idx"          : np.arange(len(all_x)), 
                             "date"         : all_dates,
                             'composite_key': all_composite_keys,})
-# Split into train and test
+# Split into train, validation and test
 df_train, df_validation, df_test = mu.train_validate_test_temporal_split(df_metadata, sort_col = 'date', train_size = 0.6, val_size=0.2, test_size=0.2)
 vc.validate_train_validation_test_split(df_train, df_validation, df_test)
 # Save train, validation, test 
-df_train_val_test = pd.DataFrame({"composite_key": pd.concat([df_train["composite_key"],
-                                                              df_validation["composite_key"],
-                                                              df_test["composite_key"]], ignore_index=True),
-                                  "split_category": (["train"] * len(df_train) +
-                                                     ["validation"] * len(df_validation) +
-                                                     ["test"] * len(df_test))})
-df_train_val_test.to_csv(DATA_DIR/"MLInputs"/"train_val_test_split.csv")
+df_split = pd.DataFrame({"composite_key": pd.concat([df_train["composite_key"],
+                                                     df_validation["composite_key"],
+                                                     df_test["composite_key"]], ignore_index=True),
+                         "split_category": (["train"] * len(df_train) +
+                                            ["validation"] * len(df_validation) +
+                                            ["test"] * len(df_test))})
+df_split.to_csv(DATA_DIR/"MLInputs"/"train_val_test_split.csv", index = False)
 
 # Extract indices to fetch observations from the arrays 
 train_idx      = df_train["idx"].to_numpy()
