@@ -4,7 +4,7 @@ import pandas as pd
 def test_train_validate_test_temporal_split_basic_case():
     # Create a sample dataframe with dates and composite keys
     df = pd.DataFrame({'date': pd.date_range(start='2023-01-01', periods=10, freq='D'),
-                       'composite_key': [f'key_{i}' for i in range(10)]})
+                       'composite_key': [f'00{i}{i+1}' for i in range(10)]})
 
     # Perform the train/validate/test split
     df_train, df_validation, df_test = mu.train_validate_test_temporal_split(df, sort_col='date', train_size=0.6, val_size=0.2, test_size=0.2)
@@ -19,7 +19,7 @@ def test_train_validate_test_temporal_split_basic_case():
     assert df_validation['date'].max() < df_test['date'].min()
 
 def test_train_validate_test_temporal_split_duplicated_dates():
-    df = pd.DataFrame({"composite_key": [f'key_{i}' for i in range(10)],
+    df = pd.DataFrame({"composite_key": [f'00{i}{i+1}' for i in range(10)],
                         "date": pd.to_datetime(["2020-01-01",  
                                                 "2020-01-02",  
                                                 "2020-01-03",  
