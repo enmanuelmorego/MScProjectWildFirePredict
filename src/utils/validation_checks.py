@@ -7,7 +7,7 @@ from datetime import datetime
 import utils.file_utils as u
 import pandas as pd
 
-def validate_params_update(validation_date: date, params_file: str = "set_parameters.py") -> None:
+def validate_params_update(validation_date: date, params_file: str = "s00_set_parameters.py") -> None:
     """Function to validate and check user have updated parameters before running pipeline
 
     Args:
@@ -20,7 +20,7 @@ def validate_params_update(validation_date: date, params_file: str = "set_parame
     # Get today's date
     today = date.today()
     if today != validation_date:
-        param_file_full = (Path(__file__).parent/params_file)
+        param_file_full = (Path(__file__).resolve().parents[1]/"scripts"/params_file)
         u.open_file(param_file_full)
         raise ValueError(f"\n\t❌ Please update object VALIDATION_DATE with today's dates in location:\n\t   src/scripts/{params_file}")
     
@@ -237,8 +237,6 @@ def validate_train_validation_test_split(df_train: pd.DataFrame, df_validation: 
 
 
 if __name__ == "__main__":
-    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
-    df_2 = pd.DataFrame({'composite_key': ['003', '004', '005']})
-    df_3 = pd.DataFrame({'composite_key': ['006', '007', '008']})
-
-    validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
+    f = Path(__file__).resolve().parents[1]/"scripts"/ "s00_set_parameters.py"
+    print(f)
+    
