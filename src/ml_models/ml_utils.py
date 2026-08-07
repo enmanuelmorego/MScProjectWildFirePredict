@@ -16,7 +16,7 @@ def train_validate_test_temporal_split(df_in: pd.DataFrame,
     """Splits data into train, validation, and test sets based on temporal/date order 
     User specifies size of training set using the proportion value
 
-    The function splits based on date. For example, if the user selects 70% split, and the 70% mark is 2020-01-01 but there are muiltiple observations on that date,
+    The function splits based on date. For example, if the user selects 60% split, and the 60% mark is 2020-01-01 but there are muiltiple observations on that date,
     the function will include all observations on that date in the training set. This means that the split might not achieve the exact proportion. 
     
     This is a concsious design choice to avoid data leakage between train and test sets.
@@ -54,9 +54,9 @@ def train_validate_test_temporal_split(df_in: pd.DataFrame,
     split_val_date   = df.iloc[split_val_idx][sort_col]
 
     # Split the dataframe into train and test based on the split date
-    df_train = df[df[sort_col] <= split_train_date]
-    df_validation = df[(df[sort_col] > split_train_date) & (df[sort_col] <= split_val_date)]
-    df_test  = df[df[sort_col] > split_val_date]
+    df_train = df[df[sort_col] < split_train_date]
+    df_validation = df[(df[sort_col] >= split_train_date) & (df[sort_col] < split_val_date)]
+    df_test  = df[df[sort_col] >= split_val_date]
 
     # Notify user of actual proportions
     actual_train_size = len(df_train) / len(df)
