@@ -219,7 +219,7 @@ def validate_date_leakage(df_1: pd.DataFrame, df_2: pd.DataFrame, df_3: pd.DataF
         raise ValueError(f"\n❌  ERROR  \nThere is date leakage between validate and test sets.\n"
                          f"Validate min date: {val_min}\nTest min date: {test_min}")
     
-def validate_train_test_split(df_train: pd.DataFrame, df_validation: pd.DataFrame, df_test: pd.DataFrame) -> None:
+def validate_train_validation_test_split(df_train: pd.DataFrame, df_validation: pd.DataFrame, df_test: pd.DataFrame) -> None:
     """Wrapper function that runs a series of checks to ensure that the train/test split was performed correctly
 
     User is able to add/remove checks as needed
