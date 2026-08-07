@@ -186,12 +186,16 @@ def validate_composite_keys_intersections(df_1: pd.DataFrame, df_2:pd.DataFrame,
     set_1 = set(df_1[col])
     set_2 = set(df_2[col])
     set_3 = set(df_3[col])
-    intersection = set_1.intersection(set_2).intersection(set_3)
 
-    if intersection:
-        raise ValueError(f"\n❌  ERROR  \nFound {len(intersection)} composite keys that exist in both dataframes.\n"
-                         f"Examples: {list(intersection)[:5]}")
-    
+    intersection_train_val  = set_1.intersection(set_2)
+    intersection_train_test = set_1.intersection(set_3)
+    intersection_val_test   = set_2.intersection(set_3)
+
+    if intersection_train_val or intersection_train_test or intersection_val_test:
+        raise ValueError(f"\n❌  ERROR  \nFound {len(intersection_train_val)} composite keys that exist in both train and validation sets [{', '.join(list(intersection_train_val))}].\n"
+                         f"Found {len(intersection_train_test)} composite keys that exist in both train and test sets [{', '.join(list(intersection_train_test))}].\n"
+                         f"Found {len(intersection_val_test)} composite keys that exist in both validation and test sets [{', '.join(list(intersection_val_test))}].\n")
+
 def validate_date_leakage(df_1: pd.DataFrame, df_2: pd.DataFrame, df_3: pd.DataFrame, date_col: str = "date") -> None:
     """Validates that there is no date leakage between the train and test sets
 
