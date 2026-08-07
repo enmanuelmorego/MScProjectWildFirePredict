@@ -8,8 +8,12 @@ from sklearn.metrics import f1_score, roc_auc_score
 from sklearn.base import clone
 
 
-def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_size: float = 0.7) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Splits data into train and test sets based on temporal/date order 
+def train_validate_test_temporal_split(df_in: pd.DataFrame, 
+                                       sort_col:str = 'date', 
+                                       train_size: float = 0.6, 
+                                       val_size: float = 0.2, 
+                                       test_size: float = 0.2) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Splits data into train, validation, and test sets based on temporal/date order 
     User specifies size of training set using the proportion value
 
     The function splits based on date. For example, if the user selects 70% split, and the 70% mark is 2020-01-01 but there are muiltiple observations on that date,
@@ -20,34 +24,53 @@ def train_test_temporal_split(df_in: pd.DataFrame, sort_col:str = 'date', train_
     Args:
         df_in (pd.DataFrame): Input dataframe to be split
         sort_col (str, optional): Column to sort the data by. Defaults to 'date'.
-        train_size (float, optional): Proportion of the dataset to include in the train split. Defaults to 0.7
+        train_size (float, optional): Proportion of the dataset to include in the train split. Defaults to 0.6
+        val_size (float, optional): Proportion of the dataset to include in the validation split. Defaults to 0.2
+        test_size (float, optional): Proportion of the dataset to include in the test split. Defaults to 0.2
 
     Raises:
-        ValueError: If train_size is not between 0 and 1
+        ValueError: If any of the size parameters are not between 0 and 1, or if they do not sum to 1
 
     Returns:
-        tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the train and test dataframes
+        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: A tuple containing the train, validation, and test dataframes
     """
     if train_size >= 1 or train_size <=0:
         raise ValueError("ERROR Train size must be >0 and <1 as this represents a proportion")
+    if val_size >= 1 or val_size <=0:
+        raise ValueError("ERROR Validation size must be >0 and <1 as this represents a proportion")
+    if test_size >= 1 or test_size <=0:
+        raise ValueError("ERROR Test size must be >0 and <1 as this represents a proportion")
+    if not abs(train_size + val_size + test_size) == 1.00:
+        raise ValueError("ERROR The sum of train_size, val_size, and test_size must equal 1")
+
     # Sort dataframe
     df = df_in.sort_values(by = [sort_col])
+
     # Find the index to split based on `train_size` proportion
-    split_idx = int(len(df) * train_size)
+    split_train_idx = int(len(df) * train_size)
+    split_val_idx   = int(len(df) * (train_size + val_size))
     # Find split date based on the index
-    split_date = df.iloc[split_idx][sort_col]
+    split_train_date = df.iloc[split_train_idx][sort_col]
+    split_val_date   = df.iloc[split_val_idx][sort_col]
+
     # Split the dataframe into train and test based on the split date
-    df_train = df[df[sort_col] <= split_date]
-    df_test  = df[df[sort_col] > split_date]
+    df_train = df[df[sort_col] <= split_train_date]
+    df_validation = df[(df[sort_col] > split_train_date) & (df[sort_col] <= split_val_date)]
+    df_test  = df[df[sort_col] > split_val_date]
+
     # Notify user of actual proportions
     actual_train_size = len(df_train) / len(df)
+    actual_val_size   = len(df_validation) / len(df)
     actual_test_size  = len(df_test) / len(df)
     print(f"\nℹ️  INFO Train/Test split based on {sort_col}\n"
           f"Requested train size : {train_size:.4f}\n"
+          f"Requested validation size : {val_size:.4f}\n"
+          f"Requested test size : {test_size:.4f}\n"
           f"Actual train size    : {actual_train_size:.4f}\n"
+          f"Actual validation size : {actual_val_size:.4f}\n"
           f"Actual test size     : {actual_test_size:.4f}")
     # return the train and test dataframes
-    return df_train, df_test
+    return df_train, df_validation, df_test
 
 def random_search_cv(model: BaseEstimator,
                      X: pd.DataFrame,
