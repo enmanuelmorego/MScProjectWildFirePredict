@@ -24,6 +24,7 @@ start_time = time.time()
 # LOAD PARAMETERS
 # =================
 DATA_DIR = PARAMETERS['DATA_DIR']
+RUN_TIMESTAMP = PARAMETERS['RUN_TIMESTAMP']
 # Please note that parameters specific to data preparation and fine tuning are defined in this module
 # as the fine tuning process is not part of the regular execution of this program
 n_load_files_sentinel = None # Set to None to load all available Sentinel-2 data files
@@ -51,7 +52,7 @@ df_split = pd.DataFrame({"composite_key": pd.concat([df_train["composite_key"],
                          "split_category": (["train"] * len(df_train) +
                                             ["validation"] * len(df_validation) +
                                             ["test"] * len(df_test))})
-df_split.to_csv(DATA_DIR/"MLInputs"/"train_val_test_split.csv", index = False)
+df_split.to_csv(DATA_DIR/"MLInputs"/f"{RUN_TIMESTAMP}_train_val_test_split.csv", index = False)
 
 # Extract indices to fetch observations from the arrays 
 train_idx      = df_train["idx"].to_numpy()
