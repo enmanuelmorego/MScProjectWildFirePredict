@@ -139,7 +139,7 @@ def load_missing_sentinel2_from_log(base_dir: Path, data_dir: str) -> pd.DataFra
     """    
     files = fu.get_filepaths(base_dir, data_dir, 'csv') 
     file  = du.get_latest_missing_sentinel_log_filepath(files)
-    df_missing_sentinel2 = pd.read_csv(file, dtype={"composite_key": "string"})
+    df_missing_sentinel2 = pd.read_csv(file, dtype={"composite_key": str})
     vc.validate_composite_keys_structure(df_missing_sentinel2)
     return df_missing_sentinel2
 
