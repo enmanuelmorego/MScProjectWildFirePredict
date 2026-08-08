@@ -48,7 +48,8 @@ vc.validate_train_validation_test_split(df_train, df_validation, df_test)
 # Save train, validation, test 
 df_split = pd.DataFrame({"composite_key": pd.concat([df_train["composite_key"],
                                                      df_validation["composite_key"],
-                                                     df_test["composite_key"]], ignore_index=True),
+                                                     df_test["composite_key"]], ignore_index=True
+                                                     ).astype(str),
                          "split_category": (["train"] * len(df_train) +
                                             ["validation"] * len(df_validation) +
                                             ["test"] * len(df_test))})
