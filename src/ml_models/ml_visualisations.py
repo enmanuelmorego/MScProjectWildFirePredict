@@ -1,47 +1,37 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def plot_model_perf_by_folds(df_by_folds):
-    _, axes = plt.subplots(2, 2,
-                            figsize=(14, 10),
-                            sharex=True,
-                            sharey = True)
+def plot_model_perf_by_folds(df_by_folds, 
+                             metric: str, 
+                             model_family:str,
+                             save_plot = True,
+):
+    data = df_by_folds[df_by_folds["model"].str.startswith(model_family)]
 
-    # Split models into the two model families
-    rf = df_by_folds[df_by_folds["model"].str.startswith("Random Forest")]
-    lr = df_by_folds[df_by_folds["model"].str.startswith("Logistic Regression")]
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Plot configurations:
-    # row 0 = Random Forest
-    # row 1 = Logistic Regression
-    # col 0 = F1
-    # col 1 = Recall
+    sns.lineplot(data=data,
+                 x="fold",
+                 y=metric,
+                 hue="model",
+                 marker="o",
+                 linewidth=2,
+                 ax=ax)
 
-    plots = [(rf, "f1", axes[0, 0]),
-            (lr, "f1", axes[0, 1]),
-            
-            (rf, "recall", axes[1, 0]),
-            (lr, "recall", axes[1, 1])]
-    titles = ["Random Forest",
-            "Logistic Regression",
-            "Random Forest",
-            "Logistic Regression"]
+    ax.set_title(f"{model_family} — "
+                 f"{metric.replace('_', ' ').title()} Across Temporal Folds")
 
-    for (data, metric, ax), title in zip(plots, titles):
+    ax.set_xlabel("Temporal fold")
+    ax.set_ylabel(metric.replace("_", " ").title())
+    ax.set_xticks(sorted(data["fold"].unique()))
 
-        sns.lineplot(data=data,
-                    x="fold",
-                    y=metric,
-                    hue="model",
-                    marker="o",
-                    ax=ax)
-
-        ax.set_title(title)
-        ax.set_xlabel("Temporal fold")
-        ax.set_ylabel(metric.replace("_", " ").title())
-        ax.set_xticks(sorted(data["fold"].unique()))
-
-        ax.legend(title="Model", fontsize=8)
+    ax.set_ylim(0, 0.7)
 
     plt.tight_layout()
+
+    if save_plot:
+        plt.savefig(f"outputs/plots/{model_family}_{metric}_folds.png",
+                    dpi=300,
+                    bbox_inches="tight")
+
     plt.show()
