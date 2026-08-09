@@ -1,11 +1,13 @@
 import pandas as pd 
 import numpy as np
+import os
 
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
 from sklearn.metrics import classification_report
 from sklearn.metrics import f1_score, roc_auc_score
 from sklearn.base import clone
+from joblib import dump, load
 
 
 def train_validate_test_temporal_split(df_in: pd.DataFrame, 
@@ -191,3 +193,41 @@ def model_crossvalidation(model: BaseEstimator,
     model_scores[model_name]["Average Classification Report"] = avg_report
 
     return model_scores
+
+def get_best_model_folds(loaded_models: dict, cleaned_names: dict) -> pd.DataFrame:
+    """Extract results of all the folds for the best selected model from hyperparameter tunning process
+
+    Args:
+        loaded_models (dict): Dictionary containing fitted RandomizedSearchCV objects
+        cleaned_names (dict): Dictionary contaning the cleaned names of the Ml models to be used in the report
+
+    Returns:
+        pd.DataFrame: Fold-level performance metrics for the best hyperparameter configuration of each model
+
+    Example:
+        >>> fold_results = get_best_model_folds(loaded_models)
+        >>> fold_results.head()
+                     model  fold     f1  precision  recall  roc_auc
+        0  logistic_reg_fwi     1  0.39       0.34    0.46     0.69
+        1  logistic_reg_fwi     2  0.43       0.37    0.51     0.72
+        2  logistic_reg_fwi     3  0.41       0.36    0.48     0.70
+        3  logistic_reg_fwi     4  0.45       0.39    0.53     0.74
+        4  logistic_reg_fwi     5  0.42       0.37    0.50     0.71
+    """
+
+    results = []
+
+    for model_name, search in loaded_models.items():
+
+        idx          = search.best_index_
+        cleaned_name = cleaned_names.get(model_name, model_name)
+
+        for fold in range(search.n_splits_):
+            results.append({"model": cleaned_name,
+                            "fold": fold + 1,
+                            "f1": search.cv_results_[f"split{fold}_test_f1"][idx],
+                            "precision": search.cv_results_[f"split{fold}_test_precision"][idx],
+                            "recall": search.cv_results_[f"split{fold}_test_recall"][idx],
+                            "roc_auc": search.cv_results_[f"split{fold}_test_roc_auc"][idx],})
+
+    return pd.DataFrame(results).round(3).sort_values('model')
