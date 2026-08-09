@@ -1,13 +1,16 @@
 import pandas as pd 
 import numpy as np
 import os
+import re
 
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
 from sklearn.metrics import classification_report
-from sklearn.metrics import f1_score, roc_auc_score
+from sklearn.metrics import (f1_score, roc_auc_score, precision_score, recall_score,
+                             confusion_matrix, classification_report, precision_recall_curve)
 from sklearn.base import clone
-from joblib import dump, load
+from typing import Any
+
 
 
 def train_validate_test_temporal_split(df_in: pd.DataFrame, 
@@ -231,3 +234,46 @@ def get_best_model_folds(loaded_models: dict, cleaned_names: dict) -> pd.DataFra
                             "roc_auc": search.cv_results_[f"split{fold}_test_roc_auc"][idx],})
 
     return pd.DataFrame(results).round(3).sort_values('model')
+
+def evaluate_models(best_models: dict[str, RandomizedSearchCV], 
+                    predictor_data: dict[str, pd.DataFrame], 
+                    y: pd.Series) -> list[dict[str, Any]]:
+    """Function to evalue models based on unseen data and using the models from a given dictionary
+
+    Args:
+        best_models (dict[str, RandomizedSearchCV]): Dictionary containing the models to use
+        predictor_data (dict[str, pd.DataFrame]): Dictionary containing the predictor datasets. This could be test or validation
+        y (pd.Series): Binary target labels
+
+    Returns:
+        list[dict]: List containing the evaluation results for each model
+    """    
+    # Initialise empty list for results 
+    results = []
+
+    for model_name, search in best_models.items():
+        # Extract prediction dataset name from the model name 
+        data_name = re.sub(r"random_forest_|logistic_reg_", "", model_name)
+
+        # Extract predictor data
+        X          = predictor_data[data_name]
+        # Extract model
+        best_model = search.best_estimator_
+
+        # Test model
+        y_pred = best_model.predict(X) #type: ignore
+        y_prob = best_model.predict_proba(X)[:, 1] #type: ignore
+
+        precision_curve, recall_curve, threshold = (precision_recall_curve(y, y_prob))
+
+        results.append({"model": model_name,
+                        "f1": f1_score(y, y_pred),
+                        "precision": precision_score(y, y_pred),
+                        "recall": recall_score(y, y_pred),
+                        "roc_auc": roc_auc_score(y, y_prob),
+                        "confusion_matrix": confusion_matrix(y, y_pred),
+                        "classification_report": classification_report(y, y_pred, output_dict=True),
+                        "precision_curve": precision_curve,
+                        "recall_curve": recall_curve,
+                        "threshold": threshold})
+    return results
