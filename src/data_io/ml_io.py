@@ -1,8 +1,8 @@
 import os 
 
-from joblib import dump, load
+from joblib import load
 
-def get_best_model(models_dir: str = "data/MLModels") -> dict:
+def get_best_models(models_dir: str = "data/MLModels") -> dict:
     """After hyperparameter tuning is complete and the best model saved to disk, this function
     searches from the best models which are saved to disk and loads them as a dictionary 
 
