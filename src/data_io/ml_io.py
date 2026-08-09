@@ -26,7 +26,7 @@ def get_best_models(models_dir: str = "data/MLModels") -> dict:
     """
     # Load trained models 
     loaded_models = {}
-    for file_name in os.listdir("data/MLModels"):
+    for file_name in os.listdir(models_dir):
         if file_name.endswith(".joblib"):
             model_name = file_name.replace(".joblib", "")
             loaded_models[model_name] = load(os.path.join(models_dir, file_name))
