@@ -7,7 +7,7 @@ from pathlib import Path
 # Project Root
 PROJ_HOME = Path(__file__).resolve().parents[2]
 # Enter date as yyyy, m, d
-VALIDATION_DATE = date(2026, 8, 7)
+VALIDATION_DATE = date(2026, 8, 8)
 
 PARAMETERS = {"YEAR_FILTER"      : [2018, 2019, 2020, 2021, 2022, 2023, 2024],
               "CRS"              : "EPSG: 4326",          # Set Coordinate Reference System (CRS) so it is uniform across all data inputs
@@ -28,6 +28,17 @@ PARAMETERS = {"YEAR_FILTER"      : [2018, 2019, 2020, 2021, 2022, 2023, 2024],
               "FIRENOFIRE_SAMPLED_FNAME" : "sampled_firenofire.csv",
               "SP_FILENAME"              : "ukcp18-uk-land-12km.shp",
               "GEE_PROJECT"              : "ee-enmanuelmorego"}
+
+ML_CLEANED_MODELS_NAMES = {'logistic_reg_fwi': 'Logistic Regression - FWI',
+                           'logistic_reg_hybrid_default': 'Logistic Regression - Hybrid (Default)',
+                           'logistic_reg_hybrid_fineTuned': 'Logistic Regression - Hybrid (Fine-Tuned)',
+                           'logistic_reg_sentinel_default': 'Logistic Regression - Sentinel (Default)',
+                           'logistic_reg_sentinel_fineTuned': 'Logistic Regression - Sentinel (Fine-Tuned)',
+                           'random_forest_fwi': 'Random Forest - FWI',
+                           'random_forest_hybrid_default': 'Random Forest - Hybrid (Default)',
+                           'random_forest_hybrid_fineTuned': 'Random Forest - Hybrid (Fine-Tuned)',
+                           'random_forest_sentinel_default': 'Random Forest - Sentinel (Default)',
+                           'random_forest_sentinel_fineTuned': 'Random Forest - Sentinel (Fine-Tuned)'}
 if __name__ == "__main__":
     print(PROJ_HOME)
     print(type(PARAMETERS['DATA_DIR']))
