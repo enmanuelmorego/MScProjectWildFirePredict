@@ -4,13 +4,66 @@ import os
 import re
 
 from sklearn.base import BaseEstimator
-from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV
+from sklearn.model_selection import TimeSeriesSplit, RandomizedSearchCV, BaseCrossValidator
 from sklearn.metrics import classification_report
 from sklearn.metrics import (f1_score, roc_auc_score, precision_score, recall_score,
                              confusion_matrix, classification_report, precision_recall_curve)
 from sklearn.base import clone
 from typing import Any
 
+class DateTimeSeriesSplit(BaseCrossValidator):
+    """Custom cross-validation splitter class that splits the data based on dates rather than indices. 
+    
+    This class inherits from `scikit-learn`'s `BaseCrossValidator` class - It finds the unique dates in the dataset, and generates each fold split based on unique dates.
+    It extracts the observations for the CrossValidation process if the X values falls in the given date period
+    for training and validation periods. This ensures that the same dates are kept within the same folds
+
+    Args:
+        dates (pd.Series): Dates corresponding to each of the datapoints in the X object
+        n_splits (int, optional): Number of cross-validation folds. Defaults to 5.
+
+    Raises:
+        ValueError: If the number of observations in `dates` does not
+            match the data passed to `split()`.
+        ValueError: If there are not enough unique dates for the
+            requested number of splits.
+    """    
+
+
+    def __init__(self, dates: pd.Series, n_splits: int = 5):
+        self.dates = pd.to_datetime(dates).reset_index(drop=True)
+        self.n_splits = n_splits
+
+    def split(self, X, y=None, groups=None):
+        """Generate chronological train/validation indices."""
+
+        if len(X) != len(self.dates): #type: ignore
+            raise ValueError("X and dates must have the same number of observations")
+        # Get unique dates to extract indeces of data points from
+        unique_dates = np.sort(self.dates.unique())
+
+        if len(unique_dates) <= self.n_splits:
+            raise ValueError("There are not enough unique dates for the requested number of splits")
+
+        # Create n_splits expanding training/validation blocks with a final validaiton block to 
+        # validate all 5 blocks against
+        date_blocks = np.array_split(unique_dates, self.n_splits + 1)
+
+        # Create data for each of the training/validation folds
+        for fold in range(self.n_splits):
+            # Get the training dates for the fold 
+            train_dates = np.concatenate(date_blocks[:fold + 1])
+            # Get the validation set of dates
+            validation_dates = date_blocks[fold + 1]
+            # Extract the indices of the observations to use that fall within the unique
+            # specified dates in train and validation sets
+            train_idx      = np.flatnonzero(self.dates.isin(train_dates).to_numpy())
+            validation_idx = np.flatnonzero(self.dates.isin(validation_dates).to_numpy())
+            # Yield indeces for crossvalidation
+            yield train_idx, validation_idx
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        return self.n_splits
 
 
 def train_validate_test_temporal_split(df_in: pd.DataFrame, 
@@ -277,3 +330,27 @@ def evaluate_models(best_models: dict[str, RandomizedSearchCV],
                         "recall_curve": recall_curve,
                         "threshold": threshold})
     return results
+
+def summarise_model_results(results_list: list[dict[str, Any]], 
+                            cleaned_names: dict,
+                            sort_by_str: str = "F1") -> pd.DataFrame:
+    # Initialise emtpy list to store results
+    summary = []
+    # Loop over results list
+    for result in results_list:
+        # Generate cleaned model name
+        model_name_cleaned = cleaned_names.get(result['model'], result['model'])
+        # Get TP, FP, TN, FN
+        tn, fp, fn, tp = result["confusion_matrix"].ravel()
+       
+        summary.append({"Model": model_name_cleaned,
+                        "TP": tp,
+                        "FP": fp,
+                        "TN": tn,
+                        "FN": fn,
+                        "F1": result["f1"],
+                        "Precision": result["precision"],
+                        "Recall": result["recall"],
+                        "ROC_AUC": result["roc_auc"]})
+    df_out = pd.DataFrame(summary).sort_values(sort_by_str, ascending=False).round(3)
+    return df_out
