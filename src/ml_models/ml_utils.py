@@ -132,6 +132,7 @@ def train_validate_test_temporal_split(df_in: pd.DataFrame,
 def random_search_cv(model: BaseEstimator,
                      X: pd.DataFrame,
                      y: pd.Series,
+                     dates: pd.Series, 
                      param_distributions: dict,
                      scoring: dict,
                      n_iter :int,
@@ -159,8 +160,8 @@ def random_search_cv(model: BaseEstimator,
          cv_results_     : Dictionary containing the results for all
                            hyperparameter combinations evaluated}
     """    
-    # Initialise TimeSeriesSplit object to ensure there is no temporal leakage
-    tscv = TimeSeriesSplit(n_splits = n_splits)
+    # Use Custome Date Splitter to avoid temporal leakage
+    tscv = DateTimeSeriesSplit(dates = dates, n_splits = n_splits)
     # Perform the RandomizedSearch to find best HyperParameter combination
     search_hyperparams = RandomizedSearchCV(estimator = model,
                                             param_distributions = param_distributions,
@@ -248,6 +249,44 @@ def model_crossvalidation(model: BaseEstimator,
     model_scores[model_name]["Average Classification Report"] = avg_report
 
     return model_scores
+
+def create_cv_splits_summary(search_obj: RandomizedSearchCV, 
+                             x_data: pd.DataFrame, 
+                             y_data: pd.Series, 
+                             dates: pd.Series) -> pd.DataFrame:
+    """Creates a dataframe summarising the temporal coss validation folds
+    Args:
+        search_obj (RandomizedSearchCV): Fitted RandomizedSearchCV object containing the CV splitter
+        x_data (pd.DataFrame): Predictor data used for hyperparameter tuning
+        y_data (pd.Series): Target values used for hyperparameter tuning
+        dates (pd.Series): Dates used for the temporal splits
+
+    Returns:
+        pd.DataFrame: DataFrame object containing metrics for each fold
+    """
+    # Initialise list to store folds metrics
+    fold_summary = []
+    # Iterate thru the folds, and teh RandomizedSearchCV
+    for fold, (train_idx, val_idx) in enumerate(search_obj.cv.split(x_data, y_data),start=1): #type: ignore
+        # Extract the dates for train and validation objects
+        train_dates = dates.iloc[train_idx]
+        val_dates = dates.iloc[val_idx]
+        # Create summary of the metrics
+        fold_summary.append({"fold": fold,
+
+                             "train_start": train_dates.min(),
+                             "train_end": train_dates.max(),
+                             "train_fire": (y_data.iloc[train_idx] == True).sum(),
+                             "train_no_fire": (y_data.iloc[train_idx] == False).sum(),
+                 
+                             "val_start": val_dates.min(),
+                             "val_end": val_dates.max(),
+                             "val_fire": (y_data.iloc[val_idx] == True).sum(),
+                             "val_no_fire": (y_data.iloc[val_idx] == False).sum(),
+                             "val_fire_prop": (y_data.iloc[val_idx] == True).mean().round(3)})
+    # Transform to DataFrame
+    df_fold_summary = pd.DataFrame(fold_summary)
+    return df_fold_summary
 
 def get_best_model_folds(loaded_models: dict, cleaned_names: dict) -> pd.DataFrame:
     """Extract results of all the folds for the best selected model from hyperparameter tunning process
