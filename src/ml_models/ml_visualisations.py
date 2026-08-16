@@ -1,14 +1,23 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd 
 
-def plot_model_perf_by_folds(df_by_folds, 
+def plot_model_perf_by_folds(df_by_folds: pd.DataFrame, 
                              metric: str, 
                              model_family:str,
                              save_plot = True,
 ):
+    """Creates line chart containing the performance valeus (F1) for each of the crossvalidation folds 
+
+    Args:
+        df_by_folds (pd.DataFrame): DataFrame containing the results and metrics for each of the folds for the models 
+        metric (str): Metric to extract and use in plot
+        model_family (str): Whether it is Logistic Regression or Random forest as one model is ploted at the time for better readability
+        save_plot (bool, optional): Boolean flag to determine whether the plot will be saved to disk or not. Defaults to True.
+    """    
     data = df_by_folds[df_by_folds["model"].str.startswith(model_family)]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
 
     sns.lineplot(data=data,
                  x="fold",
@@ -25,7 +34,7 @@ def plot_model_perf_by_folds(df_by_folds,
     ax.set_ylabel(metric.replace("_", " ").title())
     ax.set_xticks(sorted(data["fold"].unique()))
 
-    ax.set_ylim(0, 0.7)
+    ax.set_ylim(0, 1)
 
     plt.tight_layout()
 
