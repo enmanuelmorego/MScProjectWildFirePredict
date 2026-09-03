@@ -22,6 +22,7 @@ outputs/
 .idea/
 *.egg-info/
 *.joblib
+*.grib
 
 # MacOS
 .DS_Store
