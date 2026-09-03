@@ -179,6 +179,6 @@ MScProjectWildFirePredict/
 - Sentinel2 = `.npz` downloaded from sampled dataset.
 - SampledFireNoFire = `.csv` of sampled data, per year.
 
-**ML Model Input:**
+**ML Model Inputs:**
 - MLInputs = `.csv` files with sampled data containing all relevant data to train the model.
 """
