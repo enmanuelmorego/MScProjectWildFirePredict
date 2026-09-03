@@ -34,6 +34,10 @@ mscprojectwildfirepredict = {file = ".", editable = true}
 matplotlib = "*"
 torch = "*"
 torchvision = "*"
+docx = "*"
+python-docx = "*"
+contextily = "*"
+geodatasets = "*"
 
 [dev-packages]
 pandas-stubs = "*"

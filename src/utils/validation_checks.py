@@ -7,7 +7,7 @@ from datetime import datetime
 import utils.file_utils as u
 import pandas as pd
 
-def validate_params_update(validation_date: date, params_file: str = "set_parameters.py") -> None:
+def validate_params_update(validation_date: date, params_file: str = "s00_set_parameters.py") -> None:
     """Function to validate and check user have updated parameters before running pipeline
 
     Args:
@@ -20,7 +20,7 @@ def validate_params_update(validation_date: date, params_file: str = "set_parame
     # Get today's date
     today = date.today()
     if today != validation_date:
-        param_file_full = (Path(__file__).parent/params_file)
+        param_file_full = (Path(__file__).resolve().parents[1]/"scripts"/params_file)
         u.open_file(param_file_full)
         raise ValueError(f"\n\t❌ Please update object VALIDATION_DATE with today's dates in location:\n\t   src/scripts/{params_file}")
     
@@ -170,13 +170,14 @@ def validate_composite_keys_structure(df_in: pd.DataFrame, col: str = "composite
                          f"Composite key data type: {composite_keys_data_types}\n"
                          f"Examples: {invalid_keys}")
 
-def validate_composite_keys_intersections(df_1: pd.DataFrame, df_2:pd.DataFrame, col: str = "composite_key") -> None:
+def validate_composite_keys_intersections(df_1: pd.DataFrame, df_2:pd.DataFrame, df_3: pd.DataFrame, col: str = "composite_key") -> None:
     """Validates that the composite keys in two dataframes have no intersection. This is mainly used to 
     avoid leakege when splitting data into train and test sets
 
     Args:
         df_1 (pd.DataFrame): First dataframe to compare
         df_2 (pd.DataFrame): Second dataframe to compare
+        df_3 (pd.DataFrame): Third dataframe to compare
         col (str, optional): Name of the column containing the composite keys. Defaults to "composite_key".
 
     Raises:
@@ -184,57 +185,58 @@ def validate_composite_keys_intersections(df_1: pd.DataFrame, df_2:pd.DataFrame,
     """
     set_1 = set(df_1[col])
     set_2 = set(df_2[col])
-    intersection = set_1.intersection(set_2)
-    
-    if intersection:
-        raise ValueError(f"\n❌  ERROR  \nFound {len(intersection)} composite keys that exist in both dataframes.\n"
-                         f"Examples: {list(intersection)[:5]}")
-    
-def validate_date_leakage(df_1: pd.DataFrame, df_2: pd.DataFrame, date_col: str = "date") -> None:
+    set_3 = set(df_3[col])
+
+    intersection_train_val  = set_1.intersection(set_2)
+    intersection_train_test = set_1.intersection(set_3)
+    intersection_val_test   = set_2.intersection(set_3)
+
+    if intersection_train_val or intersection_train_test or intersection_val_test:
+        raise ValueError(f"\n❌  ERROR  \nFound {len(intersection_train_val)} composite keys that exist in both train and validation sets [{', '.join(list(intersection_train_val))}].\n"
+                         f"Found {len(intersection_train_test)} composite keys that exist in both train and test sets [{', '.join(list(intersection_train_test))}].\n"
+                         f"Found {len(intersection_val_test)} composite keys that exist in both validation and test sets [{', '.join(list(intersection_val_test))}].\n")
+
+def validate_date_leakage(df_1: pd.DataFrame, df_2: pd.DataFrame, df_3: pd.DataFrame, date_col: str = "date") -> None:
     """Validates that there is no date leakage between the train and test sets
 
     Args:
         df_1 (pd.DataFrame): First dataframe to compare
         df_2 (pd.DataFrame): Second dataframe to compare
+        df_3 (pd.DataFrame): Third dataframe to compare
         date_col (str, optional): Name of the column containing the dates. Defaults to "date".
 
     Raises:
         ValueError: If there is any date leakage between the train and test sets
     """
     train_max = df_1[date_col].max()
-    test_min  = df_2[date_col].min()
+    val_min   = df_2[date_col].min()
+    test_min  = df_3[date_col].min()
 
-    if train_max >= test_min:
+    if train_max >= val_min:
         raise ValueError(f"\n❌  ERROR  \nThere is date leakage between train and test sets.\n"
-                         f"Train max date: {train_max}\nTest min date: {test_min}")
+                         f"Train max date: {train_max}\nValidate min date: {val_min}")
+    if val_min >= test_min:
+        raise ValueError(f"\n❌  ERROR  \nThere is date leakage between validate and test sets.\n"
+                         f"Validate min date: {val_min}\nTest min date: {test_min}")
     
-def validate_train_test_split(df_train: pd.DataFrame, df_test: pd.DataFrame) -> None:
+def validate_train_validation_test_split(df_train: pd.DataFrame, df_validation: pd.DataFrame, df_test: pd.DataFrame) -> None:
     """Wrapper function that runs a series of checks to ensure that the train/test split was performed correctly
 
     User is able to add/remove checks as needed
 
     Args:
         df_train (pd.DataFrame): Train dataframe
+        df_validation (pd.DataFrame): Validation dataframe
         df_test (pd.DataFrame): Test dataframe
 
     """
     # Check that there is no date leakage between train and test sets
-    validate_date_leakage(df_train, df_test, date_col = "date")
+    validate_date_leakage(df_train, df_validation, df_test, date_col = "date")
     # Check that there are no composite keys that exist in both train and test sets
-    validate_composite_keys_intersections(df_train, df_test, col = "composite_key")
+    validate_composite_keys_intersections(df_train, df_validation, df_test, col = "composite_key")
 
 
 if __name__ == "__main__":
-    df_feat = pd.DataFrame({'composite_key': ['00120200501', 
-                                              '512202050101'],
-                            'feat_01': [0,11],
-                            'feat_02': [0,11]})
-    df_sampled = pd.DataFrame({'composite_key': ['00120200501', 
-                                              '512202050101',
-                                              '512202061201',],
-                            'feat_01': [0,11,1],
-                            'feat_02': [0,11,1]})
-    df_missed = pd.DataFrame({'composite_key': [],
-                              'some_var': []})
-    input_test = "12"+"0226"+"10"+"09"
-    print(valid_composite_key(input_test))
+    f = Path(__file__).resolve().parents[1]/"scripts"/ "s00_set_parameters.py"
+    print(f)
+    

@@ -134,7 +134,7 @@ def fine_tune_resnet18(model: nn.Module,
                 # across the entire dataset can be calculated at the end of the epoch
                 epoch_loss = running_loss / len(dataloaders[phase].dataset) # type: ignore
                 # Calculate F1 score
-                epoch_f1 = f1_score(all_labels, all_preds, average='weighted')
+                epoch_f1 = f1_score(all_labels, all_preds, average='macro')
 
                 print(f'{phase} Loss: {epoch_loss:.4f} F1 Score: {epoch_f1:.4f}')
 

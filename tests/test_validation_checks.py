@@ -156,8 +156,56 @@ def test_valid_composite_key_nondidigts():
 def test_valid_composite_key_wrong_datatype():
         assert vc.valid_composite_key(120261009) == False   # type: ignore[arg-type]
 
+# ==========================================
+# TEST validate_date_leakage()
+# ==========================================
+def test_validate_date_leakage_no_leakage():
+    df_train = pd.DataFrame({'date': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03'])})
+    df_validation = pd.DataFrame({'date': pd.to_datetime(['2023-01-04', '2023-01-05'])})
+    df_test = pd.DataFrame({'date': pd.to_datetime(['2023-01-06', '2023-01-07'])})
 
+    assert vc.validate_date_leakage(df_train, df_validation, df_test, date_col='date') is None
 
+def test_validate_date_leakage_with_leakage():
+    df_train = pd.DataFrame({'date': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03'])})
+    df_validation = pd.DataFrame({'date': pd.to_datetime(['2023-01-03', '2023-01-04'])})
+    df_test = pd.DataFrame({'date': pd.to_datetime(['2023-01-05', '2023-01-06'])})
 
+    with pytest.raises(ValueError):
+        vc.validate_date_leakage(df_train, df_validation, df_test, date_col='date')
+
+# ==========================================
+# TEST validate_composite_keys_intersections()
+# ==========================================
+def test_validate_composite_keys_intersections_no_intersection():
+    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
+    df_2 = pd.DataFrame({'composite_key': ['004', '005', '006']})
+    df_3 = pd.DataFrame({'composite_key': ['007', '008', '009']})
+
+    assert vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key') is None
+
+def test_validate_composite_keys_intersections_with_intersection_train_val():
+    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
+    df_2 = pd.DataFrame({'composite_key': ['003', '004', '005']})
+    df_3 = pd.DataFrame({'composite_key': ['006', '007', '008']})
+
+    with pytest.raises(ValueError):
+        vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
+
+def test_validate_composite_keys_intersections_with_intersection_train_test():
+    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
+    df_2 = pd.DataFrame({'composite_key': ['004', '005', '006']})
+    df_3 = pd.DataFrame({'composite_key': ['003', '007', '008']})
+
+    with pytest.raises(ValueError):
+        vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
+
+def test_validate_composite_keys_intersections_with_intersection_val_test():
+    df_1 = pd.DataFrame({'composite_key': ['001', '002', '003']})
+    df_2 = pd.DataFrame({'composite_key': ['004', '005', '006']})
+    df_3 = pd.DataFrame({'composite_key': ['006', '007', '008']})
+
+    with pytest.raises(ValueError):
+        vc.validate_composite_keys_intersections(df_1, df_2, df_3, col='composite_key')
 
 

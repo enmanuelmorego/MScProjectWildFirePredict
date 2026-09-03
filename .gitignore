@@ -10,9 +10,10 @@ __pycache__/
 .venv/
 
 # Objects
-data/
+data/UKGrid
 models/
 outputs/
+*Archive/
 *.csv
 *.zip
 *.npz
@@ -20,6 +21,7 @@ outputs/
 *.bkp
 .idea/
 *.egg-info/
+*.joblib
 
 # MacOS
 .DS_Store

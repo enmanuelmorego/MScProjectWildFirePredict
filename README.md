@@ -15,6 +15,7 @@
     - [Codebase](#codebase)
     - [Data Files](#data-files)
 
+
 ## Getting Started
 
 This project requires Python 3.11 and Pipenv
@@ -81,11 +82,17 @@ The project is divided into modules, which have specific responsibilities. An ov
 | MScProjectWildFirePredict/
 |   |- data
 |   |   |- MLInputs
+|   |   |   |- Archive
 |   |   |- MLModels
+|   |   |   |- Archive
 |   |   |- SampledFireNoFire
 |   |   |- Sentinel2
+|   |   |- UKGrid
+|   |   |- VIIRS
 |   |- outputs
 |   |   |- logs
+|   |   |- plots
+|   |   |- tables
 |   |- src
 |   |   |- data_io
 |   |   |- ml_models
@@ -105,12 +112,17 @@ MScProjectWildFirePredict/
 |   |- __init__.py
 |   |- data_io
 |   |   |- fwi_loader.py
+|   |   |- ml_io.py
 |   |   |- sampled_loader.py
 |   |   |- sampling_writter.py
 |   |   |- sentinel2_io.py
 |   |   |- ukgrid_loader.py
 |   |   |- viirs_loader.py
 |   |- ml_models
+|   |   |- ml_utils.py
+|   |   |- ml_visualisations.py
+|   |   |- resnet_feature_extractor.py
+|   |   |- resnet_fine_tune.py
 |   |- pipelines
 |   |   |- fwi_pipeline.py
 |   |   |- readme_doc_pipeline.py
@@ -129,11 +141,11 @@ MScProjectWildFirePredict/
 |   |   |- s00_set_parameters.py
 |   |   |- s01_run_tabular.py
 |   |   |- s02_run_sentinel2_fetch.py
-|   |   |- s03_run_feature_extractor.py
+|   |   |- s03.1_run_resnet18_finetune.py
+|   |   |- s03.2_run_feature_extractor.py
 |   |- transforms
 |   |   |- fwi_transforms.py
 |   |   |- preprocessing_transforms.py
-|   |   |- resnet_feature_extractor.py
 |   |   |- sentinel2_transforms.py
 |   |   |- viirs_transforms.py
 |   |- utils
@@ -182,7 +194,8 @@ MScProjectWildFirePredict/
 |   |   |- s00_set_parameters.py
 |   |   |- s01_run_tabular.py
 |   |   |- s02_run_sentinel2_fetch.py
-|   |   |- s03_run_feature_extractor.py
+|   |   |- s03.1_run_resnet18_finetune.py
+|   |   |- s03.2_run_feature_extractor.py
 ```
 #### `s01_run_tabular.py`
 
@@ -224,9 +237,13 @@ This module contains files and objects used to build the different components of
 MScProjectWildFirePredict/
 |- data/
 |   |- MLInputs
+|   |   |- Archive
 |   |- MLModels
+|   |   |- Archive
 |   |- SampledFireNoFire
 |   |- Sentinel2
+|   |- UKGrid
+|   |- VIIRS
 ```
 **Raw inputs:**
 - FWI = `.grib` files for each year.

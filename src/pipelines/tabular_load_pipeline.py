@@ -44,13 +44,3 @@ def load_tabular_data(year_filter: list[int], data_dir: Path, crs: str, sp_filen
            'df_ukgrid': df_ukgrid,
            'df_daily_grid': df_daily_grid,
            'df_fwi': df_fwi}
-
-if __name__ == "__main__":
-    from scripts.set_parameters import  PARAMETERS
-    YEAR_FILTER = PARAMETERS['YEAR_FILTER']
-    DATA_DIR    = PARAMETERS['DATA_DIR']
-    CRS         = PARAMETERS['CRS'] 
-    SP_FILENAME = PARAMETERS['SP_FILENAME']
-    GRB_NAME    = PARAMETERS['GRB_NAME']
-    d = load_tabular_data(YEAR_FILTER, DATA_DIR, CRS, SP_FILENAME, GRB_NAME)
-    print(d)
