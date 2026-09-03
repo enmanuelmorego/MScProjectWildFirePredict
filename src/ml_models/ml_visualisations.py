@@ -15,7 +15,7 @@ def plot_model_perf_by_folds(df_by_folds: pd.DataFrame,
         model_family (str): Whether it is Logistic Regression or Random forest as one model is ploted at the time for better readability
         save_plot (bool, optional): Boolean flag to determine whether the plot will be saved to disk or not. Defaults to True.
     """    
-    data = df_by_folds[df_by_folds["model"].str.startswith(model_family)]
+    data = df_by_folds[df_by_folds["model"].str.startswith(model_family)] #type:ignore
 
     _, ax = plt.subplots(figsize=(10, 6))
 
