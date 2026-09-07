@@ -2,12 +2,11 @@ import utils.file_utils as fu
 from pathlib import Path
 
 markdown = f"""
-# MScProjectWildFirePredict Architecture
-
+# MScProjectWildFirePredict
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-    - [Check if Python 3.11 is Installed](#check-if-python-311-is-installed)
+    - [Python 3.11](#python-311)
     - [Install Python 3.11](#install-python-311)
     - [Install Pipenv](#install-pipenv)
     - [Install Project Dependencies](#install-project-dependencies)
