@@ -12,7 +12,7 @@ __pycache__/
 # Objects
 data/UKGrid
 models/
-outputs/
+outputs/*RUNNING*
 *Archive/
 *.csv
 *.zip
@@ -32,3 +32,4 @@ outputs/
 !data/
 !data/MLInputs
 !src_archive/
+!outputs/
