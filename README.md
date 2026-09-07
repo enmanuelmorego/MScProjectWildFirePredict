@@ -91,7 +91,7 @@ The project is divided into modules, which have specific responsibilities. An ov
 |   |   |- VIIRS
 |   |- outputs
 |   |   |- logs
-|   |   |- maps
+|   |   |- plots
 |   |- src
 |   |   |- data_io
 |   |   |- ml_models
@@ -101,6 +101,7 @@ The project is divided into modules, which have specific responsibilities. An ov
 |   |   |- scripts
 |   |   |- transforms
 |   |   |- utils
+|   |- src_archive
 |   |- tests
 ```
 
@@ -170,21 +171,6 @@ The file structure is shown below, but an in text explanation is also provided f
 
 `validation_checks.py` = Contains functions used to check and validate expected rules for when the program is being executed.
 
-`s00_set_parameters.py` = Define all the values for the variables to be used by all scripts in the program. This includes years to process, file names, etc. This module is called by all modules below.
-
-*Note:*
-
-*`s00_set_parameters.py` has a date field which needs to be updated with the date of run. A safeguard is implemented to ensure parameters are reviewed before execution. 
-If the configuration date does not match the current run date, a warning is raised.*
-
-`s01_run_tabular.py` = Loads and processes all tabular data in the project. It also performs preprocessing steps and sampling. The output are `.csv` files with the preprocessed and sampled data.
-
-`s02_run_sentinel2_fetch.py` = Loads the `.csv` preprocessed and sampled data and fetches the Sentinel-2 data from GEE. Stores Sentinel2-2 data as `.npz` files to local disk.
-
-`s03_run_feature_extraction.py` = Loads the `.npz` files and uses a CNN architecture to extract the features to be used in the analysis. This module also loads the sampled `.csv` files and joins them. It saves `.csv` per year containing all data ready for modelling. 
-
-`run_train_ml_model.py` = Trains the model.
-
 ```
 MScProjectWildFirePredict/
 |- src/
@@ -196,9 +182,21 @@ MScProjectWildFirePredict/
 |   |   |- s03.1_run_resnet18_finetune.py
 |   |   |- s03.2_run_feature_extractor.py
 ```
-#### `s01_run_tabular.py`
 
-- Imports parameters from set_parameters.py.
+#### `scripts/s00_set_parameters.py` 
+ 
+- Define all the values for the variables to be used by all scripts in the program. This includes years to process, file names, etc. This module is called by all modules below.
+
+*Note:*
+
+*`s00_set_parameters.py` has a date field which needs to be updated with the date of run. A safeguard is implemented to ensure parameters are reviewed before execution. 
+If the configuration date does not match the current run date, a warning is raised.*
+
+---
+
+#### `scripts/s01_run_tabular.py`
+
+- Imports parameters from `set_parameters.py`.
 - Loads and preprocesses the VIIRS, FWI and UK Grid datasets.
 - Performs the sampling procedure to generate fire and non-fire observations.
 - Creates the predictor (X) and target (Y) tabular dataset (excluding Sentinel-2 features).
@@ -206,7 +204,7 @@ MScProjectWildFirePredict/
 - Splits the sampled dataset by year and saves .csv files to disk for later processing.
 ---
 
-#### `s02_run_setinel2_fetch.py`
+#### `scripts/s02_run_setinel2_fetch.py`
 
 - Imports parameters from `set_parameters.py`.
 - Uses `YEAR_FILTER` to identify which sampled datasets to process.
@@ -217,17 +215,34 @@ MScProjectWildFirePredict/
 - Saves downlaoded data as `npz` files to disk for later use.
 ---
 
-#### `s03_run_feature_extractor.py`
+#### `scripts/s03.1_run_resnet18_finetune.py`
 
 - Imports parameters from `set_parameters.py`.
 - Loads all Sentinel2 `.npz` files available in disk (assumes that s01 and s02 processes are complete).
 - Loads data containing `composite_keys` for which no Sentinel2 data was found. 
 - Loads sampled (pre sentinel2) dataset.
+- Splits the sampled dataset into train, validate and test sets. The composite keys of each set are saved to disk to use the same split across the project.
+- Uses train and validate to FineTune layer 4 of the ResNet-18 CNN.
+- Saves updated weights to disk
+---
+
+#### `scripts/s03.2_run_feature_extraction.py`
+
+- Loads all Sentinel2 `.npz` files available in disk (assumes that s01, s02 and s03.1 processes are complete).
 - ResNet18 is used as Feature Extractor - each `.npz` file is loaded, and the image data is processed with the `ResNetFeatExtractor` class.
+- Using class `ResNetFeatExtractor`, the user can selects to perform feature extraction using default (no need to pass parameter value) of pre trained (user passes location of pre trained weights on disk as input argument) weights. 
 - Transformation and composite keys are validated and checked with a set of validation functions.
 - Final data set is cleaned and merged with the sampled data by `composite_key` (not to be confused with `composite_key_y` which is the composite key of the expected/predicted value - composite key of these observations is kept for traceability).
 - Complete ML (machine learning) dataset is saved to disk so next process can simply read this file rather than repeat the processing steps.
 ---
+
+#### `s01MachineLearningModel.ipynb`
+
+- Last module to run (assumes that s01, s02, s03.1, s03.2 processes are complete)
+- Loads ML Inputs generated by previous step
+- Runs descriptive statistics analysis, machine learning traning, fine tuning and testing and produces the outputs for the report
+- Further details of the module can be found on the notebook
+
 
 ### Data Files
 This module contains files and objects used to build the different components of the program. It is further split by type of data, i.e., raw inputs, preprocessed, etc. 
@@ -250,9 +265,14 @@ MScProjectWildFirePredict/
 - UKGrid = `.shp` files to split UK into grids.
 - VIIRS = `.csv` files fire labels for each year.
 
-**PreProcessed:**
+**PrebProcessed:**
 - Sentinel2 = `.npz` downloaded from sampled dataset.
 - SampledFireNoFire = `.csv` of sampled data, per year.
 
-**ML Model Inputs:**
+**ML Inputs:**
 - MLInputs = `.csv` files with sampled data containing all relevant data to train the model.
+
+**ML Models**
+- Contains both `.joblib` and `pt` files
+- `pt` are the fine tuned weights from layer 4 of ResNet 18
+- `joblib` are the classifier models that are trained. These are saved to disk to allow reruning of the project without the need to re train the classifiers
