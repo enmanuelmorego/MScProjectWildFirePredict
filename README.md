@@ -274,5 +274,5 @@ MScProjectWildFirePredict/
 
 **ML Models**
 - Contains both `.joblib` and `pt` files
-- `pt` are the fine tuned weights from layer 4 of ResNet 18
-- `joblib` are the classifier models that are trained. These are saved to disk to allow reruning of the project without the need to re train the classifiers
+- `pt` are the fine-tuned weights from layer 4 of ResNet 18
+- `joblib` are the classifier models that are trained. These are saved to disk to allow rerunning of the project without the need to retrain the classifiers
