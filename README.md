@@ -17,7 +17,7 @@
 
 ## Getting Started
 
-This project requires Python 3.11 and Pipenv
+This project requires Python 3.11 and `Pipenv`
 
 ### Check if Python 3.11 is installed
 
@@ -43,7 +43,7 @@ https://www.python.org/downloads/release/python-3119/
 
 During the installation, make sure to tick: `Add Python to PATH`
 
-Verify that Python 3.11 was succesfully installed 
+Verify that Python 3.11 was successfully installed 
 
 Windows:
 ```
@@ -161,11 +161,11 @@ MScProjectWildFirePredict/
 This folder contains a `.py` for each of the pipelines. The files might contain only one function, and be quite shallow. However, this was a conscious design choice to allow easy testing and debugging of pipeline processes, as it is easier to read than having large scripts with many orchestrators. 
 
 #### Scripts
-This folder contains the modules that performs specific steps in the program.
+This folder contains the modules that perform specific steps in the program.
 
 These are split into separate, independent components as they are expected to run in isolation. Each file is prefixed with `sXX` where `X` are digits; this stands for `S`cript 00, 01, etc, which indicates the order in which the files are expected to run. 
 
-The outputs of these files are saved to disk, this means that s03 can be executed at any point as long as s02 had already run and saved its outputs. This allows for better debugging and continuity of the project, as some processed are extremly lenghty and computational expensive.
+The outputs of these files are saved to disk, this means that s03 can be executed at any point as long as s02 had already run and saved its outputs. This allows for better debugging and continuity of the project, as some processed are extremely lengthy and computational expensive.
 
 The file structure is shown below, but an in text explanation is also provided for clarity. 
 
@@ -209,10 +209,10 @@ If the configuration date does not match the current run date, a warning is rais
 - Imports parameters from `set_parameters.py`.
 - Uses `YEAR_FILTER` to identify which sampled datasets to process.
     - If any of the requested years do not have a corresponding dataset, the function stops, and notifies the user of what is missing and what needs to be run.
-- Takes the list of loaded files, and combines them into a single dataframe.
+- Takes the list of loaded files, and combines them into a single data frame.
 - Split the data into batches suitable for GEE requests (see `sampled_to_batch`, `sampled_to_batch_df`).
-- For each row of the sampled batch df, a request is sent to GEE for Sentinel2 data. 
-- Saves downlaoded data as `npz` files to disk for later use.
+- For each row of the sampled batch `df`, a request is sent to GEE for Sentinel2 data. 
+- Saves downloaded data as `npz` files to disk for later use.
 ---
 
 #### `scripts/s03.1_run_resnet18_finetune.py`
@@ -220,9 +220,9 @@ If the configuration date does not match the current run date, a warning is rais
 - Imports parameters from `set_parameters.py`.
 - Loads all Sentinel2 `.npz` files available in disk (assumes that s01 and s02 processes are complete).
 - Loads data containing `composite_keys` for which no Sentinel2 data was found. 
-- Loads sampled (pre sentinel2) dataset.
+- Load the sampled (pre sentinel2) dataset.
 - Splits the sampled dataset into train, validate and test sets. The composite keys of each set are saved to disk to use the same split across the project.
-- Uses train and validate to FineTune layer 4 of the ResNet-18 CNN.
+- Uses train and validate to Fine-tune layer 4 of the ResNet-18 CNN.
 - Saves updated weights to disk
 ---
 
@@ -230,17 +230,17 @@ If the configuration date does not match the current run date, a warning is rais
 
 - Loads all Sentinel2 `.npz` files available in disk (assumes that s01, s02 and s03.1 processes are complete).
 - ResNet18 is used as Feature Extractor - each `.npz` file is loaded, and the image data is processed with the `ResNetFeatExtractor` class.
-- Using class `ResNetFeatExtractor`, the user can selects to perform feature extraction using default (no need to pass parameter value) of pre trained (user passes location of pre trained weights on disk as input argument) weights. 
+- Using class `ResNetFeatExtractor`, the user can select to perform feature extraction using default (no need to pass parameter value) of pre-trained (user passes location of pre-trained weights on disk as input argument) weights. 
 - Transformation and composite keys are validated and checked with a set of validation functions.
 - Final data set is cleaned and merged with the sampled data by `composite_key` (not to be confused with `composite_key_y` which is the composite key of the expected/predicted value - composite key of these observations is kept for traceability).
-- Complete ML (machine learning) dataset is saved to disk so next process can simply read this file rather than repeat the processing steps.
+- Complete ML (machine learning) dataset is saved to disk, so next process can simply read this file rather than repeat the processing steps.
 ---
 
 #### `s01MachineLearningModel.ipynb`
 
 - Last module to run (assumes that s01, s02, s03.1, s03.2 processes are complete)
 - Loads ML Inputs generated by previous step
-- Runs descriptive statistics analysis, machine learning traning, fine tuning and testing and produces the outputs for the report
+- Runs descriptive statistics analysis, machine learning training, fine-tuning and testing and produces the outputs for the report
 - Further details of the module can be found on the notebook
 
 
@@ -261,18 +261,34 @@ MScProjectWildFirePredict/
 |   |- VIIRS
 ```
 **Raw inputs:**
-- FWI = `.grib` files for each year.
-- UKGrid = `.shp` files to split UK into grids.
-- VIIRS = `.csv` files fire labels for each year.
+- `FWI` = `.grib` files for each year.
+- `UKGrid` = `.shp` files to split UK into grids.
+- `VIIRS` = `.csv` files fire labels for each year.
 
-**PrebProcessed:**
-- Sentinel2 = `.npz` downloaded from sampled dataset.
-- SampledFireNoFire = `.csv` of sampled data, per year.
+**Preprocessed:**
+- `Sentinel2` = `.npz` downloaded from sampled dataset.
+- `SampledFireNoFire` = `.csv` of sampled data, per year.
 
 **ML Inputs:**
-- MLInputs = `.csv` files with sampled data containing all relevant data to train the model.
+- `MLInputs` = `.csv` files with sampled data containing all relevant data to train the model.
 
 **ML Models**
 - Contains both `.joblib` and `pt` files
 - `pt` are the fine-tuned weights from layer 4 of ResNet 18
-- `joblib` are the classifier models that are trained. These are saved to disk to allow rerunning of the project without the need to retrain the classifiers
+- `joblib` are the classifier models that are trained. These are saved to disk to allow rerunning of the project without the need to re-train the classifiers
+
+```
+MScProjectWildFirePredict/
+|- src_archive/
+
+```
+
+This folder contains scripts and files that were used either to test ideas and processes, or functions that were replaced as the project evolved
+
+
+### Summary
+The README file presented the user with the overall structure of the project. It also provides details of the key sections and areas that the user needs to execute the program.
+
+The sections not included in the README file should be self-explanatory, and the naming convention should indicate the reader exactly what is contained in the folders along with responsibility.
+
+For example the `outputs` folder contains all the objects needed for the report, such as plots, maps etc. 
