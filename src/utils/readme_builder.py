@@ -206,7 +206,7 @@ MScProjectWildFirePredict/
 {fu.build_dir_tree(Path("src_archive"), False)}
 ```
 
-This folder contains scripts and files that were used either to test ideas and processes, or funcitons that were replaced as the project evolved
+This folder contains scripts and files that were used either to test ideas and processes, or functions that were replaced as the project evolved
 
 
 ### Summary
