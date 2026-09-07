@@ -1,10 +1,9 @@
 
-# MScProjectWildFirePredict Architecture
-
+# MScProjectWildFirePredict
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-    - [Check if Python 3.11 is Installed](#check-if-python-311-is-installed)
+    - [Python 3.11](#python-311)
     - [Install Python 3.11](#install-python-311)
     - [Install Pipenv](#install-pipenv)
     - [Install Project Dependencies](#install-project-dependencies)
@@ -81,18 +80,18 @@ The project is divided into modules, which have specific responsibilities. An ov
 ```
 | MScProjectWildFirePredict/
 |   |- data
+|   |   |- FWI
+|   |   |   |- Archive
 |   |   |- MLInputs
-|   |   |   |- Archive
 |   |   |- MLModels
-|   |   |   |- Archive
 |   |   |- SampledFireNoFire
 |   |   |- Sentinel2
+|   |   |   |- Archive
 |   |   |- UKGrid
 |   |   |- VIIRS
 |   |- outputs
 |   |   |- logs
-|   |   |- plots
-|   |   |- tables
+|   |   |- maps
 |   |- src
 |   |   |- data_io
 |   |   |- ml_models
@@ -236,12 +235,13 @@ This module contains files and objects used to build the different components of
 ```
 MScProjectWildFirePredict/
 |- data/
+|   |- FWI
+|   |   |- Archive
 |   |- MLInputs
-|   |   |- Archive
 |   |- MLModels
-|   |   |- Archive
 |   |- SampledFireNoFire
 |   |- Sentinel2
+|   |   |- Archive
 |   |- UKGrid
 |   |- VIIRS
 ```
@@ -254,5 +254,5 @@ MScProjectWildFirePredict/
 - Sentinel2 = `.npz` downloaded from sampled dataset.
 - SampledFireNoFire = `.csv` of sampled data, per year.
 
-**ML Model Input:**
+**ML Model Inputs:**
 - MLInputs = `.csv` files with sampled data containing all relevant data to train the model.
