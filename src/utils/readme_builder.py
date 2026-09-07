@@ -199,4 +199,20 @@ MScProjectWildFirePredict/
 - Contains both `.joblib` and `pt` files
 - `pt` are the fine tuned weights from layer 4 of ResNet 18
 - `joblib` are the classifier models that are trained. These are saved to disk to allow reruning of the project without the need to re train the classifiers
+
+```
+MScProjectWildFirePredict/
+|- src_archive/
+{fu.build_dir_tree(Path("src_archive"), False)}
+```
+
+This folder contains scripts and files that were used either to test ideas and processes, or funcitons that were replaced as the project evolved
+
+
+### Summary
+The README file presented the user with the overall structure of the project. It also provides details of the key sections and areas that the user needs to execute the program.
+
+The sections not included in the README file should be self explanatory and the naming convention should indicate the reader exactly what is contained in the folders along wiht responsibility.
+
+For example the `outputs` folder contains all of the objects needed for the report, such as plots, maps etc. 
 """
