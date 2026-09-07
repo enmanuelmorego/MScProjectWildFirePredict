@@ -31,3 +31,4 @@ outputs/
 # Allow for ML data directory to be visible
 !data/
 !data/MLInputs
+!src_archive/
