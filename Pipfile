@@ -3,6 +3,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cu130"
+verify_ssl = true
+name = "pytorch"
+
 [packages]
 requests = "*"
 google = "*"
@@ -23,7 +28,7 @@ scikit-image = "*"
 seaborn = "*"
 mscprojectwildfirepredict = {file = ".", editable = true}
 matplotlib = "*"
-torch = "*"
+torch = {version = "2.13.0", index = "pytorch"}
 torchvision = "*"
 docx = "*"
 python-docx = "*"
