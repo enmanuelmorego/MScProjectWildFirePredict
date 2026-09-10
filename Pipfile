@@ -15,15 +15,6 @@ folium = "*"
 leafmap = "*"
 ee = "*"
 geemap = "*"
-# pygrib = "*"
-# Required only for:
-# - transform_grib_to_csv()
-# - Initial FWI preprocessing pipeline
-# Not required for:
-# - Sentinel processing
-# - ResNet18 feature extraction
-# - Model training/evaluation
-# Fails to install on Windows.
 xarray = "*"
 cdsapi = "*"
 opencv-python = "*"
@@ -36,7 +27,6 @@ torch = "*"
 torchvision = "*"
 docx = "*"
 python-docx = "*"
-contextily = "*"
 geodatasets = "*"
 
 [dev-packages]

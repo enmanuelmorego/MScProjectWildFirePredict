@@ -1,1 +1,4 @@
 MScProjectWildFirePredict
+ResNet
+VIIRS
+Pipenv
