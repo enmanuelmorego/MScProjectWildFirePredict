@@ -42,8 +42,9 @@ def run_tabular():
     dict_samples  = sp.create_samples_dict(df_composite_key)
     #samples_stats = sr.create_sampling_statistics(dict_samples)
     # TODO Create function to write samples_stats to json file
-    # TODO Write function that generates histogram of distances from sampled
-    # TODO Write wrapper function that calls create_sampling_statistics + json writer + histogram create + histogram saver
+    # TODO Write wrapper function that calls create_sampling_statistics + json writer
+    # Note create_sampling_statistics is ready, the only missing function is the json (or other format) writer for the output
+    # future work can use the existing function and add the writer to generate an explicit report of the sampling outcome
     
     df_sampled_y = sf.create_y_target_sampled_df(dict_samples, df_composite_key)
     df_sampled   = sf.create_sampled_df(df_composite_key, df_sampled_y)
