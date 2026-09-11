@@ -18,11 +18,9 @@ outputs/*RUNNING*
 *.docx
 *.zip
 *.npz
-*.pt
 *.bkp
 .idea/
 *.egg-info/
-*.joblib
 *.grib
 *.png
 
